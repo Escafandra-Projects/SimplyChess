@@ -1,19 +1,19 @@
-#include "Button.h"
+#include "ui/Button.h"
 
-// Constructor & Destructor
-Button::Button(float x, float y, float width, float height, 
+// Constructor y destructor
+Button::Button(float x, float y, float width, float height,
 	sf::Font* font, std::string text, unsigned characterSize,
 	sf::Color textIdleColor, sf::Color textHoverColor, sf::Color textActiveColor,
 	sf::Texture& textureSheet) {
 
 	// Al crearse, el estado actual es idle
-	this->buttonStates = BTN_IDL;
-	  
-	// Establece tama駉, posici髇 y color
+	this->buttonStates = ButtonStates::BTN_IDL;
+
+	// Establece tama帽o, posici贸n y color
 	this->shape.setPosition(sf::Vector2f(x, y));
 	this->height = height;
 	this->width = width;
-	
+
 
 	// Establece fuente, texto y propiedades
 	this->font = font;
@@ -23,28 +23,28 @@ Button::Button(float x, float y, float width, float height,
 	this->text.setCharacterSize(characterSize);
 
 
-	// Establece todos los colores seg鷑 el estado
+	// Establece todos los colores seg煤n el estado
 	this->textIdleColor = textIdleColor;
 	this->textHoverColor = textHoverColor;
 	this->textActiveColor = textActiveColor;
 
-	
-	
+
+
 	// Establecemos textura
 	this->shape.setTexture(textureSheet);
 	this->shape.setTextureRect(sf::IntRect(0, 0, width, height));
 
 	this->shape.scale(1.f, 0.5f);
 
-	// Centra texto  
+	// Centra texto
 	this->text.setPosition(this->shape.getPosition().x + (this->shape.getGlobalBounds().width / 2.0f) - this->text.getGlobalBounds().width / 2.0f,
 		this->shape.getPosition().y + (this->shape.getGlobalBounds().height / 2.0f) - this->text.getGlobalBounds().height / 1.5f );
 
-	
+
 }
 
 Button::~Button() {
-	
+
 }
 
 void Button::centerText() {
@@ -53,21 +53,10 @@ void Button::centerText() {
 
 }
 
-// Acci髇 del bot髇
-const bool Button::isPressed() const
+// Acci贸n del bot贸n
+bool Button::isPressed() const
 {
-	if (this->buttonStates == BTN_ACTIVE) return true;
-	else return false;
-}
-
-void Button::scaleX(float x) {
-	this->shape.scale(x, 1.f);
-	this->centerText();
-}
-
-void Button::scaleY(float y) {
-	this->shape.scale(1.f, y);
-	this->centerText();
+	return this->buttonStates == ButtonStates::BTN_ACTIVE;
 }
 
 void Button::scale(float x, float y) {
@@ -77,35 +66,35 @@ void Button::scale(float x, float y) {
 
 // Funciones
 void Button::update(const sf::Vector2i& mousePos) {
-	
+
 	// Idle
-	this->buttonStates = BTN_IDL;
+	this->buttonStates = ButtonStates::BTN_IDL;
 
 	// Hover
 	if (this->shape.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePos))) {
-		this->buttonStates = BTN_HOVER;
+		this->buttonStates = ButtonStates::BTN_HOVER;
 
 		// Active
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-			this->buttonStates = BTN_ACTIVE;
+			this->buttonStates = ButtonStates::BTN_ACTIVE;
 		}
 	}
 
-	// Gestiona colores del bot髇 en funci髇 del estado
+	// Gestiona colores del bot贸n en funci贸n del estado
 	switch (this->buttonStates)
 	{
-	case BTN_IDL:
+	case ButtonStates::BTN_IDL:
 		this->shape.setTextureRect(sf::IntRect(0, 0, width, height));
 		this->text.setFillColor(this->textIdleColor);
 		break;
-	case BTN_HOVER:
-		
+	case ButtonStates::BTN_HOVER:
+
 		this->text.setFillColor(this->textHoverColor);
 		this->shape.setTextureRect(sf::IntRect(width, 0 , width, height));
 		break;
 
-	case BTN_ACTIVE:
-		
+	case ButtonStates::BTN_ACTIVE:
+
 		this->text.setFillColor(this->textActiveColor);
 		this->shape.setTextureRect(sf::IntRect(width*2, 0 , width, height));
 		break;
@@ -121,4 +110,3 @@ void Button::render(sf::RenderTarget& target) {
 	target.draw(this->shape);
 	target.draw(this->text);
 }
-

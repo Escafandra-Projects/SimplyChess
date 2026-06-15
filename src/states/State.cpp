@@ -1,6 +1,6 @@
-#include "State.h"
+#include "states/State.h"
 
-// Constructor & Destructor
+// Constructor y destructor
 State::State(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states) {
 	this->window = window;
 	this->supportedKeys = supportedKeys;
@@ -15,12 +15,12 @@ State::~State() {
 
 }
 
-// Getters
-const bool& State::getQuit() const {
+// Métodos de consulta
+bool State::getQuit() const {
 	return this->quit;
 }
 
-const bool State::getKeytime() {
+bool State::getKeytime() {
 	if (this->keytime >= this->keytimeMax) {
 		this->keytime = 0.0f;
 		return true;
@@ -28,7 +28,7 @@ const bool State::getKeytime() {
 	return false;
 }
 
-// Funciones p�blicas
+// Funciones públicas
 void State::endState() {
 	this->quit = true;
 }
@@ -48,7 +48,7 @@ void State::updateMousePositions() {
 	this->mousePosView = this->window->mapPixelToCoords(sf::Mouse::getPosition(*this->window));
 }
 
-void State::updateKeytime(const float& dt) {
+void State::updateKeytime(float dt) {
 	if (this->keytime < this->keytimeMax) {
 		this->keytime += 100.0f * dt;
 	}

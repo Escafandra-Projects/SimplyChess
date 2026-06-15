@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.14)
 project(SimplyChess)
 
-set(CMAKE_CXX_STANDARD 17)
+# Estándar C++20
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
+# SFML 2.6.1
 include(FetchContent)
 FetchContent_Declare(
   SFML
@@ -12,25 +15,26 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SFML)
 
-# Gather source files
-file(GLOB SOURCES "src/*.cpp")
+# Añadir source files de src/ y sus subcarpetas (core, states, ui, chess).
+# CONFIGURE_DEPENDS re-detecta nuevos .cpp al reconfigurar.
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 
-# Include headers
+# Incluir headers
 include_directories(include)
 
-# Add compiler warnings
+# Añadir warnings del compilador
 add_compile_options(-Wall -Wextra -Wpedantic)
 
-# Create executable
+# Crear ejecutable
 add_executable(SimplyChess ${SOURCES})
 
-# Link SFML 2.6
+# Enlazar SFML 2.6.1
 target_link_libraries(SimplyChess PRIVATE sfml-graphics sfml-window sfml-system)
 
 # Copiar recursos al directorio de construcción
 add_custom_command(TARGET SimplyChess POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/Resources ${CMAKE_BINARY_DIR}/Resources
+    ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/resources
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/Config ${CMAKE_BINARY_DIR}/Config
+    ${CMAKE_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/config
 )

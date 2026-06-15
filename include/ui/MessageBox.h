@@ -1,11 +1,12 @@
 #pragma once
-   
+
 #include <SFML/Graphics.hpp>
 
-#include "Button.h"
+#include "ui/Button.h"
 #include <memory>
 
-class MessageBox {  
+/// Cuadro de mensaje con texto y un botón (p. ej. el aviso de fin de partida).
+class MessageBox {
 
 private:
     sf::Font& font;
@@ -13,18 +14,21 @@ private:
     sf::RectangleShape container;
     std::unique_ptr<Button> button;
 
+    /// Centra el texto dentro del cuadro.
     void centerText();
 
 public:
     MessageBox(sf::Font& font, std::string message, std::string buttonText, sf::Texture& buttonTexture);
     virtual ~MessageBox();
 
+    /// Devuelve true si se ha pulsado el botón.
     bool isButtonPressed();
 
+    /// Cambia el texto del mensaje y lo recentra.
     void setText(std::string text);
 
+    /// Actualiza el botón según la posición del ratón.
     void update(sf::Vector2i& mousePosWindow);
+    /// Dibuja el cuadro, el texto y el botón.
     void render(sf::RenderTarget& target);
 };
-
-      

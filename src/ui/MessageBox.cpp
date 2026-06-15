@@ -1,4 +1,4 @@
-#include "MessageBox.h"
+#include "ui/MessageBox.h"
 
 void MessageBox::centerText() {
 	this->messageText.setPosition(this->container.getPosition().x + (this->container.getGlobalBounds().width / 2.0f) - this->container.getGlobalBounds().width / 2.5f,
@@ -19,7 +19,7 @@ MessageBox::MessageBox(sf::Font& font, std::string message, std::string buttonTe
 	this->messageText.setPosition(480.f, 260.f);
 	this->messageText.setString(message);
 
-	// Botón
+	// BotÃ³n
 	this->button = std::make_unique<Button>(470.f, 410.f, 100.f, 61.0f,
 		&this->font, buttonText, 35,
 		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
