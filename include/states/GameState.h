@@ -23,6 +23,9 @@ private:
 	std::string player1, player2;
 	int points1, points2;
 	bool turn;
+	// Evita que el clic que da el mate cierre el cuadro de fin de partida:
+	// solo se acepta el botón Exit tras soltar el ratón al menos una vez.
+	bool gameOverReady;
 
 	// Inicialización
 	/// Inicializa las variables y el mensaje de fin de partida.

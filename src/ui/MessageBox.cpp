@@ -6,21 +6,21 @@ void MessageBox::centerText() {
 }
   
 MessageBox::MessageBox(sf::Font& font, std::string message, std::string buttonText, sf::Texture& buttonTexture) : font(font) {
-	// Fondo   
+	// Fondo (en el panel derecho, fuera del tablero de 800x800)
 	this->container.setSize(sf::Vector2f(300.f, 300.f));
-	this->container.setPosition(420.f, 200.f);
+	this->container.setPosition(810.f, 460.f);
 	this->container.setFillColor(sf::Color(255, 255, 255, 150));
 	this->container.setOutlineThickness(2.f);
 
 	// Titulo
 	this->messageText.setFont(font);
-	this->messageText.setCharacterSize(50);   
+	this->messageText.setCharacterSize(50);
 	this->messageText.setFillColor(sf::Color(75, 53, 47, 255));
-	this->messageText.setPosition(480.f, 260.f);
+	this->messageText.setPosition(840.f, 490.f);
 	this->messageText.setString(message);
 
 	// Botón
-	this->button = std::make_unique<Button>(470.f, 410.f, 100.f, 61.0f,
+	this->button = std::make_unique<Button>(860.f, 650.f, 100.f, 61.0f,
 		&this->font, buttonText, 35,
 		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
 		buttonTexture); 

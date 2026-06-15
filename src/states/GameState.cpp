@@ -11,6 +11,7 @@ void GameState::initVariables() {
 	this->player2 = "Player 2";
 	this->points1 = 0;
 	this->points2 = 0;
+	this->gameOverReady = false;
 	this->background.setPosition(sf::Vector2f(820.f, 0.f));
 
 	// Mensaje fin del juego
@@ -120,9 +121,16 @@ void GameState::updateInput(float /*dt*/) {
 		this->updateText();
 	}
 
-	// Boton del mensaje fin del juego
-	if (this->gameOverBox->isButtonPressed()) {
-		this->endState();
+	// Botón del mensaje de fin de partida.
+	// Exigimos haber soltado el ratón al menos una vez tras el fin de la partida,
+	// para que el mismo clic que da el mate no cierre el cuadro al instante.
+	if (this->board->getEndGame()) {
+		if (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+			this->gameOverReady = true;
+		}
+		if (this->gameOverReady && this->gameOverBox->isButtonPressed()) {
+			this->endState();
+		}
 	}
 }
 
