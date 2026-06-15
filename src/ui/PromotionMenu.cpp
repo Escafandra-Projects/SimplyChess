@@ -1,9 +1,9 @@
-#include "PromotionMenu.h"
-#include "Piece.h"
+#include "ui/PromotionMenu.h"
+#include "chess/Piece.h"
 
 void PromotionMenu::setPosition(float x, float y) {
     this->selector.setPosition(x, y);
-      
+
 }
 
 PromotionMenu::PromotionMenu(sf::Texture& texture) : texture(texture) {
@@ -13,29 +13,24 @@ PromotionMenu::PromotionMenu(sf::Texture& texture) : texture(texture) {
 
 
 
-const bool PromotionMenu::isPressed(sf::Vector2i& mousePos) const {
+bool PromotionMenu::isPressed(sf::Vector2i& mousePos) const {
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         if (this->selector.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePos))) {
             return true;
         }
     }
-    
+
     return false;
 }
 
-unsigned short int PromotionMenu::getSelectedPiece(sf::Vector2i mousePos) {
+PieceType PromotionMenu::getSelectedPiece(sf::Vector2i mousePos) {
     mousePos.x -= this->selector.getPosition().x;
     mousePos.y -= this->selector.getPosition().y;
     if (mousePos.y <= 50) return PieceType::REINA;
-    else if (mousePos.y > 50 && mousePos.y <= 100) return PieceType::CABALLO;
-    else if (mousePos.y > 100 && mousePos.y <= 150 ) return PieceType::ALFIL;
-    else if (mousePos.y > 150 && mousePos.y <= 200) return PieceType::TORRE;
-}
-
-sf::Texture& PromotionMenu::getTexture()
-{
-    return this->texture;
+    else if (mousePos.y <= 100) return PieceType::CABALLO;
+    else if (mousePos.y <= 150) return PieceType::ALFIL;
+    return PieceType::TORRE;
 }
 
 bool PromotionMenu::isShown()
@@ -55,14 +50,8 @@ void PromotionMenu::setShown(bool shown, bool color)
 
 }
 
-void PromotionMenu::update()
-{
-   
-}
-
 void PromotionMenu::render(sf::RenderTarget& target)
 {
     if(this->shown) target.draw(this->selector);
-    
-}
 
+}

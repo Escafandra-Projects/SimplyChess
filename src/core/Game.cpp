@@ -1,10 +1,10 @@
-#include "Game.h"
-#include "GameState.h"
-#include "MainMenuState.h"
+#include "core/Game.h"
+#include "states/GameState.h"
+#include "states/MainMenuState.h"
 
 
 
-// Inicializaci髇
+// Inicializaci贸n
 void Game::initVariables() {
 	     
 	this->fullscreen = false;
@@ -12,8 +12,8 @@ void Game::initVariables() {
 }
 
 void Game::initWindow() {
-	// Crea una ventana SFML seg鷑 la configuraci髇
-	std::ifstream ifs("Config/window.ini");
+	// Crea una ventana SFML seg煤n la configuraci贸n
+	std::ifstream ifs("config/window.ini");
 	this->videoModes = sf::VideoMode::getFullscreenModes();
 
 	// Ajustes por defecto
@@ -32,11 +32,11 @@ void Game::initWindow() {
 		ifs >> antialiasingLevel;
 	}
 	else {
-		std::cout << "Error al abrir el archivo window.ini, configuraci髇 establecida por defecto" << std::endl;
+		std::cout << "Error al abrir el archivo window.ini, configuraci贸n establecida por defecto" << std::endl;
 	}
 	ifs.close();
 
-	// Una vez leida la configuraci髇 del archivo, la establecemos
+	// Una vez leida la configuraci贸n del archivo, la establecemos
 	this->fullscreen = fullscreen;
 	this->windowSettings.antialiasingLevel = antialiasingLevel;
 	if (this->fullscreen) {
@@ -48,11 +48,19 @@ void Game::initWindow() {
 	
 	this->window->setFramerateLimit(framerateLimit);
 	this->window->setVerticalSyncEnabled(verticalSyncEnabled);
+
+	// Centrar la ventana en el escritorio (en modo ventana)
+	if (!this->fullscreen) {
+		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+		this->window->setPosition(sf::Vector2i(
+			static_cast<int>(desktop.width - this->window->getSize().x) / 2,
+			static_cast<int>(desktop.height - this->window->getSize().y) / 2));
+	}
 }
 
 void Game::initKeys() {
 	// Obtiene las teclas soportadas supported_keys.ini
-	std::ifstream ifs("Config/supported_keys.ini");
+	std::ifstream ifs("config/supported_keys.ini");
 
 	if (ifs.is_open()) {
 		std::string key = "";
@@ -71,7 +79,7 @@ void Game::initStates() {
 	this->states.push(std::make_unique<MainMenuState>(this->window.get(), &this->supportedKeys, &this->states));
 }
 
-// Constructor & Destructor
+// Constructor y destructor
 Game::Game() {
 	this->initVariables();
 	this->initWindow();
@@ -118,7 +126,7 @@ void Game::update() {
 		}
 	}
 	else {
-		// Si la pila de estados esta vac韆, salimos de la aplicaci髇
+		// Si la pila de estados esta vac铆a, salimos de la aplicaci贸n
 		this->endApplication();
 		this->window->close();
 	}
@@ -145,5 +153,5 @@ void Game::run() {
 }
 
 void Game::endApplication() {
-	std::cout << "Cerrando aplicaci髇" << std::endl;
+	std::cout << "Cerrando aplicaci贸n" << std::endl;
 }

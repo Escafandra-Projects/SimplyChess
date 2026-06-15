@@ -1,8 +1,10 @@
-#include "MainMenuState.h"
-#include "GameState.h"
+#include "states/MainMenuState.h"
+#include "states/GameState.h"
+
+#include <stdexcept>
 
 
-// Inicialización
+// InicializaciÃ³n
 void MainMenuState::initVariables()
 {
 	this->titleText.setFont(this->font);
@@ -14,22 +16,22 @@ void MainMenuState::initVariables()
 
 void MainMenuState::initTextures()
 {
-	// Fondo   
-	if (!this->textures["BACKGROUND"].loadFromFile("Resources/Images/Menu/background.png")) {
-		throw "ERROR::MAIN_MENU_STATE::FAILED TO LOAD BACKGROUND";
+	// Fondo
+	if (!this->textures["BACKGROUND"].loadFromFile("resources/images/menu/background.png")) {
+		throw std::runtime_error("ERROR::MAIN_MENU_STATE::FAILED TO LOAD BACKGROUND");
 	}
 	this->background.setTexture(this->textures["BACKGROUND"]);
 	this->background.scale(4.49f, 4.1f);
-	
+
 	// Botones
-	if (!this->textures["BUTTONS"].loadFromFile("Resources/Images/Interface/buttons.png")) {
-		throw "ERROR::MAIN_MENU_STATE::FAILED TO LOAD BACKGROUND";
+	if (!this->textures["BUTTONS"].loadFromFile("resources/images/interface/buttons.png")) {
+		throw std::runtime_error("ERROR::MAIN_MENU_STATE::FAILED TO LOAD BUTTONS");
 	}
 }
 
 void MainMenuState::initKeybinds() {
 	// Obtiene keybinds de gamestate_keybinds.ini
-	std::ifstream ifs("Config/mainmenustate_keybinds.ini");
+	std::ifstream ifs("config/mainmenustate_keybinds.ini");
 
 	if (ifs.is_open()) {
 		std::string key = "";
@@ -44,8 +46,8 @@ void MainMenuState::initKeybinds() {
 }
 
 void MainMenuState::initFonts() {
-	if (!this->font.loadFromFile("Resources/Fonts/Factory LJDS.ttf")) {
-		throw("ERROR::MAIN_MENU_STATE::COULD NOT LOAD FONT");
+	if (!this->font.loadFromFile("resources/fonts/Factory LJDS.ttf")) {
+		throw std::runtime_error("ERROR::MAIN_MENU_STATE::COULD NOT LOAD FONT");
 	}
 }
 
@@ -74,7 +76,7 @@ void MainMenuState::initButtons() {
 		
 }
 
-// Constructor & Destructor
+// Constructor y destructor
 MainMenuState::MainMenuState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states) : State(window, supportedKeys, states)
 {
 	this->initVariables();
@@ -88,15 +90,15 @@ MainMenuState::~MainMenuState() {
 }
 
 // Funciones
-void MainMenuState::updateInput(const float& dt) {
-	
+void MainMenuState::updateInput(float /*dt*/) {
+
 }
 
 void MainMenuState::updateButtons() {
-	
+
 	// Actualiza todos los botones y su funcionalidad
-	for (auto& it : this->buttons) {
-		it.second->update(this->mousePosWindow);
+	for (auto& [name, button] : this->buttons) {
+		button->update(this->mousePosWindow);
 	}
 
 	// Nuevo juego
@@ -115,15 +117,15 @@ void MainMenuState::updateButtons() {
 	}
 }
 
-void MainMenuState::update(const float& dt) {
+void MainMenuState::update(float dt) {
 	this->updateInput(dt);
 	this->updateMousePositions();
-	this->updateButtons(); 
+	this->updateButtons();
 }
 
 void MainMenuState::renderButtons(sf::RenderTarget& target) {
-	for (auto& it : this->buttons) {
-		it.second->render(target);
+	for (auto& [name, button] : this->buttons) {
+		button->render(target);
 	}
 }
 
@@ -137,16 +139,4 @@ void MainMenuState::render(sf::RenderTarget* target) {
 	target->draw(this->titleText);
 
 	this->renderButtons(*target);
-	
-
-	//DEBUG: Ver posición del boton
-	/*sf::Text mouseText;
-	mouseText.setPosition(this->mousePosView);
-	mouseText.setFont(this->font);
-	mouseText.setCharacterSize(22);
-	std::stringstream ss;
-	ss << this->mousePosView.x << " " << this->mousePosView.y;
-	mouseText.setString(ss.str());
-
-	target->draw(mouseText);*/
 }

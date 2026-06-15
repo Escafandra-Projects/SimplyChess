@@ -1,4 +1,8 @@
-#include "Board.h"
+#include "chess/Board.h"
+
+#include <cstdlib>
+#include <iostream>
+#include <stdexcept>
 
 void Board::initVariables() {
 	// Variables
@@ -12,11 +16,11 @@ void Board::initVariables() {
 		this->peonPaso[i][1] = false;
 	}
 
-	// Selected cell
+	// Casilla seleccionada
 	this->selectedCell.setSize(sf::Vector2f(100.f, 100.f));
 	this->selectedCell.setFillColor(sf::Color(222, 235, 127, 100));
 
-	// Jaque cell
+	// Casilla de jaque
 	this->jaqueCell.setSize(sf::Vector2f(100.f, 100.f));
 	this->jaqueCell.setFillColor(sf::Color(255, 0, 0, 100));
 
@@ -50,7 +54,7 @@ void Board::initVariables() {
 
 	//Caballos
 	board[7][1] = "CB"; board[7][6] = "CB";
-	board[0][1] = "CN"; board[0][6] = "CN";   
+	board[0][1] = "CN"; board[0][6] = "CN";
 
 	//Alfiles
 	board[7][2] = "AB"; board[7][5] = "AB";
@@ -64,71 +68,70 @@ void Board::initVariables() {
 void Board::initTextures(std::map<std::string, sf::Texture>& textures) {
 
 	// Tablero
-	if (!textures["BOARD"].loadFromFile("Resources/Images/Tablero.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD BACKGROUND";
+	if (!textures["BOARD"].loadFromFile("resources/images/Tablero.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD BACKGROUND");
 	}
 	// Torre negra
-	if (!textures["TN"].loadFromFile("Resources/Images/Pieces/TorreN.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD TORRE NEGRA";
+	if (!textures["TN"].loadFromFile("resources/images/pieces/TorreN.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD TORRE NEGRA");
 	}
-	// Torre blanca    
-	if (!textures["TB"].loadFromFile("Resources/Images/Pieces/TorreB.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD TORRE BLANCA";
+	// Torre blanca
+	if (!textures["TB"].loadFromFile("resources/images/pieces/TorreB.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD TORRE BLANCA");
 	}
 	// Caballo negro
-	if (!textures["CN"].loadFromFile("Resources/Images/Pieces/CaballoN.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD CABALLO NEGRO";
+	if (!textures["CN"].loadFromFile("resources/images/pieces/CaballoN.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD CABALLO NEGRO");
 	}
 	// Caballo blanco
-	if (!textures["CB"].loadFromFile("Resources/Images/Pieces/CaballoB.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD CABALLO BLANCO";
+	if (!textures["CB"].loadFromFile("resources/images/pieces/CaballoB.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD CABALLO BLANCO");
 	}
 
 
 	// Alfil negro
-	if (!textures["AN"].loadFromFile("Resources/Images/Pieces/AlfilN.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD ALFIL NEGRO";
+	if (!textures["AN"].loadFromFile("resources/images/pieces/AlfilN.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD ALFIL NEGRO");
 	}
 
 	// Alfil blanco
-	if (!textures["AB"].loadFromFile("Resources/Images/Pieces/AlfilB.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD ALFIL BLANCO";
+	if (!textures["AB"].loadFromFile("resources/images/pieces/AlfilB.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD ALFIL BLANCO");
 	}
 
 	// Reina negra
-	if (!textures["QN"].loadFromFile("Resources/Images/Pieces/ReinaN.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD REINA NEGRA";
+	if (!textures["QN"].loadFromFile("resources/images/pieces/ReinaN.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD REINA NEGRA");
 	}
 
 	// Reina blanca
-	if (!textures["QB"].loadFromFile("Resources/Images/Pieces/ReinaB.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD REINA BLANCA";
+	if (!textures["QB"].loadFromFile("resources/images/pieces/ReinaB.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD REINA BLANCA");
 	}
 
 	// Rey negro
-	if (!textures["KN"].loadFromFile("Resources/Images/Pieces/ReyN.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD REY NEGRO";
+	if (!textures["KN"].loadFromFile("resources/images/pieces/ReyN.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD REY NEGRO");
 	}
 
 	// Rey blanco
-	if (!textures["KB"].loadFromFile("Resources/Images/Pieces/ReyB.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD REY BLANCO";
+	if (!textures["KB"].loadFromFile("resources/images/pieces/ReyB.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD REY BLANCO");
 	}
-	std::cout << "todo nice" << std::endl;
 
 	// Peon negro
-	if (!textures["PN"].loadFromFile("Resources/Images/Pieces/PeonN.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD PEON NEGRO";
+	if (!textures["PN"].loadFromFile("resources/images/pieces/PeonN.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD PEON NEGRO");
 	}
 
-	// Peon blanco    
-	if (!textures["PB"].loadFromFile("Resources/Images/Pieces/PeonB.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD PEON BLANCO";
+	// Peon blanco
+	if (!textures["PB"].loadFromFile("resources/images/pieces/PeonB.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD PEON BLANCO");
 	}
 
 	// Coronación
-	if (!textures["PROMOTION"].loadFromFile("Resources/Images/Interface/promotionMenu.png")) {
-		throw "ERROR::GAME_STATE::FAILED TO LOAD PROMOTIOM";
+	if (!textures["PROMOTION"].loadFromFile("resources/images/interface/promotionMenu.png")) {
+		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD PROMOTIOM");
 	}
 
 	// Menu de promocion
@@ -139,7 +142,7 @@ void Board::initPieces(std::map<std::string, sf::Texture>& textures) {
 
 	// Torre negra izq
 	this->pieces[0][0] = std::make_unique<Piece>(0, 0, textures["TN"], PieceType::TORRE, 0);
-	// Torre negra der	
+	// Torre negra der
 	this->pieces[1][0] = std::make_unique<Piece>(0, 7, textures["TN"], PieceType::TORRE, 0);
 	// Torre blanca izq
 	this->pieces[0][1] = std::make_unique<Piece>(7, 0, textures["TB"], PieceType::TORRE, 1);
@@ -178,39 +181,30 @@ void Board::initPieces(std::map<std::string, sf::Texture>& textures) {
 	//rey blanco
 	this->pieces[7][1] = std::make_unique<Piece>(7, 4, textures["KB"], PieceType::REY, 1);
 
-	//peones    
+	//peones
 	for (int i=0; i<8; i++) {
 		this->pieces[i+8][0] = std::make_unique<Piece>(1, i, textures["PN"], PieceType::PEON, 0);
-		this->pieces[i+8][1] = std::make_unique<Piece>(6, i, textures["PB"], PieceType::PEON, 1);  
+		this->pieces[i+8][1] = std::make_unique<Piece>(6, i, textures["PB"], PieceType::PEON, 1);
 	}
 	this->background.setTexture(textures["BOARD"]);
 
 }
 void Board::startMove(sf::Vector2i mousePos, bool& turn) {
 	sf::Vector2i pieceStartGridPos;
-	pieceStartGridPos.y = mousePos.x / 100;
-	pieceStartGridPos.x = mousePos.y / 100;
+	pieceStartGridPos.y = mousePos.x / CELL_SIZE;
+	pieceStartGridPos.x = mousePos.y / CELL_SIZE;
 
 
 
-	// Obtenemos el objeto de la pieza a mover. Returna nullprt si no hay pieza
+	// Obtenemos el objeto de la pieza a mover. Devuelve nullptr si no hay pieza
 	this->movingPiece = this->getPiece(pieceStartGridPos.x, pieceStartGridPos.y);
 
 
 	if (movingPiece) {
-		this->selectedCell.setPosition(pieceStartGridPos.y*100, pieceStartGridPos.x*100);
+		this->selectedCell.setPosition(pieceStartGridPos.y * CELL_SIZE, pieceStartGridPos.x * CELL_SIZE);
 		// Permitimos selección solo si es el turno adecuado
 		if (turn == movingPiece->getColor()) {
-			std::cout << "Pieza seleccionada" << "\n";
 			this->isMoving = true;
-		}
-	}
-}
-void Board::copyBoard(string board[8][8], string newBoard[8][8]) {
-
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 8; j++) {
-			newBoard[i][j] = board[i][j];
 		}
 	}
 }
@@ -218,8 +212,8 @@ void Board::copyBoard(string board[8][8], string newBoard[8][8]) {
 void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points2) {
 
 	sf::Vector2i pieceDesGridPos;
-	pieceDesGridPos.y = mousePos.x / 100;
-	pieceDesGridPos.x = mousePos.y / 100;
+	pieceDesGridPos.y = mousePos.x / CELL_SIZE;
+	pieceDesGridPos.x = mousePos.y / CELL_SIZE;
 	sf::Vector2i pieceStartGridPos;
 	pieceStartGridPos.y = movingPiece->getGridPosition().y;
 	pieceStartGridPos.x = movingPiece->getGridPosition().x;
@@ -227,12 +221,10 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	this->menacedPiece = getPiece(pieceDesGridPos.x, pieceDesGridPos.y);
 
 	// ========== FASE 1: Validar geometria en una COPIA del tablero ==========
-	// checkMoveKing tiene side effects (mueve torre en el string del board para enroques)
-	// Al usar checkMove(board), esos side effects solo afectan a testBoard, no a this->board
-	string testBoard[8][8];
-	bool testCastling[5];
-	copyBoard(this->board, testBoard);
-	for (int i = 0; i < 5; i++) testCastling[i] = this->castling[i];
+	// checkMoveKing tiene efectos secundarios (mueve torre en el string del board para enroques)
+	// Al usar checkMove(board), esos efectos secundarios solo afectan a testBoard, no a this->board
+	BoardGrid testBoard = this->board;
+	CastlingState testCastling = this->castling;
 
 	if (!checkMove(turn, pieceStartGridPos, pieceDesGridPos, this->movingPiece, this->menacedPiece, testCastling, testBoard)) {
 		this->isMoving = false;
@@ -240,19 +232,18 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	}
 
 	// ========== FASE 2: Validar restricciones de jaque ==========
-	bool isCastling = (this->movingPiece->getPoints() == 0 && abs(pieceStartGridPos.y - pieceDesGridPos.y) == 2);
+	bool isCastling = (this->movingPiece->getType() == PieceType::REY && std::abs(pieceStartGridPos.y - pieceDesGridPos.y) == 2);
 
 	if (isCastling) {
 		// Validar enroque usando tablero ORIGINAL (this->board NO ha sido modificado)
 		if (!isCastlingLegal(turn, pieceStartGridPos, pieceDesGridPos, this->board)) {
 			this->isMoving = false;
-			std::cout << "Enroque ilegal: rey en jaque o pasa por casilla amenazada\n";
 			return;
 		}
 	}
 
 	// Simular el movimiento de la pieza en testBoard
-	// (testBoard ya contiene los side effects de checkMoveKing para enroques: torre movida)
+	// (testBoard ya contiene los efectos secundarios de checkMoveKing para enroques: torre movida)
 	testBoard[pieceDesGridPos.x][pieceDesGridPos.y] = testBoard[pieceStartGridPos.x][pieceStartGridPos.y];
 	if ((pieceStartGridPos.x + pieceStartGridPos.y) % 2 != 0)
 		testBoard[pieceStartGridPos.x][pieceStartGridPos.y] = "-";
@@ -262,26 +253,25 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	// Verificar que el rey no queda en jaque tras el movimiento
 	if (isInCheck(turn, testBoard)) {
 		this->isMoving = false;
-		std::cout << "Movimiento ilegal: deja al rey en jaque\n";
 		return;
 	}
 
 	// ========== FASE 3: Todo validado - aplicar al tablero real ==========
-	copyBoard(testBoard, this->board);
-	for (int i = 0; i < 5; i++) this->castling[i] = testCastling[i];
+	this->board = testBoard;
+	this->castling = testCastling;
 
 	// Peon al paso
-	if (this->peonPaso[pieceDesGridPos.y][!turn] && pieceStartGridPos.y != pieceDesGridPos.y && this->movingPiece->getPoints() == 1) {
+	if (this->peonPaso[pieceDesGridPos.y][!turn] && pieceStartGridPos.y != pieceDesGridPos.y && this->movingPiece->getType() == PieceType::PEON) {
 		this->peonPasoMovement(turn, pieceStartGridPos, pieceDesGridPos);
 	}
-	for (int i = 0; i < 8; i++) { 
+	for (int i = 0; i < 8; i++) {
 		this->peonPaso[i][!turn] = false;
 	}
 
 	// Movemos visualmente
 	this->movingPiece->move(pieceDesGridPos.x, pieceDesGridPos.y);
 
-	// Promotion
+	// Coronación
 	this->promotion(turn, pieceDesGridPos, false);
 
 	// Movimiento de la torre en caso de enroques
@@ -301,8 +291,8 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 		this->pieces[0][0]->move(0, 3);
 		castling[3] = true;
 	}
-		
-	//Comemos pieza 
+
+	//Comemos pieza
 	if (menacedPiece) {
 		this->capturePiece(menacedPiece, turn, points1, points2);
 	}
@@ -312,41 +302,35 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	// Cambiamos turno
 	turn = !turn;
 
-	// DEBUG
-	std::cout << "Movimiento realizado\n";
-	this->showBoard();
-
 	// Comprobamos jaque al oponente
 	this->jaque[0] = false;
 	this->jaque[1] = false;
 
 	if (isInCheck(turn, this->board)) {
-		std::cout << "JAQUE!\n";
 		this->jaque[turn] = true;
 		Piece* king = this->pieces[7][turn].get();
 		this->jaqueCell.setPosition(king->getPosition().x, king->getPosition().y);
 
 		if (isCheckmate(turn)) {
-			std::cout << "JAQUE MATE!\n";
 			this->endGame = true;
 		}
 	}
 }
-   
+
 void Board::capturePiece(Piece* menacedPiece, bool turn, int& points1, int& points2) {
 	menacedPiece->setActive(false);
 	menacedPiece->move(-100, -100);
-	
-	if (menacedPiece->getPoints() == 0) {
+
+	// Si capturamos al rey, la partida termina
+	if (menacedPiece->getType() == PieceType::REY) {
 		this->endGame = true;
-		std::cout << "Fin del juego \n";
 	}
 
 	if (turn) {
 		points1 += menacedPiece->getPoints();
 	}
 	else {
-		points2 += menacedPiece->getPoints();  
+		points2 += menacedPiece->getPoints();
 	}
 }
 
@@ -401,35 +385,32 @@ void Board::promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting)
 		}
 	}
 	else {
-		if (this->movingPiece->getPoints() == 1) {
-			
+		if (this->movingPiece->getType() == PieceType::PEON) {
+
 				if (gridPos.x == 0) {
-					this->promotionMenu->setPosition(gridPos.y * 100, gridPos.x * 100 + 100);
+					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE, gridPos.x * CELL_SIZE + CELL_SIZE);
 					this->promotionMenu->setShown(true, turn);
 					this->promotionTurn = turn;
-					this->promotionGridPos = gridPos;   
+					this->promotionGridPos = gridPos;
 				}
 				if (gridPos.x == 7) {
-					this->promotionMenu->setPosition(gridPos.y * 100, gridPos.x * 100 - 200);
+					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE, gridPos.x * CELL_SIZE - 2 * CELL_SIZE);
 					this->promotionMenu->setShown(true, turn);
 					this->promotionTurn = turn;
 					this->promotionGridPos = gridPos;
 				}
 
-		
+
 		}
 	}
-	
+
 }
 
 void Board::peonPasoMovement(bool turn, sf::Vector2i startPos, sf::Vector2i desPos)
 {
-	
-	std::cout << "LLAMANDO FUNCION";
-	
 	//Quitamos el peon comido
 	if (turn) {
-	
+
 		if (this->board[startPos.x][startPos.y] == "-") {
 			board[3][desPos.y] = "+";
 		}
@@ -449,14 +430,14 @@ void Board::peonPasoMovement(bool turn, sf::Vector2i startPos, sf::Vector2i desP
 	}
 
 	this->peonPiece->setActive(false);
-	this->peonPiece->move(-100, -100);  
+	this->peonPiece->move(-100, -100);
 }
 
 
-Board::Board(std::map<std::string, sf::Texture>& textures) : 
-	promotionQB(textures["QB"]), promotionQN(textures["QN"]), 
-	promotionCB(textures["CB"]), promotionCN(textures["CN"]), 
-	promotionAB(textures["AB"]), promotionAN(textures["AN"]), 
+Board::Board(std::map<std::string, sf::Texture>& textures) :
+	promotionQB(textures["QB"]), promotionQN(textures["QN"]),
+	promotionCB(textures["CB"]), promotionCN(textures["CN"]),
+	promotionAB(textures["AB"]), promotionAN(textures["AN"]),
 	promotionTB(textures["TB"]), promotionTN(textures["TN"]) {
 
 	this->initTextures(textures);
@@ -468,9 +449,9 @@ Board::~Board() {
 }
 
 
-bool Board::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, bool castling[5]) {
+bool Board::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, CastlingState& castling) {
 
-	
+
 	if ((turn == movingPiece->getColor())&&(startPos!=desPos)) {
 		if (menacedPiece) {
 			if(menacedPiece->getColor() != movingPiece->getColor() && menacedPiece->isActive()) {
@@ -479,7 +460,6 @@ bool Board::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Pie
 				}
 				else {
 					this->isMoving = false;
-					std::cout << "Movimiento cancelado" << "\n";
 				}
 			}
 		}
@@ -489,15 +469,14 @@ bool Board::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Pie
 			}
 			else {
 				this->isMoving = false;
-				std::cout << "Movimiento cancelado" << "\n";
 			}
 		}
-	} 
+	}
 
 	return false;
 }
 
-bool Board::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, bool castling[5], string checkBoard[8][8]) {
+bool Board::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, CastlingState& castling, BoardGrid& checkBoard) {
 	if ((turn == movingPiece->getColor())&&(startPos!=desPos)) {
 		if (menacedPiece) {
 			if(menacedPiece->getColor() != movingPiece->getColor() && menacedPiece->isActive()) {
@@ -511,13 +490,13 @@ bool Board::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Pie
 				return true;
 			}
 		}
-	} 
+	}
 	return false;
 }
 
 
 void Board::movePiece(bool& turn, int& points1, int& points2) {
-	
+
 	// Seleccionar pieza
 	if (!this->isMoving) {
 
@@ -526,10 +505,10 @@ void Board::movePiece(bool& turn, int& points1, int& points2) {
 		if (mousePos.x < BOARD_SIZE && mousePos.y < BOARD_SIZE && mousePos.x > 0 && mousePos.y > 0) {
 			this->startMove(mousePos, turn);
 		}
-	}    
-	// Seleccionar casilla de destino   
+	}
+	// Seleccionar casilla de destino
 	else {
-		
+
 		// Comprobamos limites del tablero
 		if (mousePos.x < BOARD_SIZE && mousePos.y < BOARD_SIZE && mousePos.x > 0 && mousePos.y > 0) {
 			this->endMove(mousePos, turn, points1, points2);
@@ -538,7 +517,7 @@ void Board::movePiece(bool& turn, int& points1, int& points2) {
 }
 
 Piece* Board::getPiece(int x, int y) {
-	
+
 	for (int i = 0; i < 16; i++) {
 		for (int j = 0; j < 2; j++) {
 			if ((this->pieces[i][j]->getGridPosition().x == x && this->pieces[i][j]->getGridPosition().y == y))
@@ -549,13 +528,13 @@ Piece* Board::getPiece(int x, int y) {
 	}
 	return nullptr;
 }
-  
+
 bool Board::getEndGame()
 {
 	return this->endGame;
 }
 
-bool Board::isMenaced(bool turn, sf::Vector2i targetPos, Piece* targetPiece, string board[8][8], bool castling[5])
+bool Board::isMenaced(bool turn, sf::Vector2i targetPos, Piece* targetPiece, BoardGrid& board, CastlingState& castling)
 {
 	int attackerColorIdx = turn ? 1 : 0;
 	char expectedSuffix = turn ? 'B' : 'N';
@@ -567,7 +546,7 @@ bool Board::isMenaced(bool turn, sf::Vector2i targetPos, Piece* targetPiece, str
 		sf::Vector2i attackerPos = attacker->getGridPosition();
 
 		// Verificar que el atacante siga existiendo en esta posicion del tablero
-		string cell = board[attackerPos.x][attackerPos.y];
+		std::string cell = board[attackerPos.x][attackerPos.y];
 		if (cell.length() < 2 || cell[1] != expectedSuffix) continue;
 
 		if (this->checkMove(turn, attackerPos, targetPos, attacker, targetPiece, castling, board))
@@ -576,9 +555,9 @@ bool Board::isMenaced(bool turn, sf::Vector2i targetPos, Piece* targetPiece, str
 	return false;
 }
 
-bool Board::isInCheck(bool color, string board[8][8]) {
+bool Board::isInCheck(bool color, BoardGrid& board) {
 	// Buscar la posicion del rey en el TABLERO (no en el objeto Piece)
-	string kingCode = color ? "KB" : "KN";
+	std::string kingCode = color ? "KB" : "KN";
 	sf::Vector2i kingPos(-1, -1);
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
@@ -593,64 +572,46 @@ bool Board::isInCheck(bool color, string board[8][8]) {
 	return isMenaced(!color, kingPos, king, board, this->castling);
 }
 
-bool Board::simulateAndValidate(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece) {
-    copyBoard(this->board, this->tempBoard);
-    
-    // Simulate the move on tempBoard
-    this->tempBoard[desPos.x][desPos.y] = this->tempBoard[startPos.x][startPos.y];
-    if ((startPos.x + startPos.y) % 2 != 0) {
-        this->tempBoard[startPos.x][startPos.y] = "-";
-    }
-    else {
-        this->tempBoard[startPos.x][startPos.y] = "+";
-    }
-    
-    // Evaluate if the king of the 'turn' player is in check after this move
-    return !isInCheck(turn, this->tempBoard);
-}
-
 bool Board::isCheckmate(bool color) {
     for (int i = 0; i < 16; i++) {
         Piece* p = this->pieces[i][color].get();
         if (!p->isActive()) continue;
-        
+
         sf::Vector2i startPos = p->getGridPosition();
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 sf::Vector2i desPos(x, y);
                 if (startPos == desPos) continue;
-                
+
                 Piece* target = getPiece(x, y);
-                
+
                 // Saltar piezas amigas
                 if (target && (target->getColor() == p->getColor() || !target->isActive())) continue;
-                
-                // Usar copias para evitar side effects de checkMoveKing
-                string testBoard[8][8];
-                bool testCastling[5];
-                copyBoard(this->board, testBoard);
-                for (int c = 0; c < 5; c++) testCastling[c] = this->castling[c];
-                
+
+                // Usar copias para evitar efectos secundarios de checkMoveKing
+                BoardGrid testBoard = this->board;
+                CastlingState testCastling = this->castling;
+
                 if (p->checkMove(color, startPos, desPos, testBoard, testCastling, this->peonPaso)) {
                     // Simular el movimiento de la pieza sobre testBoard
                     testBoard[desPos.x][desPos.y] = testBoard[startPos.x][startPos.y];
                     if ((startPos.x + startPos.y) % 2 != 0) testBoard[startPos.x][startPos.y] = "-";
                     else testBoard[startPos.x][startPos.y] = "+";
-                    
+
                     if (!isInCheck(color, testBoard)) {
-                        return false; // Found at least one legal move
+                        return false; // Hay al menos un movimiento legal
                     }
                 }
             }
         }
     }
-    return true; // No legal moves found
+    return true; // No se encontró ningún movimiento legal
 }
 
-bool Board::isCastlingLegal(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, string originalBoard[8][8]) {
+bool Board::isCastlingLegal(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, BoardGrid& originalBoard) {
     // Si el rey esta en jaque, no puede enrocar
     if (isInCheck(turn, originalBoard)) return false;
-    
+
     // Comprobar casilla intermedia
     sf::Vector2i intermediatePos = startPos;
     if (desPos.y > startPos.y) {
@@ -658,24 +619,23 @@ bool Board::isCastlingLegal(bool turn, sf::Vector2i startPos, sf::Vector2i desPo
     } else {
         intermediatePos.y -= 1;
     }
-    
+
     // Crear tablero con rey en la posicion intermedia (usando el tablero original)
-    string interBoard[8][8];
-    copyBoard(originalBoard, interBoard);
-    string kingCode = turn ? "KB" : "KN";
+    BoardGrid interBoard = originalBoard;
+    std::string kingCode = turn ? "KB" : "KN";
     interBoard[intermediatePos.x][intermediatePos.y] = kingCode;
     if ((startPos.x + startPos.y) % 2 != 0) interBoard[startPos.x][startPos.y] = "-";
     else interBoard[startPos.x][startPos.y] = "+";
-    
+
     if (isInCheck(turn, interBoard)) return false;
-    
+
     return true;
 }
 
 
 
 void Board::update(sf::Vector2i mousePos, sf::RenderWindow& window) {
-	// Update pieces
+	// Actualiza las piezas
 	for (int i = 0; i < 16; i++) {
 		this->pieces[i][0]->update();
 		this->pieces[i][1]->update();
@@ -683,7 +643,7 @@ void Board::update(sf::Vector2i mousePos, sf::RenderWindow& window) {
 
 
 
-	
+
 	// Esto esta MUY RARO. Para coronar utiliza posicion del raton calculada en State.cpp. Para mover el juego utiliza la posicion interna del Board
 	if (!this->promotionMenu->isShown()) {
 
@@ -709,14 +669,14 @@ void Board::render(sf::RenderTarget& target)
 
 	// Jaques
 	if (this->jaque[0] || this->jaque[1]) target.draw(this->jaqueCell);
-	
+
 	// Piezas
 	for (int i = 0; i<16; i++) {
 		this->pieces[i][0]->render(target);
-		this->pieces[i][1]->render(target);	
+		this->pieces[i][1]->render(target);
 	}
 
-	// Promotion
+	// Coronación
 	this->promotionMenu->render(target);
 
 }
@@ -724,8 +684,8 @@ void Board::render(sf::RenderTarget& target)
 void Board::showBoard() {
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if (board[i][j] == "+" || board[i][j] == "-") cout << board[i][j] << "  ";
-			else cout << board[i][j] << " ";
+			if (board[i][j] == "+" || board[i][j] == "-") std::cout << board[i][j] << "  ";
+			else std::cout << board[i][j] << " ";
 		}
 		std::cout << "\n";
 	}

@@ -1,4 +1,4 @@
-#include "PauseMenu.h"
+#include "ui/PauseMenu.h"
 
 
 PauseMenu::PauseMenu(sf::Font& font) : font(font) {
@@ -35,16 +35,16 @@ void PauseMenu::addButton(std::string key, float x, float y, std::string text, s
 }
 
 void PauseMenu::update(sf::Vector2i& mousePosWindow) {
-	for (auto& i : this->buttons) {
-		i.second->update(mousePosWindow);
+	for (auto& [key, button] : this->buttons) {
+		button->update(mousePosWindow);
 	}
 }
 
 void PauseMenu::render(sf::RenderTarget& target) {
 	target.draw(this->container);
 
-	for (auto& i : this->buttons) {
-		i.second->render(target);
+	for (auto& [key, button] : this->buttons) {
+		button->render(target);
 	}
 	target.draw(this->menuText);
 
