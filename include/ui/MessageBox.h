@@ -10,7 +10,8 @@ class MessageBox {
 
 private:
     sf::Font& font;
-    sf::Text messageText;
+    sf::Text titleText;
+    sf::Text bodyText;
     sf::RectangleShape container;
     std::unique_ptr<Button> button;
 
