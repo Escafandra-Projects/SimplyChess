@@ -162,7 +162,7 @@ chore/actualizar-sfml
 | Regla | Valor |
 |---|---|
 | Estrategia de merge | **Squash & Merge** |
-| Aprobadores mínimos | **1** |
+| Aprobadores mínimos | **1 (distinto al autor)** |
 | Formato del título | Sigue el formato de commit |
 
 El título del PR se convierte en el commit que queda en `main`. Esto mantiene el

@@ -195,7 +195,7 @@ Ejemplos: `feat/deteccion-ahogado`, `fix/enroque-largo`, `docs/arquitectura`
 
 ### Pull Requests
 - **Estrategia de merge:** Squash & Merge.
-- **Aprobadores:** mínimo 1.
+- **Aprobadores:** mínimo 1 (distinto al autor del PR).
 - **Título del PR:** sigue el formato de commit (será el mensaje que quede en `main`).
 
 ### Versionado
