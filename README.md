@@ -69,3 +69,13 @@ SimplyChess/
 Las cabeceras se incluyen con su grupo, p. ej. `#include "ui/Button.h"`,
 tomando `include/` como raíz de búsqueda. La arquitectura se basa en una pila
 de estados (`State`): `MainMenuState` para el menú y `GameState` para la partida.
+
+## Documentación
+
+| Documento | Descripción |
+|---|---|
+| [`docs/architecture.md`](docs/architecture.md) | Arquitectura técnica, diagramas y modelo de datos |
+| [`docs/conventions.md`](docs/conventions.md) | Convenciones de código, commits, ramas y PRs |
+| [`docs/roadmap.md`](docs/roadmap.md) | Hitos priorizados con tareas concretas |
+| [`docs/ideas.md`](docs/ideas.md) | Ideas exploratorias a futuro |
+| [`CHANGELOG.md`](CHANGELOG.md) | Registro de cambios por versión |
