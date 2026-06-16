@@ -49,13 +49,6 @@ void Game::initWindow() {
 	this->window->setFramerateLimit(framerateLimit);
 	this->window->setVerticalSyncEnabled(verticalSyncEnabled);
 
-	// Centrar la ventana en el escritorio (en modo ventana)
-	if (!this->fullscreen) {
-		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-		this->window->setPosition(sf::Vector2i(
-			static_cast<int>(desktop.width - this->window->getSize().x) / 2,
-			static_cast<int>(desktop.height - this->window->getSize().y) / 2));
-	}
 }
 
 void Game::initKeys() {
