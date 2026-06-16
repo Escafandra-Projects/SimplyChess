@@ -71,3 +71,29 @@ Expandir el juego al terreno online usando `sfml-network`.
 - Documentar el formato de los archivos de configuración con todos los valores
   posibles y sus efectos.
 - Añadir una sección de FAQ o solución de problemas comunes.
+
+---
+
+## 🎨 Personalización estética
+
+- **Distintas skins:** Permitir cambiar el aspecto visual del tablero y las piezas mediante temas seleccionables (ej. estilo clásico, madera, minimalista, neón).
+- **Logotipo personalizado:** Diseñar e incluir un logo único para el juego en el menú principal.
+
+---
+
+## 🌍 Internacionalización
+
+- **Soporte multilenguaje:** Traducir los textos de la interfaz (menús, botones, mensajes de fin de partida) a múltiples idiomas, permitiendo seleccionar el idioma desde los Ajustes.
+
+---
+
+## 🎲 Modos de juego alternativos
+
+- **Distribución inicial aleatoria (Chess960):** Añadir la opción de jugar con la variante Fischer Random, donde las piezas de la primera fila se colocan aleatoriamente siguiendo ciertas reglas.
+- **Multijugador Cooperativo (Co-op):** Implementar un modo donde dos jugadores colaboran compartiendo piezas, o modos tipo "Pasapiezas" (Bughouse) si se decide expandir a más de un tablero simultáneo.
+
+---
+
+## 🖱️ Interfaz y Experiencia de Usuario (UX)
+
+- **Entrada por teclado de los nombres:** Reemplazar los nombres fijos ("Player 1", "Player 2") por cuadros de texto que permitan a los jugadores escribir su propio nombre antes de empezar la partida.

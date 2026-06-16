@@ -79,6 +79,13 @@ expandirse a otras áreas.
     - Jaque mate / fin de partida
   - Añadir `sfml-audio` a `target_link_libraries` en CMakeLists.txt.
 
+- [ ] **Coordenadas en el tablero**
+  - Mostrar los números (1-8) a la izquierda y las letras (A-H) en la parte inferior para ayudar a la lectura.
+
+- [ ] **Menú de Ajustes**
+  - Dar funcionalidad al botón *Settings* del menú principal.
+  - Permitir cambiar volumen, pantalla completa, o atajos de teclado desde la interfaz.
+
 ---
 
 ## 🟡 Hito 3 — Gestión de partidas
@@ -100,3 +107,7 @@ expandirse a otras áreas.
     movimiento.
   - Permitir retroceder y avanzar movimientos para análisis o práctica.
   - Debe guardar: `BoardGrid`, posiciones de piezas, flags de enroque, al paso, turno y puntos.
+
+- [ ] **Reloj de ajedrez (Tiempo)**
+  - Añadir soporte para partidas con límite de tiempo por jugador (ej: 5 min, 10 min).
+  - Implementar cuenta regresiva y fin de partida por tiempo agotado.
