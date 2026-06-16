@@ -27,24 +27,24 @@ Funcionalidades ya implementadas y funcionando:
 
 ---
 
-## 🔴 Hito 1 — Reglas completas del ajedrez
+## 🟢 Hito 1 — Reglas completas del ajedrez
 
 **Prioridad:** Alta
 **Objetivo:** El juego debe cumplir todas las reglas oficiales del ajedrez antes de
 expandirse a otras áreas.
 
-- [ ] **Detección de ahogado (stalemate)**
+- [x] **Detección de ahogado (stalemate)**
   - Si el jugador en turno no está en jaque pero no tiene ningún movimiento legal,
     declarar empate.
   - Actualmente el juego se **bloquea** en esta situación.
   - Se puede reutilizar la lógica de `isCheckmate()` comprobando que `!isInCheck()`.
 
-- [ ] **Regla de los 50 movimientos**
+- [x] **Regla de los 50 movimientos**
   - Si se realizan 50 movimientos consecutivos sin captura ni movimiento de peón,
     declarar empate.
   - Requiere un contador que se reinicie en cada captura o movimiento de peón.
 
-- [ ] **Triple repetición de posición**
+- [x] **Triple repetición de posición**
   - Si la misma posición del tablero se repite 3 veces (mismas piezas, mismo turno,
     mismos derechos de enroque y al paso), declarar empate.
   - Requiere almacenar un historial de posiciones con un hash o comparación directa.
