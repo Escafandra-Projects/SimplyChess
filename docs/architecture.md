@@ -444,7 +444,7 @@ flowchart TD
   enemiga puede alcanzarlo mediante `isMenaced()`.
 - `isCheckmate(color)`: para cada pieza activa del bando en jaque, intenta todos los
   destinos posibles simulando el movimiento en una copia. Devuelve `true` solo si
-  **ningún** movimiento legal resuelve el jaque.
+  **ningún** movimiento legal resuelve el jaque. *Nota: En realidad, esta función comprueba si hay cualquier movimiento legal disponible, por lo que su lógica se reutiliza directamente para la detección de ahogado (stalemate).*
 
 **Archivos:**
 - [`Board.h`](file:///Users/luissantra/Projects/Simply%20Chess/include/chess/Board.h) / [`Board.cpp`](file:///Users/luissantra/Projects/Simply%20Chess/src/chess/Board.cpp)
@@ -533,5 +533,7 @@ resources/
 | **Sin detección de ahogado** (stalemate) | El juego se bloquea si un jugador no tiene movimientos legales sin estar en jaque | `Board` |
 | **Botón Settings** sin implementar | Visible pero sin funcionalidad | `MainMenuState` |
 | **Flag `castling[4]`** (rey movido) compartido entre ambos colores | Posible bug: mover un rey podría afectar al estado de enroque del otro | `Board` / `Piece` |
-| **Piezas capturadas** permanecen en el array `pieces[16][2]` y se renderizan fuera de pantalla (-100, -100) | Desperdicio de ciclos de renderizado | `Board` |
+| **Piezas capturadas** permanecen en el array `pieces[16][2]` y se renderizan fuera de pantalla (-100, -100) | Desperdicio de ciclos de renderizado. Deberían borrarse del todo | `Board` |
 | **Gestión del ratón en coronación** difiere del flujo normal | Código reconocido como inconsistente (comentario: "Esto esta MUY RARO...") | [`Board.cpp`](file:///Users/luissantra/Projects/Simply%20Chess/src/chess/Board.cpp) |
+| **Coordenadas invertidas (`gridPos` vs `pos`)** | `pos.x` se calcula usando `gridPos.y` y viceversa; las coordenadas lógicas y visuales están transpuestas | `Piece.cpp` |
+| **Falta separar inicialización y limpieza** | Todo ocurre en el constructor/destructor; sería ideal refactorizar usando `startGame()` y `endGame()` | `GameState` |

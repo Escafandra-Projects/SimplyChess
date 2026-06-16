@@ -27,24 +27,24 @@ Funcionalidades ya implementadas y funcionando:
 
 ---
 
-## 🔴 Hito 1 — Reglas completas del ajedrez
+## 🟢 Hito 1 — Reglas completas del ajedrez
 
 **Prioridad:** Alta
 **Objetivo:** El juego debe cumplir todas las reglas oficiales del ajedrez antes de
 expandirse a otras áreas.
 
-- [ ] **Detección de ahogado (stalemate)**
+- [x] **Detección de ahogado (stalemate)**
   - Si el jugador en turno no está en jaque pero no tiene ningún movimiento legal,
     declarar empate.
   - Actualmente el juego se **bloquea** en esta situación.
   - Se puede reutilizar la lógica de `isCheckmate()` comprobando que `!isInCheck()`.
 
-- [ ] **Regla de los 50 movimientos**
+- [x] **Regla de los 50 movimientos**
   - Si se realizan 50 movimientos consecutivos sin captura ni movimiento de peón,
     declarar empate.
   - Requiere un contador que se reinicie en cada captura o movimiento de peón.
 
-- [ ] **Triple repetición de posición**
+- [x] **Triple repetición de posición**
   - Si la misma posición del tablero se repite 3 veces (mismas piezas, mismo turno,
     mismos derechos de enroque y al paso), declarar empate.
   - Requiere almacenar un historial de posiciones con un hash o comparación directa.
@@ -79,6 +79,13 @@ expandirse a otras áreas.
     - Jaque mate / fin de partida
   - Añadir `sfml-audio` a `target_link_libraries` en CMakeLists.txt.
 
+- [ ] **Coordenadas en el tablero**
+  - Mostrar los números (1-8) a la izquierda y las letras (A-H) en la parte inferior para ayudar a la lectura.
+
+- [ ] **Menú de Ajustes**
+  - Dar funcionalidad al botón *Settings* del menú principal.
+  - Permitir cambiar volumen, pantalla completa, o atajos de teclado desde la interfaz.
+
 ---
 
 ## 🟡 Hito 3 — Gestión de partidas
@@ -100,3 +107,7 @@ expandirse a otras áreas.
     movimiento.
   - Permitir retroceder y avanzar movimientos para análisis o práctica.
   - Debe guardar: `BoardGrid`, posiciones de piezas, flags de enroque, al paso, turno y puntos.
+
+- [ ] **Reloj de ajedrez (Tiempo)**
+  - Añadir soporte para partidas con límite de tiempo por jugador (ej: 5 min, 10 min).
+  - Implementar cuenta regresiva y fin de partida por tiempo agotado.

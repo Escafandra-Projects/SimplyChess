@@ -156,11 +156,19 @@ void GameState::update(float dt) {
 	
 	if (!this->paused) {
 		if (this->board->getEndGame()) {
-			if (this->turn) {
-				this->gameOverBox->setText("  Game over.\n" + this->player2 + " wins");
-			}
-			else {
-				this->gameOverBox->setText("  Game over.\n" + this->player1 + " wins");
+			GameStatus status = this->board->getGameStatus();
+			if (status == GameStatus::CHECKMATE) {
+				if (this->turn) {
+					this->gameOverBox->setText("Game over.\n" + this->player2 + " wins");
+				} else {
+					this->gameOverBox->setText("Game over.\n" + this->player1 + " wins");
+				}
+			} else if (status == GameStatus::STALEMATE) {
+				this->gameOverBox->setText("Game over.\nDraw by stalemate");
+			} else if (status == GameStatus::FIFTY_MOVE_RULE) {
+				this->gameOverBox->setText("Game over.\nDraw by 50-move rule");
+			} else if (status == GameStatus::REPETITION) {
+				this->gameOverBox->setText("Game over.\nDraw by repetition");
 			}
 			this->gameOverBox->update(this->mousePosWindow);
 		}
