@@ -12,6 +12,14 @@
 // Lado del tablero, en píxeles.
 constexpr int BOARD_SIZE = 800;
 
+enum class GameStatus {
+	PLAYING,
+	CHECKMATE,
+	STALEMATE,
+	FIFTY_MOVE_RULE,
+	REPETITION
+};
+
 /// El tablero: mantiene la representación de la posición, las piezas y las
 /// reglas (movimientos, enroque, captura al paso, coronación, jaque y mate).
 class Board {
@@ -58,6 +66,10 @@ private:
 	bool endGame;
 	bool promotionTurn;
 
+	GameStatus status;
+	int halfMoveClock;
+	std::map<std::string, int> positionHistory;
+
 	sf::Vector2i mousePos;
 	sf::Vector2i promotionGridPos;
 
@@ -71,6 +83,9 @@ private:
 	void initPieces(std::map<std::string, sf::Texture>& textures);
 
 	// Funciones privadas
+	/// Genera un string que representa el estado actual para detectar repeticiones.
+	std::string getPositionHash(bool currentTurn) const;
+
 	/// Selecciona la pieza bajo el ratón si es del jugador en turno.
 	void startMove(sf::Vector2i mousePos, bool& turn);
 	/// Valida y aplica el movimiento a la casilla destino (jaque, enroque, etc.).
@@ -98,6 +113,8 @@ public:
 	Piece* getPiece(int x, int y);
 	/// Indica si la partida ha terminado.
 	bool getEndGame();
+	/// Devuelve el estado actual de la partida.
+	GameStatus getGameStatus() const;
 
 	/// Indica si la casilla objetivo está amenazada por el bando 'turn'.
 	bool isMenaced(bool turn, sf::Vector2i targetPos, Piece* targetPiece, BoardGrid& board, CastlingState& castling);

@@ -9,6 +9,9 @@ void Board::initVariables() {
 	this->isMoving = false;
 	this->endGame = false;
 	this->promotionTurn = false;
+	this->status = GameStatus::PLAYING;
+	this->halfMoveClock = 0;
+	this->positionHistory.clear();
 
 	// Peon al paso
 	for (int i = 0; i < 8; i++) {
@@ -297,10 +300,21 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 		this->capturePiece(menacedPiece, turn, points1, points2);
 	}
 
+	// Regla de los 50 movimientos
+	if (this->movingPiece->getType() == PieceType::PEON || menacedPiece != nullptr) {
+		this->halfMoveClock = 0;
+	} else {
+		this->halfMoveClock++;
+	}
+
 	this->isMoving = false;
 
 	// Cambiamos turno
 	turn = !turn;
+
+	// Triple repetición
+	std::string currentHash = getPositionHash(turn);
+	this->positionHistory[currentHash]++;
 
 	// Comprobamos jaque al oponente
 	this->jaque[0] = false;
@@ -312,7 +326,19 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 		this->jaqueCell.setPosition(king->getPosition().x, king->getPosition().y);
 
 		if (isCheckmate(turn)) {
-			this->endGame = true;
+			this->status = GameStatus::CHECKMATE;
+		}
+	} else {
+		if (isCheckmate(turn)) {
+			this->status = GameStatus::STALEMATE;
+		}
+	}
+
+	if (this->status == GameStatus::PLAYING) {
+		if (this->halfMoveClock >= 100) {
+			this->status = GameStatus::FIFTY_MOVE_RULE;
+		} else if (this->positionHistory[currentHash] >= 3) {
+			this->status = GameStatus::REPETITION;
 		}
 	}
 }
@@ -531,7 +557,28 @@ Piece* Board::getPiece(int x, int y) {
 
 bool Board::getEndGame()
 {
-	return this->endGame;
+	return this->status != GameStatus::PLAYING;
+}
+
+GameStatus Board::getGameStatus() const
+{
+	return this->status;
+}
+
+std::string Board::getPositionHash(bool currentTurn) const {
+	std::string hash;
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 8; ++j) {
+			hash += this->board[i][j];
+		}
+	}
+	hash += (currentTurn ? "W" : "B");
+	for (bool c : this->castling) hash += (c ? "1" : "0");
+	for (int i = 0; i < 8; ++i) {
+		hash += (this->peonPaso[i][0] ? "1" : "0");
+		hash += (this->peonPaso[i][1] ? "1" : "0");
+	}
+	return hash;
 }
 
 bool Board::isMenaced(bool turn, sf::Vector2i targetPos, Piece* targetPiece, BoardGrid& board, CastlingState& castling)
