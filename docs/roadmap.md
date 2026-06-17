@@ -82,9 +82,9 @@ expandirse a otras áreas.
 - [ ] **Coordenadas en el tablero**
   - Mostrar los números (1-8) a la izquierda y las letras (A-H) en la parte inferior para ayudar a la lectura.
 
-- [ ] **Menú de Ajustes**
+- [x] **Menú de Ajustes**
   - Dar funcionalidad al botón *Settings* del menú principal.
-  - Permitir cambiar volumen, pantalla completa, o atajos de teclado desde la interfaz.
+  - Permitir cambiar parámetros como los de tiempo base e incremento desde la interfaz.
 
 ---
 
@@ -108,6 +108,6 @@ expandirse a otras áreas.
   - Permitir retroceder y avanzar movimientos para análisis o práctica.
   - Debe guardar: `BoardGrid`, posiciones de piezas, flags de enroque, al paso, turno y puntos.
 
-- [ ] **Reloj de ajedrez (Tiempo)**
+- [x] **Reloj de ajedrez (Tiempo)**
   - Añadir soporte para partidas con límite de tiempo por jugador (ej: 5 min, 10 min).
   - Implementar cuenta regresiva y fin de partida por tiempo agotado.
