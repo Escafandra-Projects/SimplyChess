@@ -1,5 +1,6 @@
 #include "states/MainMenuState.h"
 #include "states/GameState.h"
+#include "states/SettingsState.h"
 
 #include <stdexcept>
 
@@ -108,7 +109,7 @@ void MainMenuState::updateButtons() {
 
 	// Ajustes
 	if (this->buttons["SETTINGS_STATE"]->isPressed()) {
-		
+		this->states->push(std::make_unique<SettingsState>(this->window, this->supportedKeys, this->states));
 	}
 
 	// Salir del juego

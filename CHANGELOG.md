@@ -10,6 +10,9 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 ## [Sin publicar]
 
 ### Añadido
+- **Reloj de Ajedrez**: Lógica completa para tiempo base e incremento por turno, mostrándose la cuenta atrás y provocando el fin de la partida por "Time Out" (`TIMEOUT`).
+- **Menú de Ajustes**: Nueva ventana (accesible desde el Menú Principal) que permite configurar el tiempo base (ej. 3 min, 5 min, 10 min, etc.) y el incremento (ej. 0 sec, 2 sec, 5 sec, etc.).
+- Funcionalidad para pausar automáticamente el tiempo del jugador activo mientras éste se encuentra moviendo la pieza seleccionada o en el proceso de elegir una pieza de coronación.
 - Documentación completa del proyecto:
   - `ESCAFANDRIN.md` — guía de contexto para asistentes IA.
   - `docs/architecture.md` — documentación técnica de arquitectura.
@@ -17,6 +20,9 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
   - `docs/roadmap.md` — hitos priorizados con tareas concretas.
   - `docs/ideas.md` — ideas exploratorias a futuro.
   - `CHANGELOG.md` — este archivo.
+
+### Cambiado
+- Homogeneizado el tiempo de respuesta (debounce) de la UI para todos los botones en 30.0f (menús más suaves y controlados).
 
 ### Eliminado
 - `docs/Plan de Próximos Pasos.md` — reemplazado por `docs/roadmap.md` y `docs/ideas.md`.
