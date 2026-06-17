@@ -22,72 +22,6 @@ por **Escafandra Projects**.
 
 ---
 
-## Compilar y ejecutar
-
-```bash
-# Compilar (la primera vez descarga SFML, tarda más)
-cmake -S . -B build
-cmake --build build
-
-# Ejecutar (siempre desde build/)
-cd build
-./SimplyChess
-```
-
-> El juego carga recursos con rutas relativas (`resources/...`, `config/...`),
-> por lo que debe ejecutarse desde el directorio `build/`.
-
----
-
-## Estructura del proyecto
-
-```
-SimplyChess/
-├── ESCAFANDRIN.md        ← ESTE ARCHIVO (contexto para IAs)
-├── README.md             ← Presentación pública del proyecto
-├── CHANGELOG.md          ← Registro de cambios por versión
-├── CMakeLists.txt        ← Configuración de compilación
-├── .gitignore
-│
-├── include/              ← Cabeceras (.h)
-│   ├── core/             ← Game — bucle principal, ventana, pila de estados
-│   ├── states/           ← State (abstracta), MainMenuState, GameState
-│   ├── ui/               ← Button, MessageBox, PauseMenu, PromotionMenu
-│   └── chess/            ← Board, Piece — lógica del ajedrez
-│
-├── src/                  ← Implementaciones (.cpp), misma estructura que include/
-│   ├── core/
-│   ├── states/
-│   ├── ui/
-│   ├── chess/
-│   └── main.cpp          ← Punto de entrada
-│
-├── config/               ← Archivos de configuración (.ini)
-│   ├── window.ini
-│   ├── supported_keys.ini
-│   ├── gamestate_keybinds.ini
-│   └── mainmenustate_keybinds.ini
-│
-├── resources/            ← Recursos gráficos
-│   ├── fonts/
-│   └── images/
-│       ├── Tablero.png
-│       ├── pieces/       ← 12 PNGs (6 tipos × 2 colores)
-│       ├── interface/    ← Botones, fondo del panel, menú de coronación
-│       └── menu/         ← Fondo y logo del menú principal
-│
-└── docs/                 ← Documentación extendida
-    ├── architecture.md   ← Arquitectura técnica y diagramas
-    ├── conventions.md    ← Convenciones de código, commits y flujo Git
-    ├── roadmap.md        ← Hitos y tareas priorizadas
-    └── ideas.md          ← Ideas exploratorias a futuro
-```
-
-Las cabeceras se incluyen con su grupo: `#include "ui/Button.h"`, usando `include/`
-como raíz de búsqueda.
-
----
-
 ## Arquitectura — Resumen rápido
 
 La aplicación usa una **pila de estados** (`std::stack<std::unique_ptr<State>>`):
@@ -118,15 +52,15 @@ El tablero (`Board`) mantiene **dos representaciones** sincronizadas manualmente
 - Coronación de peones (menú gráfico de selección)
 - Detección de jaque con resaltado visual
 - Detección de jaque mate (fin de partida)
+- Detección de ahogado (stalemate)
+- Regla de los 50 movimientos
+- Triple repetición de posición
 - Menú principal con botones
 - Menú de pausa (Esc)
 - Sistema de puntos por capturas
 - Configuración de ventana vía archivos `.ini`
 
 ### ❌ Pendiente (ver `docs/roadmap.md`)
-- Detección de ahogado (stalemate) — **el juego se bloquea sin esto**
-- Regla de los 50 movimientos
-- Triple repetición de posición
 - Animaciones de movimiento
 - Resaltado de movimientos legales
 - Efectos de sonido
@@ -205,24 +139,6 @@ Ejemplos: `feat/deteccion-ahogado`, `fix/enroque-largo`, `docs/arquitectura`
 
 ---
 
-## Deuda técnica conocida
-
-Tenlas en cuenta al trabajar en el código. Son oportunidades de mejora pero **no las
-refactorices sin que te lo pidan explícitamente**.
-
-| # | Problema | Dónde |
-|---|---|---|
-| 1 | Representación dual del tablero (grid + objetos) que debe sincronizarse manualmente | `Board` |
-| 2 | `getPiece(x, y)` hace búsqueda lineal O(32) | `Board.cpp` |
-| 3 | `checkMoveKing()` tiene efectos secundarios sobre el grid (mueve la torre al validar enroque) | `Piece.cpp` |
-| 4 | Sin detección de ahogado — el juego se bloquea | `Board` |
-| 5 | `castling[4]` (rey movido) compartido entre ambos colores — posible bug | `Board` / `Piece` |
-| 6 | Piezas capturadas se renderizan fuera de pantalla (-100, -100) en vez de omitirse | `Board` |
-| 7 | Gestión del ratón en coronación inconsistente con el flujo normal (comentario: "Esto esta MUY RARO...") | `Board.cpp` |
-| 8 | Botón Settings visible pero sin funcionalidad | `MainMenuState` |
-
----
-
 ## Cómo trabajar en este proyecto
 
 ### Al recibir una tarea
@@ -232,6 +148,9 @@ refactorices sin que te lo pidan explícitamente**.
 4. **Consulta `docs/roadmap.md`** para entender el contexto y las prioridades.
 
 ### Al escribir código
+- Asegurarse de que estamos en la rama main, y hacer fetch y pull primero antes de nada.
+- Crear rama para trabajar en github, con las conveciones del proyecto.
+- 
 - Comenta en **español**, siguiendo el estilo Doxygen (`///`) en headers.
 - Mantén la estructura de secciones (`// Variables`, `// Inicialización`, etc.).
 - Si creas un archivo nuevo en `include/` o `src/`, hazlo en la subcarpeta correcta
@@ -244,6 +163,11 @@ refactorices sin que te lo pidan explícitamente**.
 - Un commit por cambio lógico.
 - Las ramas se nombran `tipo/descripcion-corta`.
 
+### Al documentar cambios
+- Registra todo cambio relevante en `CHANGELOG.md`, bajo la sección `[Sin publicar]`.
+- Sigue el formato [Keep a Changelog](https://keepachangelog.com/es/1.1.0/):
+  agrupa las entradas en `Añadido`, `Cambiado`, `Eliminado`, etc.
+
 ### Al compilar
 - Compila con `cmake -S . -B build && cmake --build build`.
 - Los warnings están habilitados: `-Wall -Wextra -Wpedantic`. **No introduzcas warnings nuevos.**
@@ -253,11 +177,11 @@ refactorices sin que te lo pidan explícitamente**.
 
 ## Documentación disponible
 
-| Documento | Ruta | Contenido |
-|---|---|---|
-| README | `README.md` | Presentación, compilación, controles, estructura |
+| Documento    | Ruta                   | Contenido                                                |
+| --------------| ------------------------| ----------------------------------------------------------|
+| README       | `README.md`            | Presentación, compilación, controles, estructura         |
 | Arquitectura | `docs/architecture.md` | Diagramas, módulos, flujo de movimiento, modelo de datos |
-| Convenciones | `docs/conventions.md` | Commits, ramas, PRs, estilo de código |
-| Roadmap | `docs/roadmap.md` | Hitos priorizados con tareas concretas |
-| Ideas | `docs/ideas.md` | Ideas exploratorias sin comprometer |
-| Changelog | `CHANGELOG.md` | Registro de cambios por versión |
+| Convenciones | `docs/conventions.md`  | Commits, ramas, PRs, estilo de código                    |
+| Roadmap      | `docs/roadmap.md`      | Hitos priorizados con tareas concretas                   |
+| Ideas        | `docs/ideas.md`        | Ideas exploratorias sin comprometer                      |
+| Changelog    | `CHANGELOG.md`         | Registro de cambios por versión                          |

@@ -10,6 +10,12 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 ## [Sin publicar]
 
 ### Añadido
+- **Reglas de tablas (Hito 1 completado):**
+  - Detección de **ahogado (stalemate)**: tablas cuando el jugador en turno no está en
+    jaque pero no tiene ningún movimiento legal (antes el juego se bloqueaba).
+  - **Regla de los 50 movimientos**: tablas tras 50 movimientos consecutivos sin captura
+    ni movimiento de peón.
+  - **Triple repetición de posición**: tablas cuando la misma posición se repite tres veces.
 - Documentación completa del proyecto:
   - `ESCAFANDRIN.md` — guía de contexto para asistentes IA.
   - `docs/architecture.md` — documentación técnica de arquitectura.
@@ -17,6 +23,10 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
   - `docs/roadmap.md` — hitos priorizados con tareas concretas.
   - `docs/ideas.md` — ideas exploratorias a futuro.
   - `CHANGELOG.md` — este archivo.
+
+### Cambiado
+- Mensaje de fin de partida centrado en pantalla.
+- Ventana centrada al iniciar y título de la ventana actualizado.
 
 ### Eliminado
 - `docs/Plan de Próximos Pasos.md` — reemplazado por `docs/roadmap.md` y `docs/ideas.md`.
@@ -42,7 +52,7 @@ Refactor de la estructura del proyecto y consolidación de las reglas del ajedre
   - `include/` y `src/` comparten la misma estructura.
   - Recursos movidos a `resources/` (minúsculas) con subcarpetas `fonts/`, `images/`.
   - Configuración movida a `config/` (minúsculas).
-- CMakeLists.txt actualizado con `GLOB_RECURSE` para detectar automáticamente nuevos `.cpp`.
+  - CMakeLists.txt actualizado con `GLOB_RECURSE` para detectar automáticamente nuevos `.cpp`.
 - Mejoras en la documentación Doxygen (`///`) en todos los headers.
 
 ---
