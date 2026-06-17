@@ -10,6 +10,8 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 ## [Sin publicar]
 
 ### Añadido
+- **Coordenadas en el tablero**: nueva imagen de tablero con los números (1-8) a la
+  izquierda y las letras (A-H) abajo.
 - Documentación completa del proyecto:
   - `ESCAFANDRIN.md` — guía de contexto para asistentes IA.
   - `docs/architecture.md` — documentación técnica de arquitectura.
@@ -17,6 +19,11 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
   - `docs/roadmap.md` — hitos priorizados con tareas concretas.
   - `docs/ideas.md` — ideas exploratorias a futuro.
   - `CHANGELOG.md` — este archivo.
+
+### Cambiado
+- La rejilla jugable se posiciona mediante un offset (`BOARD_OFFSET_X/Y`) para que
+  piezas, resaltados, menú de coronación y detección de clics queden alineados con la
+  nueva franja de coordenadas.
 
 ### Eliminado
 - `docs/Plan de Próximos Pasos.md` — reemplazado por `docs/roadmap.md` y `docs/ideas.md`.

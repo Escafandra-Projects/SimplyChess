@@ -20,8 +20,8 @@ Piece::Piece(unsigned x, unsigned y, sf::Texture& texture, PieceType type, bool 
 
 	this->gridPos.y = y;
 	this->gridPos.x = x;
-	this->pos.x = this->gridPos.y * CELL_SIZE;
-	this->pos.y = this->gridPos.x * CELL_SIZE;
+	this->pos.x = this->gridPos.y * CELL_SIZE + BOARD_OFFSET_X;
+	this->pos.y = this->gridPos.x * CELL_SIZE + BOARD_OFFSET_Y;
 	this->piece.setTexture(texture);
 	this->piece.setPosition(pos.x, pos.y);
 
@@ -119,8 +119,8 @@ bool Piece::isActive() const {
 
 
 void Piece::move(int x, int y){
-	this->pos.x = y * CELL_SIZE;
-	this->pos.y = x * CELL_SIZE;
+	this->pos.x = y * CELL_SIZE + BOARD_OFFSET_X;
+	this->pos.y = x * CELL_SIZE + BOARD_OFFSET_Y;
 	this->gridPos.x = x;
 	this->gridPos.y = y;
 

@@ -194,8 +194,8 @@ void Board::initPieces(std::map<std::string, sf::Texture>& textures) {
 }
 void Board::startMove(sf::Vector2i mousePos, bool& turn) {
 	sf::Vector2i pieceStartGridPos;
-	pieceStartGridPos.y = mousePos.x / CELL_SIZE;
-	pieceStartGridPos.x = mousePos.y / CELL_SIZE;
+	pieceStartGridPos.y = (mousePos.x - BOARD_OFFSET_X) / CELL_SIZE;
+	pieceStartGridPos.x = (mousePos.y - BOARD_OFFSET_Y) / CELL_SIZE;
 
 
 
@@ -204,7 +204,7 @@ void Board::startMove(sf::Vector2i mousePos, bool& turn) {
 
 
 	if (movingPiece) {
-		this->selectedCell.setPosition(pieceStartGridPos.y * CELL_SIZE, pieceStartGridPos.x * CELL_SIZE);
+		this->selectedCell.setPosition(pieceStartGridPos.y * CELL_SIZE + BOARD_OFFSET_X, pieceStartGridPos.x * CELL_SIZE + BOARD_OFFSET_Y);
 		// Permitimos selección solo si es el turno adecuado
 		if (turn == movingPiece->getColor()) {
 			this->isMoving = true;
@@ -215,8 +215,8 @@ void Board::startMove(sf::Vector2i mousePos, bool& turn) {
 void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points2) {
 
 	sf::Vector2i pieceDesGridPos;
-	pieceDesGridPos.y = mousePos.x / CELL_SIZE;
-	pieceDesGridPos.x = mousePos.y / CELL_SIZE;
+	pieceDesGridPos.y = (mousePos.x - BOARD_OFFSET_X) / CELL_SIZE;
+	pieceDesGridPos.x = (mousePos.y - BOARD_OFFSET_Y) / CELL_SIZE;
 	sf::Vector2i pieceStartGridPos;
 	pieceStartGridPos.y = movingPiece->getGridPosition().y;
 	pieceStartGridPos.x = movingPiece->getGridPosition().x;
@@ -414,13 +414,13 @@ void Board::promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting)
 		if (this->movingPiece->getType() == PieceType::PEON) {
 
 				if (gridPos.x == 0) {
-					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE, gridPos.x * CELL_SIZE + CELL_SIZE);
+					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE + BOARD_OFFSET_X, gridPos.x * CELL_SIZE + CELL_SIZE + BOARD_OFFSET_Y);
 					this->promotionMenu->setShown(true, turn);
 					this->promotionTurn = turn;
 					this->promotionGridPos = gridPos;
 				}
 				if (gridPos.x == 7) {
-					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE, gridPos.x * CELL_SIZE - 2 * CELL_SIZE);
+					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE + BOARD_OFFSET_X, gridPos.x * CELL_SIZE - 2 * CELL_SIZE + BOARD_OFFSET_Y);
 					this->promotionMenu->setShown(true, turn);
 					this->promotionTurn = turn;
 					this->promotionGridPos = gridPos;
@@ -528,7 +528,7 @@ void Board::movePiece(bool& turn, int& points1, int& points2) {
 
 
 		// Comprobamos limites del tablero
-		if (mousePos.x < BOARD_SIZE && mousePos.y < BOARD_SIZE && mousePos.x > 0 && mousePos.y > 0) {
+		if (mousePos.x > BOARD_OFFSET_X && mousePos.x < BOARD_OFFSET_X + BOARD_SIZE && mousePos.y > BOARD_OFFSET_Y && mousePos.y < BOARD_OFFSET_Y + BOARD_SIZE) {
 			this->startMove(mousePos, turn);
 		}
 	}
@@ -536,7 +536,7 @@ void Board::movePiece(bool& turn, int& points1, int& points2) {
 	else {
 
 		// Comprobamos limites del tablero
-		if (mousePos.x < BOARD_SIZE && mousePos.y < BOARD_SIZE && mousePos.x > 0 && mousePos.y > 0) {
+		if (mousePos.x > BOARD_OFFSET_X && mousePos.x < BOARD_OFFSET_X + BOARD_SIZE && mousePos.y > BOARD_OFFSET_Y && mousePos.y < BOARD_OFFSET_Y + BOARD_SIZE) {
 			this->endMove(mousePos, turn, points1, points2);
 		}
 	}
