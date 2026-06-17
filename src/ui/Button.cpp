@@ -64,6 +64,11 @@ void Button::scale(float x, float y) {
 	this->centerText();
 }
 
+void Button::setText(const std::string text) {
+	this->text.setString(text);
+	this->centerText();
+}
+
 // Funciones
 void Button::update(const sf::Vector2i& mousePos) {
 

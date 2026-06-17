@@ -23,6 +23,14 @@ private:
 	std::string player1, player2;
 	int points1, points2;
 	bool turn;
+	bool previousTurn;
+	
+	/* Reloj */
+	float baseTime;
+	float increment;
+	float timeWhite;
+	float timeBlack;
+
 	// Evita que el clic que da el mate cierre el cuadro de fin de partida:
 	// solo se acepta el botón Exit tras soltar el ratón al menos una vez.
 	bool gameOverReady;

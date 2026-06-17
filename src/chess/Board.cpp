@@ -565,6 +565,19 @@ GameStatus Board::getGameStatus() const
 	return this->status;
 }
 
+void Board::forceEndGame(GameStatus status) {
+	this->status = status;
+	this->endGame = true;
+}
+
+bool Board::getIsMoving() const {
+	return this->isMoving;
+}
+
+bool Board::isPromoting() const {
+	return this->promotionMenu && this->promotionMenu->isShown();
+}
+
 std::string Board::getPositionHash(bool currentTurn) const {
 	std::string hash;
 	for (int i = 0; i < 8; ++i) {

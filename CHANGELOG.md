@@ -12,6 +12,9 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 ### Añadido
 - **Coordenadas en el tablero**: nueva imagen de tablero con los números (1-8) a la
   izquierda y las letras (A-H) abajo.
+- **Reloj de Ajedrez**: Lógica completa para tiempo base e incremento por turno, mostrándose la cuenta atrás y provocando el fin de la partida por "Time Out" (`TIMEOUT`).
+- **Menú de Ajustes**: Nueva ventana (accesible desde el Menú Principal) que permite configurar el tiempo base (ej. 3 min, 5 min, 10 min, etc.) y el incremento (ej. 0 sec, 2 sec, 5 sec, etc.).
+- Funcionalidad para pausar automáticamente el tiempo del jugador activo mientras éste se encuentra moviendo la pieza seleccionada o en el proceso de elegir una pieza de coronación.
 - Documentación completa del proyecto:
   - `ESCAFANDRIN.md` — guía de contexto para asistentes IA.
   - `docs/architecture.md` — documentación técnica de arquitectura.
@@ -24,6 +27,7 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 - La rejilla jugable se posiciona mediante un offset (`BOARD_OFFSET_X/Y`) para que
   piezas, resaltados, menú de coronación y detección de clics queden alineados con la
   nueva franja de coordenadas.
+- Homogeneizado el tiempo de respuesta (debounce) de la UI para todos los botones en 30.0f (menús más suaves y controlados).
 
 ### Eliminado
 - `docs/Plan de Próximos Pasos.md` — reemplazado por `docs/roadmap.md` y `docs/ideas.md`.

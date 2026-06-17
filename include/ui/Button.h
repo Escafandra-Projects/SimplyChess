@@ -44,6 +44,9 @@ public:
 	// Funciones
 	/// Escala el botón y recentra su texto.
 	void scale(float x, float y);
+	
+	/// Cambia el texto del botón y lo recentra.
+	void setText(const std::string text);
 
 	/// Actualiza el estado del botón según la posición del ratón.
 	void update(const sf::Vector2i& mousePos);
