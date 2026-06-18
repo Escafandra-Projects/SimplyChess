@@ -10,6 +10,12 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 ## [Sin publicar]
 
 ### Añadido
+- **Reglas de tablas (Hito 1 completado):**
+  - Detección de **ahogado (stalemate)**: tablas cuando el jugador en turno no está en
+    jaque pero no tiene ningún movimiento legal (antes el juego se bloqueaba).
+  - **Regla de los 50 movimientos**: tablas tras 50 movimientos consecutivos sin captura
+    ni movimiento de peón.
+  - **Triple repetición de posición**: tablas cuando la misma posición se repite tres veces.
 - **Reloj de Ajedrez**: Lógica completa para tiempo base e incremento por turno, mostrándose la cuenta atrás y provocando el fin de la partida por "Time Out" (`TIMEOUT`).
 - **Menú de Ajustes**: Nueva ventana (accesible desde el Menú Principal) que permite configurar el tiempo base (ej. 3 min, 5 min, 10 min, etc.) y el incremento (ej. 0 sec, 2 sec, 5 sec, etc.).
 - Funcionalidad para pausar automáticamente el tiempo del jugador activo mientras éste se encuentra moviendo la pieza seleccionada o en el proceso de elegir una pieza de coronación.
@@ -22,6 +28,8 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
   - `CHANGELOG.md` — este archivo.
 
 ### Cambiado
+- Mensaje de fin de partida centrado en pantalla.
+- Ventana centrada al iniciar y título de la ventana actualizado.
 - Homogeneizado el tiempo de respuesta (debounce) de la UI para todos los botones en 30.0f (menús más suaves y controlados).
 
 ### Eliminado
@@ -48,7 +56,7 @@ Refactor de la estructura del proyecto y consolidación de las reglas del ajedre
   - `include/` y `src/` comparten la misma estructura.
   - Recursos movidos a `resources/` (minúsculas) con subcarpetas `fonts/`, `images/`.
   - Configuración movida a `config/` (minúsculas).
-- CMakeLists.txt actualizado con `GLOB_RECURSE` para detectar automáticamente nuevos `.cpp`.
+  - CMakeLists.txt actualizado con `GLOB_RECURSE` para detectar automáticamente nuevos `.cpp`.
 - Mejoras en la documentación Doxygen (`///`) en todos los headers.
 
 ---

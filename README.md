@@ -55,15 +55,44 @@ El código se agrupa por responsabilidad. `include/` (cabeceras) y `src/`
 
 ```
 SimplyChess/
-├── include/        Cabeceras (.h)
-│   ├── core/       Game — bucle principal, ventana y pila de estados
-│   ├── states/     State, MainMenuState, GameState — pantallas del juego
-│   ├── ui/         Button, MessageBox, PauseMenu, PromotionMenu — interfaz
-│   └── chess/      Board, Piece — lógica del ajedrez
-├── src/            Implementaciones (.cpp), con la misma estructura
-│   └── main.cpp    Punto de entrada
-├── resources/      Imágenes y fuentes
-└── config/         Ficheros de configuración (.ini)
+├── ESCAFANDRIN.md        ← Guía de contexto para asistentes IA
+├── README.md             ← Presentación pública del proyecto
+├── CHANGELOG.md          ← Registro de cambios por versión
+├── CMakeLists.txt        ← Configuración de compilación
+├── .gitignore
+│
+├── include/              ← Cabeceras (.h)
+│   ├── core/             ← Game — bucle principal, ventana, pila de estados
+│   ├── states/           ← State (abstracta), MainMenuState, GameState
+│   ├── ui/               ← Button, MessageBox, PauseMenu, PromotionMenu
+│   └── chess/            ← Board, Piece — lógica del ajedrez
+│
+├── src/                  ← Implementaciones (.cpp), misma estructura que include/
+│   ├── core/
+│   ├── states/
+│   ├── ui/
+│   ├── chess/
+│   └── main.cpp          ← Punto de entrada
+│
+├── config/               ← Archivos de configuración (.ini)
+│   ├── window.ini
+│   ├── supported_keys.ini
+│   ├── gamestate_keybinds.ini
+│   └── mainmenustate_keybinds.ini
+│
+├── resources/            ← Recursos gráficos
+│   ├── fonts/
+│   └── images/
+│       ├── Tablero.png
+│       ├── pieces/       ← 12 PNGs (6 tipos × 2 colores)
+│       ├── interface/    ← Botones, fondo del panel, menú de coronación
+│       └── menu/         ← Fondo y logo del menú principal
+│
+└── docs/                 ← Documentación extendida
+    ├── architecture.md   ← Arquitectura técnica y diagramas
+    ├── conventions.md    ← Convenciones de código, commits y flujo Git
+    ├── roadmap.md        ← Hitos y tareas priorizadas
+    └── ideas.md          ← Ideas exploratorias a futuro
 ```
 
 Las cabeceras se incluyen con su grupo, p. ej. `#include "ui/Button.h"`,
