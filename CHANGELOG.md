@@ -10,6 +10,9 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 ## [Sin publicar]
 
 ### Añadido
+- **Mejoras visuales (Hito 2)**:
+  - **Resaltado de movimientos legales**: Al seleccionar una pieza, muestra las casillas disponibles con un punto gris oscuro y las capturas con un aro alrededor de la pieza enemiga (incluyendo captura al paso).
+  - **Resaltado del último movimiento**: Marca las casillas de origen y destino del último movimiento con un fondo sutil.
 - **Coordenadas en el tablero**: nueva imagen de tablero con los números (1-8) a la
   izquierda y las letras (A-H) abajo.
 - **Reglas de tablas (Hito 1 completado):**

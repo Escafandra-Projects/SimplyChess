@@ -19,6 +19,14 @@ void Board::initVariables() {
 		this->peonPaso[i][1] = false;
 	}
 
+	// Ultimo movimiento
+	this->hasLastMove = false;
+	this->lastMoveStartCell.setSize(sf::Vector2f(100.f, 100.f));
+	this->lastMoveStartCell.setFillColor(sf::Color(222, 235, 127, 100));
+	this->lastMoveEndCell.setSize(sf::Vector2f(100.f, 100.f));
+	this->lastMoveEndCell.setFillColor(sf::Color(222, 235, 127, 100));
+	this->legalMovesShapes.clear();
+
 	// Casilla seleccionada
 	this->selectedCell.setSize(sf::Vector2f(100.f, 100.f));
 	this->selectedCell.setFillColor(sf::Color(222, 235, 127, 100));
@@ -192,6 +200,65 @@ void Board::initPieces(std::map<std::string, sf::Texture>& textures) {
 	this->background.setTexture(textures["BOARD"]);
 
 }
+
+void Board::calculateLegalMoves(bool turn, sf::Vector2i startPos) {
+	this->legalMovesShapes.clear();
+	
+	for (int x = 0; x < 8; x++) {
+		for (int y = 0; y < 8; y++) {
+			sf::Vector2i desPos(x, y);
+			if (startPos == desPos) continue;
+
+			Piece* target = getPiece(x, y);
+
+			// Saltar piezas amigas
+			if (target && (target->getColor() == turn || !target->isActive())) continue;
+
+			// Usar copias para evitar efectos secundarios
+			BoardGrid testBoard = this->board;
+			CastlingState testCastling = this->castling;
+
+			if (this->movingPiece->checkMove(turn, startPos, desPos, testBoard, testCastling, this->peonPaso)) {
+				// Validar enroque específicamente
+				bool isCastling = (this->movingPiece->getType() == PieceType::REY && std::abs(startPos.y - desPos.y) == 2);
+				if (isCastling) {
+					if (!isCastlingLegal(turn, startPos, desPos, this->board)) continue;
+				}
+
+				// Simular movimiento
+				testBoard[desPos.x][desPos.y] = testBoard[startPos.x][startPos.y];
+				if ((startPos.x + startPos.y) % 2 != 0) testBoard[startPos.x][startPos.y] = "-";
+				else testBoard[startPos.x][startPos.y] = "+";
+
+				if (!isInCheck(turn, testBoard)) {
+					// Movimiento legal
+					bool isCapture = (target && target->isActive());
+					// Detección de captura al paso: es peón, se mueve en diagonal y no hay objetivo en la casilla final
+					if (!isCapture && this->movingPiece->getType() == PieceType::PEON && startPos.y != desPos.y) {
+						isCapture = true;
+					}
+
+					if (isCapture) {
+						// Captura: círculo hueco
+						sf::CircleShape circle(45.f);
+						circle.setFillColor(sf::Color::Transparent);
+						circle.setOutlineColor(sf::Color(0, 0, 0, 80));
+						circle.setOutlineThickness(5.f);
+						circle.setPosition(desPos.y * CELL_SIZE + BOARD_OFFSET_X + 5.f, desPos.x * CELL_SIZE + BOARD_OFFSET_Y + 5.f);
+						this->legalMovesShapes.push_back(circle);
+					} else {
+						// Movimiento normal: punto
+						sf::CircleShape dot(15.f);
+						dot.setFillColor(sf::Color(0, 0, 0, 80));
+						dot.setPosition(desPos.y * CELL_SIZE + BOARD_OFFSET_X + 35.f, desPos.x * CELL_SIZE + BOARD_OFFSET_Y + 35.f);
+						this->legalMovesShapes.push_back(dot);
+					}
+				}
+			}
+		}
+	}
+}
+
 void Board::startMove(sf::Vector2i mousePos, bool& turn) {
 	sf::Vector2i pieceStartGridPos;
 	pieceStartGridPos.y = (mousePos.x - BOARD_OFFSET_X) / CELL_SIZE;
@@ -208,6 +275,7 @@ void Board::startMove(sf::Vector2i mousePos, bool& turn) {
 		// Permitimos selección solo si es el turno adecuado
 		if (turn == movingPiece->getColor()) {
 			this->isMoving = true;
+			this->calculateLegalMoves(turn, pieceStartGridPos);
 		}
 	}
 }
@@ -231,6 +299,7 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 
 	if (!checkMove(turn, pieceStartGridPos, pieceDesGridPos, this->movingPiece, this->menacedPiece, testCastling, testBoard)) {
 		this->isMoving = false;
+		this->legalMovesShapes.clear();
 		return;
 	}
 
@@ -241,6 +310,7 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 		// Validar enroque usando tablero ORIGINAL (this->board NO ha sido modificado)
 		if (!isCastlingLegal(turn, pieceStartGridPos, pieceDesGridPos, this->board)) {
 			this->isMoving = false;
+			this->legalMovesShapes.clear();
 			return;
 		}
 	}
@@ -256,12 +326,19 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	// Verificar que el rey no queda en jaque tras el movimiento
 	if (isInCheck(turn, testBoard)) {
 		this->isMoving = false;
+		this->legalMovesShapes.clear();
 		return;
 	}
 
 	// ========== FASE 3: Todo validado - aplicar al tablero real ==========
 	this->board = testBoard;
 	this->castling = testCastling;
+
+	// Actualizar celdas del último movimiento
+	this->lastMoveStartCell.setPosition(pieceStartGridPos.y * CELL_SIZE + BOARD_OFFSET_X, pieceStartGridPos.x * CELL_SIZE + BOARD_OFFSET_Y);
+	this->lastMoveEndCell.setPosition(pieceDesGridPos.y * CELL_SIZE + BOARD_OFFSET_X, pieceDesGridPos.x * CELL_SIZE + BOARD_OFFSET_Y);
+	this->hasLastMove = true;
+	this->legalMovesShapes.clear();
 
 	// Peon al paso
 	if (this->peonPaso[pieceDesGridPos.y][!turn] && pieceStartGridPos.y != pieceDesGridPos.y && this->movingPiece->getType() == PieceType::PEON) {
@@ -707,7 +784,10 @@ void Board::update(sf::Vector2i mousePos, sf::RenderWindow& window) {
 	// Esto esta MUY RARO. Para coronar utiliza posicion del raton calculada en State.cpp. Para mover el juego utiliza la posicion interna del Board
 	if (!this->promotionMenu->isShown()) {
 
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) this->isMoving = false;
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+			this->isMoving = false;
+			this->legalMovesShapes.clear();
+		}
 		this->mousePos = sf::Mouse::getPosition(window);
 	}
 	else {
@@ -724,6 +804,12 @@ void Board::render(sf::RenderTarget& target)
 	// Tablero
 	target.draw(background);
 
+	// Último movimiento
+	if (this->hasLastMove) {
+		target.draw(this->lastMoveStartCell);
+		target.draw(this->lastMoveEndCell);
+	}
+
 	// Casilla selecionada
 	if (this->isMoving) target.draw(this->selectedCell);
 
@@ -734,6 +820,13 @@ void Board::render(sf::RenderTarget& target)
 	for (int i = 0; i<16; i++) {
 		this->pieces[i][0]->render(target);
 		this->pieces[i][1]->render(target);
+	}
+
+	// Movimientos legales
+	if (this->isMoving) {
+		for (auto& shape : this->legalMovesShapes) {
+			target.draw(shape);
+		}
 	}
 
 	// Coronación
