@@ -1,37 +1,73 @@
 # SimplyChess
 
+> Versión **1.0.0**
+
 Ajedrez para dos jugadores (local, mismo teclado/ratón) escrito en **C++20** con **SFML 2.6**.
 
-Implementa las reglas completas del ajedrez: movimiento de todas las piezas, enroque corto
-y largo, captura al paso, coronación de peones (con menú de selección de pieza) y detección
-de jaque y jaque mate.
+Implementa las reglas completas del ajedrez —movimiento de todas las piezas, enroque, captura
+al paso, coronación, jaque y jaque mate— y todas las condiciones de tablas (ahogado, regla de
+los 50 movimientos y triple repetición). Incluye además un reloj de ajedrez configurable
+(tiempo base e incremento) con menú de ajustes.
 
 ## Requisitos
 
-- Un compilador con soporte de **C++20** (GCC, Clang o MSVC recientes).
-- **CMake ≥ 3.14**.
+- Un compilador con soporte de **C++20**: GCC ≥ 10, Clang ≥ 12 o MSVC 2019/2022.
+- **CMake ≥ 3.14** y un generador de compilación (Make, Ninja o Visual Studio).
 - Conexión a internet en la **primera** compilación: SFML 2.6.1 se descarga y compila
   automáticamente mediante `FetchContent` (no hace falta instalarlo a mano).
+- En **Linux** hacen falta las dependencias de desarrollo de SFML (ver más abajo).
 
-## Compilación
+## Compilación y ejecución
+
+En las tres plataformas la compilación es la misma (desde la raíz del repositorio):
 
 ```bash
-cmake -S . -B build
-cmake --build build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
 ```
 
-El ejecutable y una copia de las carpetas `resources/` y `config/` se generan dentro de
-`build/`.
+Se genera el ejecutable y una copia de `resources/` y `config/` dentro de `build/`. El juego
+carga sus recursos con **rutas relativas**, así que debe ejecutarse desde el directorio que
+contiene `resources/` y `config/`.
 
-## Ejecución
+### Linux
+
+Instala antes el toolchain y las dependencias de desarrollo de SFML:
 
 ```bash
+# Arch
+sudo pacman -S --needed base-devel cmake libx11 libxrandr libxcursor libxi mesa freetype2
+
+# Debian / Ubuntu
+sudo apt install build-essential cmake libx11-dev libxrandr-dev libxcursor-dev \
+  libxi-dev libgl1-mesa-dev libfreetype-dev
+```
+
+Compila con los comandos de arriba y ejecuta:
+
+```bash
+cd build && ./SimplyChess
+```
+
+### macOS
+
+Necesitas las *Command Line Tools* de Xcode y CMake (`brew install cmake`). Compila con los
+comandos de arriba y ejecuta:
+
+```bash
+cd build && ./SimplyChess
+```
+
+### Windows
+
+Usa **Visual Studio 2019/2022** o las *Build Tools for Visual Studio* (incluyen CMake). Tras
+compilar, el ejecutable queda en `build\Release\SimplyChess.exe`. Como los recursos se copian
+a `build\` (no a `build\Release\`), ejecútalo con `build\` como directorio de trabajo:
+
+```powershell
 cd build
-./SimplyChess
+.\Release\SimplyChess.exe
 ```
-
-> Los recursos se cargan con rutas relativas (`resources/...`, `config/...`), por lo que el
-> juego debe lanzarse desde el directorio donde están esas carpetas (por defecto, `build/`).
 
 ## Controles
 

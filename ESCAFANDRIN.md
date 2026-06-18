@@ -16,7 +16,7 @@ por **Escafandra Projects**.
 | Lenguaje | C++20 |
 | Biblioteca gráfica | SFML 2.6.1 (descargada automáticamente vía `FetchContent`) |
 | Sistema de compilación | CMake ≥ 3.14 |
-| Versión actual | v0.7.0 (Beta) |
+| Versión actual | v1.0.0 |
 | Plataformas objetivo | macOS, Linux, Windows |
 | Repositorio | `Escafandra-Projects/SimplyChess` |
 
