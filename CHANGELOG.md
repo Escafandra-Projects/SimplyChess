@@ -9,6 +9,13 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+---
+
+## [1.0.0] — 2026-06-18
+
+Primera versión estable: el juego implementa todas las reglas oficiales del ajedrez,
+incluyendo las condiciones de tablas, además de un reloj de ajedrez configurable.
+
 ### Añadido
 - **Coordenadas en el tablero**: nueva imagen de tablero con los números (1-8) a la
   izquierda y las letras (A-H) abajo.

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(SimplyChess)
+project(SimplyChess VERSION 1.0.0 LANGUAGES CXX)
 
 # Estándar C++20
 set(CMAKE_CXX_STANDARD 20)
