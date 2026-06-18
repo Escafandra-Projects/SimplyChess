@@ -17,7 +17,8 @@ enum class GameStatus {
 	CHECKMATE,
 	STALEMATE,
 	FIFTY_MOVE_RULE,
-	REPETITION
+	REPETITION,
+	TIMEOUT
 };
 
 /// El tablero: mantiene la representación de la posición, las piezas y las
@@ -115,6 +116,12 @@ public:
 	bool getEndGame();
 	/// Devuelve el estado actual de la partida.
 	GameStatus getGameStatus() const;
+	/// Devuelve si hay una pieza seleccionada moviéndose.
+	bool getIsMoving() const;
+	/// Devuelve si el menú de promoción está abierto.
+	bool isPromoting() const;
+	/// Fuerza el final de la partida por un estado específico (ej. TIMEOUT)
+	void forceEndGame(GameStatus status);
 
 	/// Indica si la casilla objetivo está amenazada por el bando 'turn'.
 	bool isMenaced(bool turn, sf::Vector2i targetPos, Piece* targetPiece, BoardGrid& board, CastlingState& castling);

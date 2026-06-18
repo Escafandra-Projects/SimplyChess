@@ -1,4 +1,6 @@
 #include "states/GameState.h"
+#include <iomanip>
+#include <sstream>
 
 #include <stdexcept>
 
@@ -6,6 +8,7 @@
 void GameState::initVariables() {
 	this->paused = false;
 	this->turn = true;
+	this->previousTurn = true;
 
 	this->player1 = "Player 1";
 	this->player2 = "Player 2";
@@ -13,6 +16,17 @@ void GameState::initVariables() {
 	this->points2 = 0;
 	this->gameOverReady = false;
 	this->background.setPosition(sf::Vector2f(820.f, 0.f));
+
+	std::ifstream ifs("config/game.ini");
+	if (ifs.is_open()) {
+		ifs >> this->baseTime >> this->increment;
+		ifs.close();
+	} else {
+		this->baseTime = 300.0f;
+		this->increment = 0.0f;
+	}
+	this->timeWhite = this->baseTime;
+	this->timeBlack = this->baseTime;
 
 	// Mensaje fin del juego
 	this->gameOverBox = std::make_unique<MessageBox>(font, "Game over", "Exit", this->textures["BUTTONS"] );
@@ -48,9 +62,20 @@ void GameState::initBoard(std::map<std::string, sf::Texture>& textures) {
 	this->board = std::make_unique<Board>(textures);
 }
 
+static std::string formatTime(float t) {
+	if (t < 0) t = 0;
+	int minutes = static_cast<int>(t) / 60;
+	int seconds = static_cast<int>(t) % 60;
+	std::ostringstream oss;
+	oss << std::setfill('0') << std::setw(2) << minutes << ":" << std::setw(2) << seconds;
+	return oss.str();
+}
+
 std::string GameState::buildScoreText() const {
 	return "White: \n" + this->player1 + ". \nPoints: " + std::to_string(this->points1) +
-		"\n\n\nBlack: \n" + this->player2 + ". \nPoints: " + std::to_string(this->points2);
+		"\nTime: " + formatTime(this->timeWhite) + 
+		"\n\n\nBlack: \n" + this->player2 + ". \nPoints: " + std::to_string(this->points2) +
+		"\nTime: " + formatTime(this->timeBlack);
 }
 
 void GameState::initText() {
@@ -155,9 +180,44 @@ void GameState::update(float dt) {
 	this->updateInput(dt);
 	
 	if (!this->paused) {
+		if (!this->board->getEndGame()) {
+			// Reloj: se pausa si el jugador está moviendo la pieza (isMoving) o si hay una coronación pendiente.
+			if (!this->board->getIsMoving() && !this->board->isPromoting()) {
+				if (this->turn) {
+					this->timeWhite -= dt;
+					if (this->timeWhite <= 0) {
+						this->board->forceEndGame(GameStatus::TIMEOUT);
+					}
+				} else {
+					this->timeBlack -= dt;
+					if (this->timeBlack <= 0) {
+						this->board->forceEndGame(GameStatus::TIMEOUT);
+					}
+				}
+			}
+
+			// Incremento
+			if (this->previousTurn != this->turn) {
+				// Turno acaba de cambiar
+				if (this->previousTurn) {
+					this->timeWhite += this->increment;
+				} else {
+					this->timeBlack += this->increment;
+				}
+				this->previousTurn = this->turn;
+			}
+			this->updateText();
+		}
+
 		if (this->board->getEndGame()) {
 			GameStatus status = this->board->getGameStatus();
-			if (status == GameStatus::CHECKMATE) {
+			if (status == GameStatus::TIMEOUT) {
+				if (this->turn) {
+					this->gameOverBox->setText("Game over.\nTime Out. " + this->player2 + " wins");
+				} else {
+					this->gameOverBox->setText("Game over.\nTime Out. " + this->player1 + " wins");
+				}
+			} else if (status == GameStatus::CHECKMATE) {
 				if (this->turn) {
 					this->gameOverBox->setText("Game over.\n" + this->player2 + " wins");
 				} else {
