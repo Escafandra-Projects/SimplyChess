@@ -79,7 +79,7 @@ expandirse a otras áreas.
     - Jaque mate / fin de partida
   - Añadir `sfml-audio` a `target_link_libraries` en CMakeLists.txt.
 
-- [ ] **Coordenadas en el tablero**
+- [x] **Coordenadas en el tablero**
   - Mostrar los números (1-8) a la izquierda y las letras (A-H) en la parte inferior para ayudar a la lectura.
 
 - [x] **Menú de Ajustes**

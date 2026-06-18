@@ -10,6 +10,10 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 ## [Sin publicar]
 
 ### Añadido
+- **Mejoras visuales (Hito 2)**:
+  - **Animaciones de movimiento**: Las piezas se desplazan de forma suave (interpolación lineal) en lugar de teletransportarse instantáneamente.
+  - **Efectos de sonido**: Añadida la biblioteca `sfml-audio` y un `AudioSystem` para reproducir sonidos al mover, capturar, dar jaque o finalizar la partida.
+  - **Resaltado de movimientos legales**: Al seleccionar una pieza, muestra las casillas disponibles con un punto gris oscuro y las capturas con un aro alrededor de la pieza enemiga (incluyendo captura al paso).
 - **Coordenadas en el tablero**: nueva imagen de tablero con los números (1-8) a la
   izquierda y las letras (A-H) abajo.
 - **Reglas de tablas (Hito 1 completado):**

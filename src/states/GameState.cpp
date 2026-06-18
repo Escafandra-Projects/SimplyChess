@@ -141,9 +141,10 @@ void GameState::updateInput(float /*dt*/) {
 
 	// Click izquierdo en la pieza para seleccionarla 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->getKeytime()) {
-		
-		this->board->movePiece(this->turn, this->points1, this->points2);
-		this->updateText();
+		if (!this->board->isAnyPieceAnimating()) {
+			this->board->movePiece(this->turn, this->points1, this->points2);
+			this->updateText();
+		}
 	}
 
 	// Botón del mensaje de fin de partida.
@@ -233,6 +234,7 @@ void GameState::update(float dt) {
 			this->gameOverBox->update(this->mousePosWindow);
 		}
 		else {
+			this->board->updateAnimations(dt);
 			this->board->update(this->mousePosWindow, *this->window);
 		}
 	}

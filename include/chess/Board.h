@@ -131,11 +131,22 @@ public:
 	bool isCheckmate(bool color);
 	/// Comprueba que el enroque es legal (rey no en jaque ni pasa por casilla amenazada).
 	bool isCastlingLegal(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, BoardGrid& originalBoard);
+	/// Indica si el estado actual es GameStatus::PLAYING.
+	bool isPlaying() const;
+	/// Indica si alguna pieza se está animando.
+	bool isAnyPieceAnimating() const;
 
-	// Funciones principales
+	/* Movimiento y Selección */
+	/// Devuelve true si la partida no ha terminado y hay una pieza siendo movida.
+	bool IsMoving() const;
+
+	/// Gestiona la selección de una pieza o el destino de un movimiento.
+	void updateInput(const sf::Vector2i& mousePosWindow, bool turn);
 	/// Actualiza el tablero y el menú de coronación.
 	void update(sf::Vector2i mousePos, sf::RenderWindow& window);
-	/// Dibuja el tablero, las piezas y los resaltados.
+	/// Actualiza las animaciones de las piezas.
+	void updateAnimations(float dt);
+	/// Dibuja el tablero, casillas resaltadas, piezas y el menú de coronación.
 	void render(sf::RenderTarget& target);
 
 	// DEPURACIÓN
