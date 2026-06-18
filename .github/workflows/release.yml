@@ -54,7 +54,6 @@ jobs:
           if [ "${{ matrix.name }}" = "macos" ]; then
             mkdir -p "$DIR/Frameworks"
             cp -R build/_deps/sfml-src/extlibs/libs-osx/Frameworks/*.framework "$DIR/Frameworks/"
-            install_name_tool -add_rpath "@executable_path/Frameworks" "$DIR/SimplyChess"
           fi
           cmake -E tar cf "$DIR.zip" --format=zip "$DIR"
 

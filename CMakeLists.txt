@@ -28,6 +28,13 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 # Crear ejecutable
 add_executable(SimplyChess ${SOURCES})
 
+if (APPLE)
+    set_target_properties(SimplyChess PROPERTIES 
+        BUILD_WITH_INSTALL_RPATH ON 
+        INSTALL_RPATH "@executable_path/Frameworks"
+    )
+endif()
+
 # Enlazar SFML 2.6.1
 target_link_libraries(SimplyChess PRIVATE sfml-graphics sfml-window sfml-system)
 
