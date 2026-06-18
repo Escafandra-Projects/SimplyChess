@@ -13,7 +13,9 @@ void MainMenuState::initVariables()
 	//this->titleText.setColor(sf::Color::White);
 	this->titleText.setString("Simply Chess");
 	this->titleText.setPosition(300.f, 130.f);
-}       
+
+	this->mousePressedLastFrame = false;
+}
 
 void MainMenuState::initTextures()
 {
@@ -102,20 +104,27 @@ void MainMenuState::updateButtons() {
 		button->update(this->mousePosWindow);
 	}
 
-	// Nuevo juego
-	if (this->buttons["GAME_STATE"]->isPressed()) {
-		this->states->push(std::make_unique<GameState>(this->window, this->supportedKeys, this->states));
+	// Solo procesamos un clic nuevo (flanco de pulsación). De lo contrario, un clic
+	// mantenido proveniente de otro estado (p. ej. el botón Back de Settings, que se
+	// solapa con Start) se "colaría" y lanzaría un botón nada más volver al menú.
+	bool mousePressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+
+	if (!this->mousePressedLastFrame) {
+		// Nuevo juego
+		if (this->buttons["GAME_STATE"]->isPressed()) {
+			this->states->push(std::make_unique<GameState>(this->window, this->supportedKeys, this->states));
+		}
+		// Ajustes
+		else if (this->buttons["SETTINGS_STATE"]->isPressed()) {
+			this->states->push(std::make_unique<SettingsState>(this->window, this->supportedKeys, this->states));
+		}
+		// Salir del juego
+		else if (this->buttons["EXIT_STATE"]->isPressed()) {
+			this->quit = true;
+		}
 	}
 
-	// Ajustes
-	if (this->buttons["SETTINGS_STATE"]->isPressed()) {
-		this->states->push(std::make_unique<SettingsState>(this->window, this->supportedKeys, this->states));
-	}
-
-	// Salir del juego
-	if (this->buttons["EXIT_STATE"]->isPressed()) {
-		this->quit = true;
-	}
+	this->mousePressedLastFrame = mousePressed;
 }
 
 void MainMenuState::update(float dt) {
