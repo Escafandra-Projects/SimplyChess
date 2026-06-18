@@ -409,6 +409,13 @@ void Board::promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting)
 				this->movingPiece->setTexture(this->promotionTN);
 			}
 		}
+
+		// Efectos de sonido post-promoción
+		if (this->status != GameStatus::PLAYING) {
+			AudioSystem::getInstance().playSound("game_over");
+		} else if (this->jaque[opponentTurn]) {
+			AudioSystem::getInstance().playSound("check");
+		}
 	}
 	else {
 		if (this->movingPiece->getType() == PieceType::PEON) {

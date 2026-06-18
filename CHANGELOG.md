@@ -10,6 +10,8 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 ## [Sin publicar]
 
 ### Añadido
+- **Sonido al coronar**: reproduce el efecto de jaque o de fin de partida cuando la
+  pieza resultante de una coronación da jaque, jaque mate o provoca ahogado.
 - **Coordenadas en el tablero**: nueva imagen de tablero con los números (1-8) a la
   izquierda y las letras (A-H) abajo.
 - **Reglas de tablas (Hito 1 completado):**
