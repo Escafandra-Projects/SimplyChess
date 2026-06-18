@@ -39,6 +39,13 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Corregido
 - Solucionado un error que impedía detectar el jaque (y el jaque mate / ahogado) cuando lo provocaba la pieza resultante de coronar un peón.
+- El botón **Back** de Ajustes ya no inicia la partida al volver: el menú principal solo
+  actúa ante un clic nuevo (flanco de pulsación), evitando que el clic mantenido se cuele
+  en el botón *Start* que queda debajo.
+- El **reloj** ya no empieza a descontar antes del primer movimiento: arranca cuando las
+  blancas completan su jugada inicial.
+- El **reloj** ya no se pausa al seleccionar/mover una pieza; sigue corriendo mientras el
+  jugador piensa su jugada (solo se detiene durante la coronación).
 
 ### Eliminado
 - `docs/Plan de Próximos Pasos.md` — reemplazado por `docs/roadmap.md` y `docs/ideas.md`.
