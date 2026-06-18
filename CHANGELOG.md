@@ -38,6 +38,7 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 - Homogeneizado el tiempo de respuesta (debounce) de la UI para todos los botones en 30.0f (menús más suaves y controlados).
 
 ### Corregido
+- Solucionado un error que impedía detectar el jaque (y el jaque mate / ahogado) cuando lo provocaba la pieza resultante de coronar un peón.
 - El botón **Back** de Ajustes ya no inicia la partida al volver: el menú principal solo
   actúa ante un clic nuevo (flanco de pulsación), evitando que el clic mantenido se cuele
   en el botón *Start* que queda debajo.
