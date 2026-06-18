@@ -27,6 +27,7 @@ void GameState::initVariables() {
 	}
 	this->timeWhite = this->baseTime;
 	this->timeBlack = this->baseTime;
+	this->clockStarted = false;
 
 	// Mensaje fin del juego
 	this->gameOverBox = std::make_unique<MessageBox>(font, "Game over", "Exit", this->textures["BUTTONS"] );
@@ -181,8 +182,10 @@ void GameState::update(float dt) {
 	
 	if (!this->paused) {
 		if (!this->board->getEndGame()) {
-			// Reloj: se pausa si el jugador está moviendo la pieza (isMoving) o si hay una coronación pendiente.
-			if (!this->board->getIsMoving() && !this->board->isPromoting()) {
+			// Reloj: no corre hasta que las blancas hacen su primer movimiento.
+			// También se pausa si el jugador está moviendo la pieza (isMoving)
+			// o si hay una coronación pendiente.
+			if (this->clockStarted && !this->board->getIsMoving() && !this->board->isPromoting()) {
 				if (this->turn) {
 					this->timeWhite -= dt;
 					if (this->timeWhite <= 0) {
@@ -196,7 +199,7 @@ void GameState::update(float dt) {
 				}
 			}
 
-			// Incremento
+			// Incremento (y arranque del reloj tras el primer movimiento de las blancas)
 			if (this->previousTurn != this->turn) {
 				// Turno acaba de cambiar
 				if (this->previousTurn) {
@@ -205,6 +208,7 @@ void GameState::update(float dt) {
 					this->timeBlack += this->increment;
 				}
 				this->previousTurn = this->turn;
+				this->clockStarted = true;
 			}
 			this->updateText();
 		}

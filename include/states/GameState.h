@@ -30,6 +30,8 @@ private:
 	float increment;
 	float timeWhite;
 	float timeBlack;
+	// El reloj no corre hasta que las blancas completan su primer movimiento.
+	bool clockStarted;
 
 	// Evita que el clic que da el mate cierre el cuadro de fin de partida:
 	// solo se acepta el botón Exit tras soltar el ratón al menos una vez.
