@@ -43,6 +43,8 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
   en el botón *Start* que queda debajo.
 - El **reloj** ya no empieza a descontar antes del primer movimiento: arranca cuando las
   blancas completan su jugada inicial.
+- El **reloj** ya no se pausa al seleccionar/mover una pieza; sigue corriendo mientras el
+  jugador piensa su jugada (solo se detiene durante la coronación).
 
 ### Eliminado
 - `docs/Plan de Próximos Pasos.md` — reemplazado por `docs/roadmap.md` y `docs/ideas.md`.

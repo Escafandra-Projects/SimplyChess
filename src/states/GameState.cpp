@@ -183,9 +183,10 @@ void GameState::update(float dt) {
 	if (!this->paused) {
 		if (!this->board->getEndGame()) {
 			// Reloj: no corre hasta que las blancas hacen su primer movimiento.
-			// También se pausa si el jugador está moviendo la pieza (isMoving)
-			// o si hay una coronación pendiente.
-			if (this->clockStarted && !this->board->getIsMoving() && !this->board->isPromoting()) {
+			// Solo se pausa durante una coronación pendiente: en ese momento el turno
+			// ya ha cambiado al rival, así que su reloj no debe correr mientras el
+			// jugador elige la pieza. Seleccionar/mover una pieza NO pausa el reloj.
+			if (this->clockStarted && !this->board->isPromoting()) {
 				if (this->turn) {
 					this->timeWhite -= dt;
 					if (this->timeWhite <= 0) {
