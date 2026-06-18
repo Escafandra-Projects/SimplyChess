@@ -409,6 +409,25 @@ void Board::promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting)
 				this->movingPiece->setTexture(this->promotionTN);
 			}
 		}
+
+		// Comprobamos jaque al oponente después de la promoción
+		bool opponentTurn = !turn;
+		this->jaque[0] = false;
+		this->jaque[1] = false;
+
+		if (isInCheck(opponentTurn, this->board)) {
+			this->jaque[opponentTurn] = true;
+			Piece* king = this->pieces[7][opponentTurn].get();
+			this->jaqueCell.setPosition(king->getPosition().x, king->getPosition().y);
+
+			if (isCheckmate(opponentTurn)) {
+				this->status = GameStatus::CHECKMATE;
+			}
+		} else {
+			if (isCheckmate(opponentTurn)) {
+				this->status = GameStatus::STALEMATE;
+			}
+		}
 	}
 	else {
 		if (this->movingPiece->getType() == PieceType::PEON) {
