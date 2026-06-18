@@ -10,6 +10,8 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 ## [Sin publicar]
 
 ### Añadido
+- **Coordenadas en el tablero**: nueva imagen de tablero con los números (1-8) a la
+  izquierda y las letras (A-H) abajo.
 - **Reglas de tablas (Hito 1 completado):**
   - Detección de **ahogado (stalemate)**: tablas cuando el jugador en turno no está en
     jaque pero no tiene ningún movimiento legal (antes el juego se bloqueaba).
@@ -28,6 +30,9 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
   - `CHANGELOG.md` — este archivo.
 
 ### Cambiado
+- La rejilla jugable se posiciona mediante un offset (`BOARD_OFFSET_X/Y`) para que
+  piezas, resaltados, menú de coronación y detección de clics queden alineados con la
+  nueva franja de coordenadas.
 - Mensaje de fin de partida centrado en pantalla.
 - Ventana centrada al iniciar y título de la ventana actualizado.
 - Homogeneizado el tiempo de respuesta (debounce) de la UI para todos los botones en 30.0f (menús más suaves y controlados).
