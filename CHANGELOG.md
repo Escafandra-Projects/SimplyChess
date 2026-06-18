@@ -37,6 +37,9 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 - Ventana centrada al iniciar y título de la ventana actualizado.
 - Homogeneizado el tiempo de respuesta (debounce) de la UI para todos los botones en 30.0f (menús más suaves y controlados).
 
+### Corregido
+- Solucionado un error que evitaba que se mostrase el jaque y sonase el efecto correspondiente al finalizar una promoción de peón.
+
 ### Eliminado
 - `docs/Plan de Próximos Pasos.md` — reemplazado por `docs/roadmap.md` y `docs/ideas.md`.
 
