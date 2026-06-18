@@ -53,6 +53,8 @@ incluyendo las condiciones de tablas, además de un reloj de ajedrez configurabl
   blancas completan su jugada inicial.
 - El **reloj** ya no se pausa al seleccionar/mover una pieza; sigue corriendo mientras el
   jugador piensa su jugada (solo se detiene durante la coronación).
+- **Compilación con MSVC/Windows**: los flags de warnings de GCC/Clang (`-Wextra`,
+  `-Wpedantic`) ya no abortan el build con Visual Studio; en MSVC se usa `/W4`.
 
 ### Eliminado
 - `docs/Plan de Próximos Pasos.md` — reemplazado por `docs/roadmap.md` y `docs/ideas.md`.
