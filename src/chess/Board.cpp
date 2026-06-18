@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
+#include "core/AudioSystem.h"
 
 void Board::initVariables() {
 	// Variables
@@ -340,6 +341,18 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 		} else if (this->positionHistory[currentHash] >= 3) {
 			this->status = GameStatus::REPETITION;
 		}
+	}
+
+	// Efectos de sonido
+	if (this->status != GameStatus::PLAYING) {
+		AudioSystem::getInstance().playSound("game_over");
+	} else if (this->jaque[turn]) {
+		AudioSystem::getInstance().playSound("check");
+	} else if (menacedPiece != nullptr || (this->movingPiece->getType() == PieceType::PEON && pieceStartGridPos.y != pieceDesGridPos.y && this->board[pieceDesGridPos.x][pieceDesGridPos.y] == (turn ? "PN" : "PB"))) { 
+		// if en passant happened, menacedPiece might be null but we captured something
+		AudioSystem::getInstance().playSound("capture");
+	} else {
+		AudioSystem::getInstance().playSound("move");
 	}
 }
 
@@ -695,11 +708,7 @@ bool Board::isCastlingLegal(bool turn, sf::Vector2i startPos, sf::Vector2i desPo
 
 
 void Board::update(sf::Vector2i mousePos, sf::RenderWindow& window) {
-	// Actualiza las piezas
-	for (int i = 0; i < 16; i++) {
-		this->pieces[i][0]->update();
-		this->pieces[i][1]->update();
-	}
+	// Las piezas ahora se actualizan en updateAnimations(float dt)
 
 
 
@@ -732,8 +741,8 @@ void Board::render(sf::RenderTarget& target)
 
 	// Piezas
 	for (int i = 0; i<16; i++) {
-		this->pieces[i][0]->render(target);
-		this->pieces[i][1]->render(target);
+		if (this->pieces[i][0]->isActive()) this->pieces[i][0]->render(target);
+		if (this->pieces[i][1]->isActive()) this->pieces[i][1]->render(target);
 	}
 
 	// Coronación
@@ -748,5 +757,24 @@ void Board::showBoard() {
 			else std::cout << board[i][j] << " ";
 		}
 		std::cout << "\n";
+	}
+}
+
+bool Board::isPlaying() const {
+	return this->status == GameStatus::PLAYING;
+}
+
+bool Board::isAnyPieceAnimating() const {
+	for (int i = 0; i < 16; i++) {
+		if (this->pieces[i][0] && this->pieces[i][0]->isActive() && this->pieces[i][0]->getIsAnimating()) return true;
+		if (this->pieces[i][1] && this->pieces[i][1]->isActive() && this->pieces[i][1]->getIsAnimating()) return true;
+	}
+	return false;
+}
+
+void Board::updateAnimations(float dt) {
+	for (int i = 0; i < 16; i++) {
+		if (this->pieces[i][0] && this->pieces[i][0]->isActive()) this->pieces[i][0]->update(dt);
+		if (this->pieces[i][1] && this->pieces[i][1]->isActive()) this->pieces[i][1]->update(dt);
 	}
 }
