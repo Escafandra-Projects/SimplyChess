@@ -51,7 +51,7 @@ jobs:
           elif [ "${{ matrix.name }}" = "macos" ]; then
             cp -R build/SimplyChess.app "$DIR/"
             mkdir -p "$DIR/SimplyChess.app/Contents/Frameworks"
-            cp -R build/_deps/sfml-src/extlibs/libs-osx/Frameworks/freetype.framework "$DIR/SimplyChess.app/Contents/Frameworks/"
+            cp -R build/_deps/sfml-src/extlibs/libs-osx/Frameworks/*.framework "$DIR/SimplyChess.app/Contents/Frameworks/"
           else
             cp build/SimplyChess "$DIR/"
             cp -r resources config "$DIR/"
