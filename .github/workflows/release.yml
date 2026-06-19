@@ -52,10 +52,10 @@ jobs:
           fi
           cp -r resources config "$DIR/"
           if [ "${{ matrix.name }}" = "macos" ]; then
+            # El rpath @executable_path/Frameworks ya lo fija CMake (INSTALL_RPATH en APPLE),
+            # así que aquí solo hay que copiar el framework de freetype dentro del paquete.
             mkdir -p "$DIR/Frameworks"
             cp -R build/_deps/sfml-src/extlibs/libs-osx/Frameworks/freetype.framework "$DIR/Frameworks/"
-            install_name_tool -delete_rpath "$(pwd)/build/_deps/sfml-src/extlibs/libs-osx/Frameworks" "$DIR/SimplyChess" 2>/dev/null || true
-            install_name_tool -add_rpath "@executable_path/Frameworks" "$DIR/SimplyChess"
           fi
           cmake -E tar cf "$DIR.zip" --format=zip "$DIR"
 
