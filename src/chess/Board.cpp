@@ -501,6 +501,11 @@ void Board::promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting)
 			}
 		}
 
+		// Efectos de sonido post-promoción
+		if (this->status != GameStatus::PLAYING) {
+			AudioSystem::getInstance().playSound("game_over");
+		} else if (this->jaque[opponentTurn]) {
+			AudioSystem::getInstance().playSound("check");
 		// Comprobamos jaque al oponente después de la promoción
 		bool opponentTurn = !turn;
 		this->jaque[0] = false;

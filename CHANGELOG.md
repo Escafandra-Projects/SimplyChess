@@ -20,6 +20,8 @@ Primera versión estable: el juego implementa todas las reglas oficiales del aje
 incluyendo las condiciones de tablas, además de un reloj de ajedrez configurable.
 
 ### Añadido
+- **Sonido al coronar**: reproduce el efecto de jaque o de fin de partida cuando la
+  pieza resultante de una coronación da jaque, jaque mate o provoca ahogado.
 - **Mejoras visuales (Hito 2)**:
   - **Animaciones de movimiento**: Las piezas se desplazan de forma suave (interpolación lineal) en lugar de teletransportarse instantáneamente.
   - **Efectos de sonido**: Añadida la biblioteca `sfml-audio` y un `AudioSystem` para reproducir sonidos al mover, capturar, dar jaque o finalizar la partida.
