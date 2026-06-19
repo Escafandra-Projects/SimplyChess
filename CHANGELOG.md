@@ -9,6 +9,9 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Corregido
+- Arreglada la distribución en macOS: el ejecutable ahora resuelve las rutas de los recursos correctamente independientemente del directorio de ejecución, y el paquete de release es más ligero al incluir solo el framework necesario (`freetype`).
+
 ---
 
 ## [1.0.0] — 2026-06-18
