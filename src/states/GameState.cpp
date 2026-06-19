@@ -130,16 +130,18 @@ void GameState::updateText() {
 }
 
 // Funciones
-void GameState::updateInput(float /*dt*/) {
-	// Tecla de pausa
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))) && this->getKeytime()) {
-		if (!this->paused) {
-			this->pauseState();
-		}
-		else {
-			this->unpauseState();
+void GameState::handleEvent(const sf::Event& event) {
+	if (event.type == sf::Event::KeyPressed) {
+		if (event.key.code == this->keybinds.at("CLOSE")) {
+			if (!this->paused) {
+				this->pauseState();
+			}
+			else {
+				this->unpauseState();
+			}
 		}
 	}
+}
 
 	// Movimiento: admite dos clics (clic en pieza, clic en destino) y arrastrar-soltar.
 	bool mouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Left);

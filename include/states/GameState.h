@@ -68,6 +68,8 @@ public:
 	/* Actualizar */
 	/// Refresca el texto del marcador (jugadores y puntos).
 	void updateText();
+	/// Procesa eventos discretos (teclado, etc.).
+	void handleEvent(const sf::Event& event) override;
 	/// Procesa la entrada: pausa, clics sobre el tablero y fin de juego.
 	void updateInput(float dt) override;
 	/// Gestiona los botones del menú de pausa (salir / continuar).

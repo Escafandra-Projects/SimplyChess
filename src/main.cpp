@@ -37,7 +37,13 @@ static void setWorkingDirectoryToExecutable() {
 #endif
     if (!exePath.empty()) {
         std::error_code ec;
-        std::filesystem::current_path(exePath.parent_path(), ec);
+        auto dir = exePath.parent_path();
+#ifdef __APPLE__
+        if (dir.filename() == "MacOS") {
+            dir = dir.parent_path() / "Resources";
+        }
+#endif
+        std::filesystem::current_path(dir, ec);
     }
 }
 
