@@ -3,7 +3,7 @@
 #include <iostream>
 
 void SettingsState::initVariables() {
-	this->currentBaseTimeIdx = 2; // Default: 300s
+	this->currentBaseTimeIdx = 3; // Default: 300s
 	this->currentIncrementIdx = 0; // Default: 0s
 	this->keytimeMax = 30.0f; // Aumentar delay de botones para que no cambien tan rápido
 }
@@ -93,21 +93,36 @@ void SettingsState::initButtons() {
 		this->textures["BUTTONS"]);
 	this->buttons["INC_CYCLE"]->scale(2.5f, 2.5f);
 
-	this->buttons["BACK"] = std::make_unique<Button>(415.0f, 600.0f, 100.0f, 61.0f,
-		&this->font, "Back", 40,
+	this->buttons["CANCEL"] = std::make_unique<Button>(200.0f, 600.0f, 100.0f, 61.0f,
+		&this->font, "Cancel", 40,
 		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
 		this->textures["BUTTONS"]);
-	this->buttons["BACK"]->scale(3.0f, 3.0f);
+	this->buttons["CANCEL"]->scale(3.0f, 3.0f);
+
+	this->buttons["CONFIRM"] = std::make_unique<Button>(600.0f, 600.0f, 100.0f, 61.0f,
+		&this->font, "Confirm", 40,
+		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
+		this->textures["BUTTONS"]);
+	this->buttons["CONFIRM"]->scale(3.0f, 3.0f);
 }
 
 void SettingsState::updateButtonTexts() {
 	int bt = baseTimeOptions[currentBaseTimeIdx];
-	std::string btStr = std::to_string(bt / 60) + " min";
-	this->buttons["TIME_CYCLE"]->setText(btStr);
+	if (bt == 0) {
+		// The font doesn't support the infinity symbol, so we use "Infinite"
+		this->buttons["TIME_CYCLE"]->setText("Infinite");
+	} else {
+		std::string btStr = std::to_string(bt / 60) + " min";
+		this->buttons["TIME_CYCLE"]->setText(btStr);
+	}
 
-	int inc = incrementOptions[currentIncrementIdx];
-	std::string incStr = std::to_string(inc) + " sec";
-	this->buttons["INC_CYCLE"]->setText(incStr);
+	if (bt == 0) {
+		this->buttons["INC_CYCLE"]->setText("Off");
+	} else {
+		int inc = incrementOptions[currentIncrementIdx];
+		std::string incStr = std::to_string(inc) + " sec";
+		this->buttons["INC_CYCLE"]->setText(incStr);
+	}
 }
 
 SettingsState::SettingsState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states) 
@@ -140,11 +155,17 @@ void SettingsState::updateButtons() {
 	}
 
 	if (this->buttons["INC_CYCLE"]->isPressed() && this->getKeytime()) {
-		currentIncrementIdx = (currentIncrementIdx + 1) % incrementOptions.size();
-		updateButtonTexts();
+		if (baseTimeOptions[currentBaseTimeIdx] != 0) {
+			currentIncrementIdx = (currentIncrementIdx + 1) % incrementOptions.size();
+			updateButtonTexts();
+		}
 	}
 
-	if (this->buttons["BACK"]->isPressed() && this->getKeytime()) {
+	if (this->buttons["CANCEL"]->isPressed() && this->getKeytime()) {
+		this->quit = true;
+	}
+
+	if (this->buttons["CONFIRM"]->isPressed() && this->getKeytime()) {
 		this->saveSettings();
 		this->quit = true;
 	}

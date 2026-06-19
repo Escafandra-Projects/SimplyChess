@@ -56,6 +56,9 @@ expandirse a otras áreas.
 **Prioridad:** Media
 **Objetivo:** Hacer que el juego se sienta más moderno, responsivo y dinámico.
 
+- [ ] **Añadir la lemniscata**
+  - Cargar una fuente que soporte el símbolo de infinito o usar una textura para mostrar la lemniscata en la opción de tiempo infinito de los ajustes.
+
 - [ ] **Animaciones de movimiento**
   - Reemplazar el movimiento instantáneo (teletransporte) por interpolación fluida
     entre origen y destino.

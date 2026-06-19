@@ -23,7 +23,7 @@ private:
 	int increment;
 
 	// Opciones de configuración
-	const std::vector<int> baseTimeOptions = {60, 180, 300, 600};
+	const std::vector<int> baseTimeOptions = {0, 60, 180, 300, 600};
 	const std::vector<int> incrementOptions = {0, 1, 2, 3, 5};
 	int currentBaseTimeIdx;
 	int currentIncrementIdx;

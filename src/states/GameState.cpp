@@ -74,6 +74,10 @@ static std::string formatTime(float t) {
 }
 
 std::string GameState::buildScoreText() const {
+	if (this->baseTime == 0.0f) {
+		return "White: \n" + this->player1 + ". \nPoints: " + std::to_string(this->points1) +
+			"\n\n\nBlack: \n" + this->player2 + ". \nPoints: " + std::to_string(this->points2);
+	}
 	return "White: \n" + this->player1 + ". \nPoints: " + std::to_string(this->points1) +
 		"\nTime: " + formatTime(this->timeWhite) + 
 		"\n\n\nBlack: \n" + this->player2 + ". \nPoints: " + std::to_string(this->points2) +
@@ -202,7 +206,7 @@ void GameState::update(float dt) {
 			// Solo se pausa durante una coronación pendiente: en ese momento el turno
 			// ya ha cambiado al rival, así que su reloj no debe correr mientras el
 			// jugador elige la pieza. Seleccionar/mover una pieza NO pausa el reloj.
-			if (this->clockStarted && !this->board->isPromoting()) {
+			if (this->baseTime > 0.0f && this->clockStarted && !this->board->isPromoting()) {
 				if (this->turn) {
 					this->timeWhite -= dt;
 					if (this->timeWhite <= 0) {
@@ -218,11 +222,13 @@ void GameState::update(float dt) {
 
 			// Incremento (y arranque del reloj tras el primer movimiento de las blancas)
 			if (this->previousTurn != this->turn) {
-				// Turno acaba de cambiar
-				if (this->previousTurn) {
-					this->timeWhite += this->increment;
-				} else {
-					this->timeBlack += this->increment;
+				if (this->baseTime > 0.0f) {
+					// Turno acaba de cambiar
+					if (this->previousTurn) {
+						this->timeWhite += this->increment;
+					} else {
+						this->timeBlack += this->increment;
+					}
 				}
 				this->previousTurn = this->turn;
 				this->clockStarted = true;
