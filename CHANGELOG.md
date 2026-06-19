@@ -21,6 +21,9 @@ incluyendo las condiciones de tablas, además de un reloj de ajedrez configurabl
 
 ### Añadido
 - **Mejoras visuales (Hito 2)**:
+  - **Animaciones de movimiento**: Las piezas se desplazan de forma suave (interpolación lineal) en lugar de teletransportarse instantáneamente.
+  - **Efectos de sonido**: Añadida la biblioteca `sfml-audio` y un `AudioSystem` para reproducir sonidos al mover, capturar, dar jaque o finalizar la partida.
+  - **Mover arrastrando (drag & drop)**: además del modo de dos clics, ahora se puede mover una pieza arrastrándola con el ratón y soltándola en la casilla destino.
   - **Resaltado de movimientos legales**: Al seleccionar una pieza, muestra las casillas disponibles con un punto gris oscuro y las capturas con un aro alrededor de la pieza enemiga (incluyendo captura al paso).
   - **Resaltado del último movimiento**: Marca las casillas de origen y destino del último movimiento con un fondo sutil.
 - **Coordenadas en el tablero**: nueva imagen de tablero con los números (1-8) a la

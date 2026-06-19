@@ -15,6 +15,7 @@ void GameState::initVariables() {
 	this->points1 = 0;
 	this->points2 = 0;
 	this->gameOverReady = false;
+	this->mouseHeldLastFrame = false;
 	this->background.setPosition(sf::Vector2f(820.f, 0.f));
 
 	std::ifstream ifs("config/game.ini");
@@ -140,12 +141,25 @@ void GameState::updateInput(float /*dt*/) {
 		}
 	}
 
-	// Click izquierdo en la pieza para seleccionarla 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->getKeytime()) {
-		
-		this->board->movePiece(this->turn, this->points1, this->points2);
-		this->updateText();
+	// Movimiento: admite dos clics (clic en pieza, clic en destino) y arrastrar-soltar.
+	bool mouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+	if (!this->paused && !this->board->getEndGame() && !this->board->isPromoting()) {
+		if (mouseDown && !this->mouseHeldLastFrame) {
+			// Flanco de pulsación: seleccionar, re-agarrar o soltar destino (dos clics).
+			if (!this->board->isAnyPieceAnimating()) {
+				this->board->onPress(this->mousePosWindow, this->turn, this->points1, this->points2);
+				this->updateText();
+			}
+		} else if (mouseDown) {
+			// Manteniendo pulsado: la pieza agarrada sigue al cursor.
+			this->board->onDrag(this->mousePosWindow);
+		} else if (this->mouseHeldLastFrame) {
+			// Flanco de soltar: completar el arrastre (o cancelarlo si vuelve a su casilla).
+			this->board->onRelease(this->mousePosWindow, this->turn, this->points1, this->points2);
+			this->updateText();
+		}
 	}
+	this->mouseHeldLastFrame = mouseDown;
 
 	// Botón del mensaje de fin de partida.
 	// Exigimos haber soltado el ratón al menos una vez tras el fin de la partida,
@@ -238,6 +252,7 @@ void GameState::update(float dt) {
 			this->gameOverBox->update(this->mousePosWindow);
 		}
 		else {
+			this->board->updateAnimations(dt);
 			this->board->update(this->mousePosWindow, *this->window);
 		}
 	}
