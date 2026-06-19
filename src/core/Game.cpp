@@ -101,6 +101,10 @@ void Game::updateSFMLEvents() {
 		if (this->sfEvent.type == sf::Event::Closed) {
 			this->window->close();
 		}
+		
+		if (!this->states.empty()) {
+			this->states.top()->handleEvent(this->sfEvent);
+		}
 	}
 }
 

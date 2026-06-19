@@ -9,8 +9,15 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Añadido
+- **Iconos de Aplicación**: Se han incorporado los iconos nativos para los ejecutables de release (icono de peón `PeonN`).
+  - En **Windows** (`.ico`), el icono se incrusta en el `.exe` mediante el compilador de recursos `windres` en CMake.
+  - En **macOS** (`.icns`), la aplicación se genera ahora como un **App Bundle** nativo (`SimplyChess.app`), lo que habilita la asignación del icono en el sistema y soluciona problemas de permisos de teclado.
+- Soporte para eventos de teclado basados en cola de eventos (`handleEvent`) en la arquitectura de estados, mejorando la compatibilidad con macOS.
+
 ### Corregido
 - Arreglada la distribución en macOS: el ejecutable ahora resuelve las rutas de los recursos correctamente independientemente del directorio de ejecución, y el paquete de release es más ligero al incluir solo el framework necesario (`freetype`).
+- La tecla **Escape** para pausar/reanudar la partida ahora funciona correctamente en macOS gracias a la refactorización de la lectura de teclado (usando la cola de eventos en lugar de la consulta de estado global, la cual fallaba por restricciones de permisos en los App Bundles).
 
 ---
 

@@ -47,15 +47,14 @@ jobs:
           mkdir -p "$DIR"
           if [ "${{ matrix.name }}" = "windows" ]; then
             cp build/Release/SimplyChess.exe "$DIR/"
+            cp -r resources config "$DIR/"
+          elif [ "${{ matrix.name }}" = "macos" ]; then
+            cp -R build/SimplyChess.app "$DIR/"
+            mkdir -p "$DIR/SimplyChess.app/Contents/Frameworks"
+            cp -R build/_deps/sfml-src/extlibs/libs-osx/Frameworks/freetype.framework "$DIR/SimplyChess.app/Contents/Frameworks/"
           else
             cp build/SimplyChess "$DIR/"
-          fi
-          cp -r resources config "$DIR/"
-          if [ "${{ matrix.name }}" = "macos" ]; then
-            # El rpath @executable_path/Frameworks ya lo fija CMake (INSTALL_RPATH en APPLE),
-            # así que aquí solo hay que copiar el framework de freetype dentro del paquete.
-            mkdir -p "$DIR/Frameworks"
-            cp -R build/_deps/sfml-src/extlibs/libs-osx/Frameworks/freetype.framework "$DIR/Frameworks/"
+            cp -r resources config "$DIR/"
           fi
           cmake -E tar cf "$DIR.zip" --format=zip "$DIR"
 

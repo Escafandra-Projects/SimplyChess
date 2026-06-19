@@ -59,6 +59,8 @@ public:
 
 
 	// Funciones virtuales
+	/// Procesa eventos discretos (teclado, etc.).
+	virtual void handleEvent(const sf::Event& event) {}
 	/// Actualiza las posiciones del ratón (pantalla, ventana y vista).
 	virtual void updateMousePositions();
 	/// Incrementa el contador antirrebote en función del delta-time.
