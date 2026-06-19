@@ -35,6 +35,10 @@ private:
 	// solo se acepta el botón Exit tras soltar el ratón al menos una vez.
 	bool gameOverReady;
 
+	// Estado del botón izquierdo el frame anterior, para detectar los flancos de
+	// pulsación y de soltar (necesario para distinguir clic de arrastre).
+	bool mouseHeldLastFrame;
+
 	// Inicialización
 	/// Inicializa las variables y el mensaje de fin de partida.
 	void initVariables();

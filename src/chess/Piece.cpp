@@ -145,6 +145,24 @@ void Piece::move(int x, int y){
 	this->isAnimating = true;
 }
 
+void Piece::setRenderPosition(float x, float y){
+	// Mueve solo el sprite (arrastre): sin animación y sin tocar la casilla lógica.
+	this->pos.x = x;
+	this->pos.y = y;
+	this->targetPos = this->pos;
+	this->isAnimating = false;
+	this->piece.setPosition(this->pos.x, this->pos.y);
+}
+
+void Piece::snapToGrid(){
+	// Recoloca el sprite en su casilla de rejilla actual, sin animación.
+	this->pos.x = this->gridPos.y * CELL_SIZE + BOARD_OFFSET_X;
+	this->pos.y = this->gridPos.x * CELL_SIZE + BOARD_OFFSET_Y;
+	this->targetPos = this->pos;
+	this->isAnimating = false;
+	this->piece.setPosition(this->pos.x, this->pos.y);
+}
+
 bool Piece::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, BoardGrid& board, CastlingState& castling, EnPassantState& peonPaso) {
 	switch (this->type) {
 	case PieceType::PEON:

@@ -64,6 +64,7 @@ private:
 	*/
 	std::array<std::array<std::unique_ptr<Piece>, 2>, 16> pieces;
 	bool isMoving;
+	bool isDragging;
 	bool endGame;
 	bool promotionTurn;
 
@@ -91,6 +92,10 @@ private:
 	void startMove(sf::Vector2i mousePos, bool& turn);
 	/// Valida y aplica el movimiento a la casilla destino (jaque, enroque, etc.).
 	void endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points2);
+	/// Convierte una posición de ratón (píxeles) a casilla de rejilla (x=fila, y=columna).
+	sf::Vector2i mouseToGrid(sf::Vector2i mousePos) const;
+	/// Indica si la posición de ratón cae dentro del área jugable del tablero.
+	bool isInsideBoard(sf::Vector2i mousePos) const;
 	/// Captura una pieza y suma sus puntos al jugador correspondiente.
 	void capturePiece(Piece* menacedPiece, bool turn, int& points1, int& points2);
 	/// Gestiona la coronación: muestra el menú o aplica la pieza elegida.
@@ -110,6 +115,12 @@ public:
 	bool checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, CastlingState& castling, BoardGrid& checkBoard);
 	/// Selecciona o mueve una pieza según el clic actual.
 	void movePiece(bool& turn, int& points1, int& points2);
+	/// Flanco de pulsación: selecciona una pieza, la re-agarra o completa un movimiento (modo dos clics).
+	void onPress(sf::Vector2i mousePos, bool& turn, int& points1, int& points2);
+	/// Mientras se mantiene pulsado: la pieza agarrada sigue al cursor.
+	void onDrag(sf::Vector2i mousePos);
+	/// Flanco de soltar: suelta la pieza en la casilla destino o cancela el arrastre.
+	void onRelease(sf::Vector2i mousePos, bool& turn, int& points1, int& points2);
 	/// Devuelve la pieza en la casilla (x, y) o nullptr si está vacía.
 	Piece* getPiece(int x, int y);
 	/// Indica si la partida ha terminado.

@@ -8,6 +8,7 @@
 void Board::initVariables() {
 	// Variables
 	this->isMoving = false;
+	this->isDragging = false;
 	this->endGame = false;
 	this->promotionTurn = false;
 	this->status = GameStatus::PLAYING;
@@ -555,6 +556,77 @@ void Board::movePiece(bool& turn, int& points1, int& points2) {
 	}
 }
 
+sf::Vector2i Board::mouseToGrid(sf::Vector2i mousePos) const {
+	// x = fila (desde mousePos.y), y = columna (desde mousePos.x)
+	return sf::Vector2i((mousePos.y - BOARD_OFFSET_Y) / CELL_SIZE,
+	                    (mousePos.x - BOARD_OFFSET_X) / CELL_SIZE);
+}
+
+bool Board::isInsideBoard(sf::Vector2i mousePos) const {
+	return mousePos.x > BOARD_OFFSET_X && mousePos.x < BOARD_OFFSET_X + BOARD_SIZE
+	    && mousePos.y > BOARD_OFFSET_Y && mousePos.y < BOARD_OFFSET_Y + BOARD_SIZE;
+}
+
+void Board::onPress(sf::Vector2i mousePos, bool& turn, int& points1, int& points2) {
+	if (!this->isInsideBoard(mousePos)) return;
+	sf::Vector2i sq = this->mouseToGrid(mousePos);
+
+	if (this->isMoving && this->movingPiece) {
+		sf::Vector2i selected = this->movingPiece->getGridPosition();
+		if (sq == selected) {
+			// Volver a agarrar la pieza ya seleccionada para arrastrarla.
+			this->isDragging = true;
+		} else {
+			Piece* atSquare = this->getPiece(sq.x, sq.y);
+			if (atSquare && atSquare->isActive() && atSquare->getColor() == turn) {
+				// Cambiar la selección a otra pieza propia (y permitir arrastrarla).
+				this->startMove(mousePos, turn);
+				if (this->isMoving) this->isDragging = true;
+			} else {
+				// Clic en una casilla destino (modo dos clics).
+				this->endMove(mousePos, turn, points1, points2);
+			}
+		}
+	} else {
+		// Nada seleccionado: intentar seleccionar la pieza bajo el cursor.
+		this->startMove(mousePos, turn);
+		if (this->isMoving) this->isDragging = true;
+	}
+}
+
+void Board::onDrag(sf::Vector2i mousePos) {
+	if (this->isDragging && this->movingPiece) {
+		// Centrar el sprite de la pieza en el cursor.
+		this->movingPiece->setRenderPosition(mousePos.x - CELL_SIZE / 2.f, mousePos.y - CELL_SIZE / 2.f);
+	}
+}
+
+void Board::onRelease(sf::Vector2i mousePos, bool& turn, int& points1, int& points2) {
+	if (!this->isDragging || !this->movingPiece) {
+		this->isDragging = false;
+		return;
+	}
+	this->isDragging = false;
+
+	Piece* dragged = this->movingPiece;
+	sf::Vector2i origin = dragged->getGridPosition();
+
+	// Soltar fuera del tablero o en la misma casilla no es un arrastre: se devuelve
+	// el sprite a su sitio y se mantiene la selección (para completar por dos clics).
+	if (!this->isInsideBoard(mousePos) || this->mouseToGrid(mousePos) == origin) {
+		dragged->snapToGrid();
+		return;
+	}
+
+	// Arrastre a otra casilla: intentar el movimiento.
+	this->endMove(mousePos, turn, points1, points2);
+
+	// Si el movimiento no se aplicó (ilegal), el sprite quedó bajo el cursor: devolverlo.
+	if (dragged->getGridPosition() == origin) {
+		dragged->snapToGrid();
+	}
+}
+
 Piece* Board::getPiece(int x, int y) {
 
 	for (int i = 0; i < 16; i++) {
@@ -716,7 +788,11 @@ void Board::update(sf::Vector2i mousePos, sf::RenderWindow& window) {
 	// Esto esta MUY RARO. Para coronar utiliza posicion del raton calculada en State.cpp. Para mover el juego utiliza la posicion interna del Board
 	if (!this->promotionMenu->isShown()) {
 
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) this->isMoving = false;
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+			if (this->isDragging && this->movingPiece) this->movingPiece->snapToGrid();
+			this->isMoving = false;
+			this->isDragging = false;
+		}
 		this->mousePos = sf::Mouse::getPosition(window);
 	}
 	else {
@@ -744,6 +820,9 @@ void Board::render(sf::RenderTarget& target)
 		if (this->pieces[i][0]->isActive()) this->pieces[i][0]->render(target);
 		if (this->pieces[i][1]->isActive()) this->pieces[i][1]->render(target);
 	}
+
+	// La pieza que se está arrastrando se dibuja por encima del resto.
+	if (this->isDragging && this->movingPiece) this->movingPiece->render(target);
 
 	// Coronación
 	this->promotionMenu->render(target);

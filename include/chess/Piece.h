@@ -91,6 +91,13 @@ public:
     /// Mueve la pieza a la casilla de rejilla (x, y).
     void move(int x, int y);
 
+    /// Coloca el sprite directamente en píxeles (para arrastrarlo, sin animación
+    /// ni cambiar la casilla lógica).
+    void setRenderPosition(float x, float y);
+    /// Devuelve el sprite a su casilla de rejilla actual, sin animación
+    /// (para cancelar un arrastre).
+    void snapToGrid();
+
     /// Valida si el movimiento es legal para el tipo de esta pieza.
     bool checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, BoardGrid& board, CastlingState& castling, EnPassantState& peonPaso);
 };
