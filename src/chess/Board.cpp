@@ -242,14 +242,14 @@ void Board::calculateLegalMoves(bool turn, sf::Vector2i startPos) {
 						// Captura: círculo hueco
 						sf::CircleShape circle(45.f);
 						circle.setFillColor(sf::Color::Transparent);
-						circle.setOutlineColor(sf::Color(0, 0, 0, 80));
+						circle.setOutlineColor(sf::Color(0, 0, 0, 45));
 						circle.setOutlineThickness(5.f);
 						circle.setPosition(desPos.y * CELL_SIZE + BOARD_OFFSET_X + 5.f, desPos.x * CELL_SIZE + BOARD_OFFSET_Y + 5.f);
 						this->legalMovesShapes.push_back(circle);
 					} else {
 						// Movimiento normal: punto
 						sf::CircleShape dot(15.f);
-						dot.setFillColor(sf::Color(0, 0, 0, 80));
+						dot.setFillColor(sf::Color(0, 0, 0, 45));
 						dot.setPosition(desPos.y * CELL_SIZE + BOARD_OFFSET_X + 35.f, desPos.x * CELL_SIZE + BOARD_OFFSET_Y + 35.f);
 						this->legalMovesShapes.push_back(dot);
 					}
