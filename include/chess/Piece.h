@@ -34,6 +34,10 @@ private:
     sf::Vector2f pos;
     sf::Vector2u gridPos;
 
+    // Animación
+    sf::Vector2f targetPos;
+    bool isAnimating;
+    static constexpr float ANIMATION_SPEED = 15.0f; // Constante fija de velocidad (15x distancia por segundo)
 
     /// Valida el movimiento del rey (incluye el enroque).
     bool checkMoveKing(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, BoardGrid& board, CastlingState& castling);
@@ -55,8 +59,8 @@ public:
     Piece(unsigned x, unsigned y, sf::Texture& texture, PieceType type, bool color);
     virtual ~Piece();
 
-    /// Actualiza la pieza (sin lógica por ahora).
-    void update();
+    /// Actualiza la animación de la pieza.
+    void update(float dt);
     /// Dibuja la pieza.
     void render(sf::RenderTarget& target);
 
@@ -81,9 +85,18 @@ public:
     int getPoints() const;
     /// Indica si la pieza sigue activa.
     bool isActive() const;
+    /// Indica si la pieza se está animando.
+    bool getIsAnimating() const;
 
     /// Mueve la pieza a la casilla de rejilla (x, y).
     void move(int x, int y);
+
+    /// Coloca el sprite directamente en píxeles (para arrastrarlo, sin animación
+    /// ni cambiar la casilla lógica).
+    void setRenderPosition(float x, float y);
+    /// Devuelve el sprite a su casilla de rejilla actual, sin animación
+    /// (para cancelar un arrastre).
+    void snapToGrid();
 
     /// Valida si el movimiento es legal para el tipo de esta pieza.
     bool checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, BoardGrid& board, CastlingState& castling, EnPassantState& peonPaso);

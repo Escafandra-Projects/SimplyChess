@@ -49,7 +49,7 @@ else()
 endif()
 
 # Enlazar SFML 2.6.1
-target_link_libraries(SimplyChess PRIVATE sfml-graphics sfml-window sfml-system)
+target_link_libraries(SimplyChess PRIVATE sfml-graphics sfml-window sfml-system sfml-audio)
 
 # Copiar recursos al directorio de construcción o al bundle en macOS
 if (APPLE)
