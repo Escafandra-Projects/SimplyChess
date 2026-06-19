@@ -59,7 +59,7 @@ if (APPLE)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/config $<TARGET_FILE_DIR:SimplyChess>/../Resources/config
         COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:SimplyChess>/../Frameworks
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        COMMAND ditto
         ${CMAKE_BINARY_DIR}/_deps/sfml-src/extlibs/libs-osx/Frameworks $<TARGET_FILE_DIR:SimplyChess>/../Frameworks
     )
 else()
