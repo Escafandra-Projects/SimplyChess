@@ -392,17 +392,18 @@ flowchart TD
         S2["getPiece(x, y) → buscar pieza en esa casilla"]
         S3{"¿Color de la pieza == turno?"}
         S4["Seleccionar pieza (isMoving = true)"]
+        S4B["calculateLegalMoves() → generar resaltados visuales"]
         S5["Ignorar clic"]
 
         S1 --> S2 --> S3
-        S3 -->|Sí| S4
+        S3 -->|Sí| S4 --> S4B
         S3 -->|No| S5
     end
 
     subgraph "endMove() — 3 fases"
         E1["Fase 1: Copiar tablero (testBoard)<br/>Validar geometría con checkMove()"]
         E2["Fase 2: Validar jaque<br/>• Enroque: isCastlingLegal()<br/>• Simular movimiento en testBoard<br/>• Verificar !isInCheck(turn, testBoard)"]
-        E3["Fase 3: Aplicar al tablero real<br/>• Actualizar BoardGrid<br/>• Mover sprite de la pieza<br/>• Ejecutar captura al paso<br/>• Ejecutar enroque (mover torre)<br/>• Comprobar coronación<br/>• Capturar pieza enemiga<br/>• Cambiar turno<br/>• Comprobar jaque/mate al oponente"]
+        E3["Fase 3: Aplicar al tablero real<br/>• Actualizar BoardGrid<br/>• Mover sprite de la pieza<br/>• Actualizar resaltados de último movimiento<br/>• Ejecutar captura al paso<br/>• Ejecutar enroque (mover torre)<br/>• Comprobar coronación<br/>• Capturar pieza enemiga<br/>• Cambiar turno<br/>• Comprobar jaque/mate al oponente"]
         INVALID["Movimiento rechazado"]
 
         E1 -->|Válido| E2
