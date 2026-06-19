@@ -22,8 +22,12 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 # Incluir headers
 include_directories(include)
 
-# Añadir warnings del compilador
-add_compile_options(-Wall -Wextra -Wpedantic)
+# Añadir warnings del compilador (los flags GNU no son válidos en MSVC)
+if(MSVC)
+    add_compile_options(/W4)
+else()
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
 # Crear ejecutable
 add_executable(SimplyChess ${SOURCES})
