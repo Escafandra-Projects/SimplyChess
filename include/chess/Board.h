@@ -46,6 +46,10 @@ private:
 	/* Interfaz */
 	sf::RectangleShape selectedCell;
 	sf::RectangleShape jaqueCell;
+	sf::RectangleShape lastMoveStartCell;
+	sf::RectangleShape lastMoveEndCell;
+	bool hasLastMove;
+	std::vector<sf::CircleShape> legalMovesShapes;
 	std::unique_ptr<PromotionMenu> promotionMenu;
 
 	/* Piezas */
@@ -87,6 +91,9 @@ private:
 	// Funciones privadas
 	/// Genera un string que representa el estado actual para detectar repeticiones.
 	std::string getPositionHash(bool currentTurn) const;
+
+	/// Calcula los movimientos legales de la pieza en startPos y rellena legalMovesShapes
+	void calculateLegalMoves(bool turn, sf::Vector2i startPos);
 
 	/// Selecciona la pieza bajo el ratón si es del jugador en turno.
 	void startMove(sf::Vector2i mousePos, bool& turn);

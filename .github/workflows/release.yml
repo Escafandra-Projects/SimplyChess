@@ -1,0 +1,72 @@
+name: Release
+
+# Compila y empaqueta los ejecutables de Linux, macOS y Windows y los adjunta a la
+# release. Se dispara al publicar una release en GitHub; también puede lanzarse a mano
+# (workflow_dispatch) para generar los .zip como artefactos sin tocar ninguna release.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest,  name: linux }
+          - { os: macos-latest,   name: macos }
+          - { os: windows-latest, name: windows }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependencias de SFML (Linux)
+        if: matrix.name == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libx11-dev libxrandr-dev libxcursor-dev libxi-dev libudev-dev \
+            libgl1-mesa-dev libfreetype-dev libopenal-dev libvorbis-dev libflac-dev
+
+      - name: Configurar y compilar (SFML estática)
+        shell: bash
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
+          cmake --build build --config Release
+
+      - name: Empaquetar
+        shell: bash
+        run: |
+          DIR="SimplyChess-${{ matrix.name }}"
+          mkdir -p "$DIR"
+          if [ "${{ matrix.name }}" = "windows" ]; then
+            cp build/Release/SimplyChess.exe "$DIR/"
+          else
+            cp build/SimplyChess "$DIR/"
+          fi
+          cp -r resources config "$DIR/"
+          if [ "${{ matrix.name }}" = "macos" ]; then
+            # El rpath @executable_path/Frameworks ya lo fija CMake (INSTALL_RPATH en APPLE),
+            # así que aquí solo hay que copiar el framework de freetype dentro del paquete.
+            mkdir -p "$DIR/Frameworks"
+            cp -R build/_deps/sfml-src/extlibs/libs-osx/Frameworks/freetype.framework "$DIR/Frameworks/"
+          fi
+          cmake -E tar cf "$DIR.zip" --format=zip "$DIR"
+
+      - name: Subir artefacto del workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: SimplyChess-${{ matrix.name }}
+          path: SimplyChess-${{ matrix.name }}.zip
+
+      - name: Adjuntar a la release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: SimplyChess-${{ matrix.name }}.zip

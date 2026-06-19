@@ -61,12 +61,12 @@ expandirse a otras áreas.
     entre origen y destino.
   - Opciones: interpolación lineal (lerp) o easing (ease-in-out) usando delta-time.
 
-- [ ] **Resaltado de movimientos legales**
+- [x] **Resaltado de movimientos legales**
   - Al seleccionar una pieza, iluminar todas las casillas a las que puede moverse
     legalmente.
   - Requiere calcular y filtrar todos los destinos válidos (geometría + jaque).
 
-- [ ] **Resaltado del último movimiento**
+- [x] **Resaltado del último movimiento**
   - Marcar visualmente las casillas de origen y destino del último movimiento realizado.
   - Almacenar las coordenadas del último movimiento completado.
 
