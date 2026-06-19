@@ -61,12 +61,12 @@ expandirse a otras áreas.
     entre origen y destino.
   - Opciones: interpolación lineal (lerp) o easing (ease-in-out) usando delta-time.
 
-- [ ] **Resaltado de movimientos legales**
+- [x] **Resaltado de movimientos legales**
   - Al seleccionar una pieza, iluminar todas las casillas a las que puede moverse
     legalmente.
   - Requiere calcular y filtrar todos los destinos válidos (geometría + jaque).
 
-- [ ] **Resaltado del último movimiento**
+- [x] **Resaltado del último movimiento**
   - Marcar visualmente las casillas de origen y destino del último movimiento realizado.
   - Almacenar las coordenadas del último movimiento completado.
 
@@ -79,7 +79,7 @@ expandirse a otras áreas.
     - Jaque mate / fin de partida
   - Añadir `sfml-audio` a `target_link_libraries` en CMakeLists.txt.
 
-- [ ] **Coordenadas en el tablero**
+- [x] **Coordenadas en el tablero**
   - Mostrar los números (1-8) a la izquierda y las letras (A-H) en la parte inferior para ayudar a la lectura.
 
 - [x] **Menú de Ajustes**

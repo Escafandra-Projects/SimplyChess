@@ -9,9 +9,25 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Corregido
+- Arreglada la distribución en macOS: el ejecutable ahora resuelve las rutas de los recursos correctamente independientemente del directorio de ejecución, y el paquete de release es más ligero al incluir solo el framework necesario (`freetype`).
+
+---
+
+## [1.0.0] — 2026-06-18
+
+Primera versión estable: el juego implementa todas las reglas oficiales del ajedrez,
+incluyendo las condiciones de tablas, además de un reloj de ajedrez configurable.
+
 ### Añadido
 - **Sonido al coronar**: reproduce el efecto de jaque o de fin de partida cuando la
   pieza resultante de una coronación da jaque, jaque mate o provoca ahogado.
+- **Mejoras visuales (Hito 2)**:
+  - **Animaciones de movimiento**: Las piezas se desplazan de forma suave (interpolación lineal) en lugar de teletransportarse instantáneamente.
+  - **Efectos de sonido**: Añadida la biblioteca `sfml-audio` y un `AudioSystem` para reproducir sonidos al mover, capturar, dar jaque o finalizar la partida.
+  - **Mover arrastrando (drag & drop)**: además del modo de dos clics, ahora se puede mover una pieza arrastrándola con el ratón y soltándola en la casilla destino.
+  - **Resaltado de movimientos legales**: Al seleccionar una pieza, muestra las casillas disponibles con un punto gris oscuro y las capturas con un aro alrededor de la pieza enemiga (incluyendo captura al paso).
+  - **Resaltado del último movimiento**: Marca las casillas de origen y destino del último movimiento con un fondo sutil.
 - **Coordenadas en el tablero**: nueva imagen de tablero con los números (1-8) a la
   izquierda y las letras (A-H) abajo.
 - **Reglas de tablas (Hito 1 completado):**
@@ -38,6 +54,18 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 - Mensaje de fin de partida centrado en pantalla.
 - Ventana centrada al iniciar y título de la ventana actualizado.
 - Homogeneizado el tiempo de respuesta (debounce) de la UI para todos los botones en 30.0f (menús más suaves y controlados).
+
+### Corregido
+- Solucionado un error que impedía detectar el jaque (y el jaque mate / ahogado) cuando lo provocaba la pieza resultante de coronar un peón.
+- El botón **Back** de Ajustes ya no inicia la partida al volver: el menú principal solo
+  actúa ante un clic nuevo (flanco de pulsación), evitando que el clic mantenido se cuele
+  en el botón *Start* que queda debajo.
+- El **reloj** ya no empieza a descontar antes del primer movimiento: arranca cuando las
+  blancas completan su jugada inicial.
+- El **reloj** ya no se pausa al seleccionar/mover una pieza; sigue corriendo mientras el
+  jugador piensa su jugada (solo se detiene durante la coronación).
+- **Compilación con MSVC/Windows**: los flags de warnings de GCC/Clang (`-Wextra`,
+  `-Wpedantic`) ya no abortan el build con Visual Studio; en MSVC se usa `/W4`.
 
 ### Eliminado
 - `docs/Plan de Próximos Pasos.md` — reemplazado por `docs/roadmap.md` y `docs/ideas.md`.

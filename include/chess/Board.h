@@ -46,6 +46,10 @@ private:
 	/* Interfaz */
 	sf::RectangleShape selectedCell;
 	sf::RectangleShape jaqueCell;
+	sf::RectangleShape lastMoveStartCell;
+	sf::RectangleShape lastMoveEndCell;
+	bool hasLastMove;
+	std::vector<sf::CircleShape> legalMovesShapes;
 	std::unique_ptr<PromotionMenu> promotionMenu;
 
 	/* Piezas */
@@ -64,6 +68,7 @@ private:
 	*/
 	std::array<std::array<std::unique_ptr<Piece>, 2>, 16> pieces;
 	bool isMoving;
+	bool isDragging;
 	bool endGame;
 	bool promotionTurn;
 
@@ -87,10 +92,17 @@ private:
 	/// Genera un string que representa el estado actual para detectar repeticiones.
 	std::string getPositionHash(bool currentTurn) const;
 
+	/// Calcula los movimientos legales de la pieza en startPos y rellena legalMovesShapes
+	void calculateLegalMoves(bool turn, sf::Vector2i startPos);
+
 	/// Selecciona la pieza bajo el ratón si es del jugador en turno.
 	void startMove(sf::Vector2i mousePos, bool& turn);
 	/// Valida y aplica el movimiento a la casilla destino (jaque, enroque, etc.).
 	void endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points2);
+	/// Convierte una posición de ratón (píxeles) a casilla de rejilla (x=fila, y=columna).
+	sf::Vector2i mouseToGrid(sf::Vector2i mousePos) const;
+	/// Indica si la posición de ratón cae dentro del área jugable del tablero.
+	bool isInsideBoard(sf::Vector2i mousePos) const;
 	/// Captura una pieza y suma sus puntos al jugador correspondiente.
 	void capturePiece(Piece* menacedPiece, bool turn, int& points1, int& points2);
 	/// Gestiona la coronación: muestra el menú o aplica la pieza elegida.
@@ -110,6 +122,12 @@ public:
 	bool checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, CastlingState& castling, BoardGrid& checkBoard);
 	/// Selecciona o mueve una pieza según el clic actual.
 	void movePiece(bool& turn, int& points1, int& points2);
+	/// Flanco de pulsación: selecciona una pieza, la re-agarra o completa un movimiento (modo dos clics).
+	void onPress(sf::Vector2i mousePos, bool& turn, int& points1, int& points2);
+	/// Mientras se mantiene pulsado: la pieza agarrada sigue al cursor.
+	void onDrag(sf::Vector2i mousePos);
+	/// Flanco de soltar: suelta la pieza en la casilla destino o cancela el arrastre.
+	void onRelease(sf::Vector2i mousePos, bool& turn, int& points1, int& points2);
 	/// Devuelve la pieza en la casilla (x, y) o nullptr si está vacía.
 	Piece* getPiece(int x, int y);
 	/// Indica si la partida ha terminado.
@@ -131,11 +149,22 @@ public:
 	bool isCheckmate(bool color);
 	/// Comprueba que el enroque es legal (rey no en jaque ni pasa por casilla amenazada).
 	bool isCastlingLegal(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, BoardGrid& originalBoard);
+	/// Indica si el estado actual es GameStatus::PLAYING.
+	bool isPlaying() const;
+	/// Indica si alguna pieza se está animando.
+	bool isAnyPieceAnimating() const;
 
-	// Funciones principales
+	/* Movimiento y Selección */
+	/// Devuelve true si la partida no ha terminado y hay una pieza siendo movida.
+	bool IsMoving() const;
+
+	/// Gestiona la selección de una pieza o el destino de un movimiento.
+	void updateInput(const sf::Vector2i& mousePosWindow, bool turn);
 	/// Actualiza el tablero y el menú de coronación.
 	void update(sf::Vector2i mousePos, sf::RenderWindow& window);
-	/// Dibuja el tablero, las piezas y los resaltados.
+	/// Actualiza las animaciones de las piezas.
+	void updateAnimations(float dt);
+	/// Dibuja el tablero, casillas resaltadas, piezas y el menú de coronación.
 	void render(sf::RenderTarget& target);
 
 	// DEPURACIÓN

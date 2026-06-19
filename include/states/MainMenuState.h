@@ -19,6 +19,9 @@ private:
 	std::map<std::string, std::unique_ptr<Button>> buttons;
 	/* Titulo */
 	sf::Text titleText;
+	// Recuerda si el ratón estaba pulsado el frame anterior, para actuar solo
+	// en el flanco de pulsación y no "heredar" un clic mantenido de otro estado.
+	bool mousePressedLastFrame;
 
 	// Inicialización
 	/// Configura el texto del título.

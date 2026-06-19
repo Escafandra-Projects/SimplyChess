@@ -2,14 +2,14 @@
 
 #include <algorithm>
 #include <cstdlib>
-
+#include <cmath>
 
 Piece::Piece() {
 	this->points = 0;
 	this->color = true;
 	this->type = PieceType::PEON;
 	this->active = true;
-
+	this->isAnimating = false;
 }
 
 Piece::Piece(unsigned x, unsigned y, sf::Texture& texture, PieceType type, bool color) {
@@ -22,6 +22,8 @@ Piece::Piece(unsigned x, unsigned y, sf::Texture& texture, PieceType type, bool 
 	this->gridPos.x = x;
 	this->pos.x = this->gridPos.y * CELL_SIZE + BOARD_OFFSET_X;
 	this->pos.y = this->gridPos.x * CELL_SIZE + BOARD_OFFSET_Y;
+	this->targetPos = this->pos;
+	this->isAnimating = false;
 	this->piece.setTexture(texture);
 	this->piece.setPosition(pos.x, pos.y);
 
@@ -53,8 +55,21 @@ Piece::~Piece() {
 
 }
 
-void Piece::update() {
-
+void Piece::update(float dt) {
+	if (isAnimating) {
+		float dx = targetPos.x - pos.x;
+		float dy = targetPos.y - pos.y;
+		float dist = std::sqrt(dx * dx + dy * dy);
+		
+		if (dist < 1.0f) {
+			pos = targetPos;
+			isAnimating = false;
+		} else {
+			pos.x += dx * ANIMATION_SPEED * dt;
+			pos.y += dy * ANIMATION_SPEED * dt;
+		}
+		this->piece.setPosition(pos.x, pos.y);
+	}
 }
 
 void Piece::render(sf::RenderTarget& target) {
@@ -117,13 +132,34 @@ bool Piece::isActive() const {
     return this->active;
 }
 
+bool Piece::getIsAnimating() const {
+	return this->isAnimating;
+}
 
 void Piece::move(int x, int y){
-	this->pos.x = y * CELL_SIZE + BOARD_OFFSET_X;
-	this->pos.y = x * CELL_SIZE + BOARD_OFFSET_Y;
+	this->targetPos.x = y * CELL_SIZE + BOARD_OFFSET_X;
+	this->targetPos.y = x * CELL_SIZE + BOARD_OFFSET_Y;
 	this->gridPos.x = x;
 	this->gridPos.y = y;
 
+	this->isAnimating = true;
+}
+
+void Piece::setRenderPosition(float x, float y){
+	// Mueve solo el sprite (arrastre): sin animación y sin tocar la casilla lógica.
+	this->pos.x = x;
+	this->pos.y = y;
+	this->targetPos = this->pos;
+	this->isAnimating = false;
+	this->piece.setPosition(this->pos.x, this->pos.y);
+}
+
+void Piece::snapToGrid(){
+	// Recoloca el sprite en su casilla de rejilla actual, sin animación.
+	this->pos.x = this->gridPos.y * CELL_SIZE + BOARD_OFFSET_X;
+	this->pos.y = this->gridPos.x * CELL_SIZE + BOARD_OFFSET_Y;
+	this->targetPos = this->pos;
+	this->isAnimating = false;
 	this->piece.setPosition(this->pos.x, this->pos.y);
 }
 
