@@ -931,6 +931,13 @@ void Board::render(sf::RenderTarget& target)
 		if (this->pieces[i][1]->isActive()) this->pieces[i][1]->render(target);
 	}
 
+	// Movimientos legales
+	if (this->isMoving) {
+		for (auto& shape : this->legalMovesShapes) {
+			target.draw(shape);
+		}
+	}
+
 	// La pieza que se está arrastrando se dibuja por encima del resto.
 	if (this->isDragging && this->movingPiece) this->movingPiece->render(target);
 
