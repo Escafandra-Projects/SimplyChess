@@ -119,7 +119,7 @@ public:
 	/// Valida un movimiento sobre el tablero real.
 	bool checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, CastlingState& castling);
 	/// Valida un movimiento sobre un tablero de prueba (sin tocar el real).
-	bool checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, CastlingState& castling, BoardGrid& checkBoard);
+	bool checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, CastlingState& castling, BoardGrid& checkBoard, EnPassantState& peonPaso);
 	/// Selecciona o mueve una pieza según el clic actual.
 	void movePiece(bool& turn, int& points1, int& points2);
 	/// Flanco de pulsación: selecciona una pieza, la re-agarra o completa un movimiento (modo dos clics).

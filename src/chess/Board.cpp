@@ -219,8 +219,9 @@ void Board::calculateLegalMoves(bool turn, sf::Vector2i startPos) {
 			// Usar copias para evitar efectos secundarios
 			BoardGrid testBoard = this->board;
 			CastlingState testCastling = this->castling;
+			EnPassantState testPeonPaso = this->peonPaso;
 
-			if (this->movingPiece->checkMove(turn, startPos, desPos, testBoard, testCastling, this->peonPaso)) {
+			if (this->movingPiece->checkMove(turn, startPos, desPos, testBoard, testCastling, testPeonPaso)) {
 				// Validar enroque específicamente
 				bool isCastling = (this->movingPiece->getType() == PieceType::REY && std::abs(startPos.y - desPos.y) == 2);
 				if (isCastling) {
@@ -298,8 +299,9 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	// Al usar checkMove(board), esos efectos secundarios solo afectan a testBoard, no a this->board
 	BoardGrid testBoard = this->board;
 	CastlingState testCastling = this->castling;
+	EnPassantState testPeonPaso = this->peonPaso;
 
-	if (!checkMove(turn, pieceStartGridPos, pieceDesGridPos, this->movingPiece, this->menacedPiece, testCastling, testBoard)) {
+	if (!checkMove(turn, pieceStartGridPos, pieceDesGridPos, this->movingPiece, this->menacedPiece, testCastling, testBoard, testPeonPaso)) {
 		this->isMoving = false;
 		this->legalMovesShapes.clear();
 		return;
@@ -335,6 +337,7 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	// ========== FASE 3: Todo validado - aplicar al tablero real ==========
 	this->board = testBoard;
 	this->castling = testCastling;
+	this->peonPaso = testPeonPaso;
 
 	// Actualizar celdas del último movimiento
 	this->lastMoveStartCell.setPosition(pieceStartGridPos.y * CELL_SIZE + BOARD_OFFSET_X, pieceStartGridPos.x * CELL_SIZE + BOARD_OFFSET_Y);
@@ -572,8 +575,10 @@ void Board::peonPasoMovement(bool turn, sf::Vector2i startPos, sf::Vector2i desP
 		this->peonPiece = this->getPiece(4, desPos.y);
 	}
 
-	this->peonPiece->setActive(false);
-	this->peonPiece->move(-100, -100);
+	if (this->peonPiece) {
+		this->peonPiece->setActive(false);
+		this->peonPiece->move(-100, -100);
+	}
 }
 
 
@@ -619,17 +624,17 @@ bool Board::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Pie
 	return false;
 }
 
-bool Board::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, CastlingState& castling, BoardGrid& checkBoard) {
+bool Board::checkMove(bool turn, sf::Vector2i startPos, sf::Vector2i desPos, Piece* movingPiece, Piece* menacedPiece, CastlingState& castling, BoardGrid& checkBoard, EnPassantState& peonPaso) {
 	if ((turn == movingPiece->getColor())&&(startPos!=desPos)) {
 		if (menacedPiece) {
 			if(menacedPiece->getColor() != movingPiece->getColor() && menacedPiece->isActive()) {
-				if (movingPiece->checkMove(turn, startPos, desPos, checkBoard, castling, this->peonPaso)) {
+				if (movingPiece->checkMove(turn, startPos, desPos, checkBoard, castling, peonPaso)) {
 					return true;
 				}
 			}
 		}
 		else {
-			if (movingPiece->checkMove(turn, startPos, desPos, checkBoard, castling, this->peonPaso)) {
+			if (movingPiece->checkMove(turn, startPos, desPos, checkBoard, castling, peonPaso)) {
 				return true;
 			}
 		}
@@ -797,7 +802,8 @@ bool Board::isMenaced(bool turn, sf::Vector2i targetPos, Piece* targetPiece, Boa
 		std::string cell = board[attackerPos.x][attackerPos.y];
 		if (cell.length() < 2 || cell[1] != expectedSuffix) continue;
 
-		if (this->checkMove(turn, attackerPos, targetPos, attacker, targetPiece, castling, board))
+		EnPassantState testPeonPaso = this->peonPaso;
+		if (this->checkMove(turn, attackerPos, targetPos, attacker, targetPiece, castling, board, testPeonPaso))
 			return true;
 	}
 	return false;
@@ -839,8 +845,9 @@ bool Board::isCheckmate(bool color) {
                 // Usar copias para evitar efectos secundarios de checkMoveKing
                 BoardGrid testBoard = this->board;
                 CastlingState testCastling = this->castling;
+                EnPassantState testPeonPaso = this->peonPaso;
 
-                if (p->checkMove(color, startPos, desPos, testBoard, testCastling, this->peonPaso)) {
+                if (p->checkMove(color, startPos, desPos, testBoard, testCastling, testPeonPaso)) {
                     // Simular el movimiento de la pieza sobre testBoard
                     testBoard[desPos.x][desPos.y] = testBoard[startPos.x][startPos.y];
                     if ((startPos.x + startPos.y) % 2 != 0) testBoard[startPos.x][startPos.y] = "-";
