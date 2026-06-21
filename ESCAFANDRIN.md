@@ -62,11 +62,12 @@ El tablero (`Board`) mantiene **dos representaciones** sincronizadas manualmente
 - Menú principal con botones
 - Menú de pausa (Esc)
 - Menú de Ajustes (tiempo base e incremento)
-- Reloj de ajedrez configurable, con opción de tiempo infinito (símbolo ∞)
+- Reloj de ajedrez configurable (incluido tiempo infinito)
 - Sistema de puntos por capturas
 - Configuración de ventana vía archivos `.ini`
 
 ### ❌ Pendiente (ver `docs/roadmap.md`)
+- Lemniscata (símbolo ∞) para la opción de tiempo infinito
 - Historial de movimientos en pantalla (notación algebraica)
 - Exportar e importar partidas en PGN
 - Deshacer/rehacer movimientos (undo/redo)
