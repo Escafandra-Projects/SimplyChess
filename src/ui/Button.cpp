@@ -64,7 +64,7 @@ void Button::scale(float x, float y) {
 	this->centerText();
 }
 
-void Button::setText(const std::string text) {
+void Button::setText(const sf::String& text) {
 	this->text.setString(text);
 	this->centerText();
 }
