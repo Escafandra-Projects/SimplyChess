@@ -55,16 +55,21 @@ El tablero (`Board`) mantiene **dos representaciones** sincronizadas manualmente
 - Detección de ahogado (stalemate)
 - Regla de los 50 movimientos
 - Triple repetición de posición
+- Animaciones de movimiento (interpolación) y mover arrastrando (drag & drop)
+- Resaltado de movimientos legales y del último movimiento
+- Efectos de sonido (mover, capturar, jaque, fin de partida)
+- Coordenadas en el tablero (números 1-8 y letras A-H)
 - Menú principal con botones
 - Menú de pausa (Esc)
+- Menú de Ajustes (tiempo base e incremento)
+- Reloj de ajedrez configurable, con opción de tiempo infinito (símbolo ∞)
 - Sistema de puntos por capturas
 - Configuración de ventana vía archivos `.ini`
 
 ### ❌ Pendiente (ver `docs/roadmap.md`)
-- Animaciones de movimiento
-- Resaltado de movimientos legales
-- Efectos de sonido
-- Botón de Settings (visible pero sin funcionalidad)
+- Historial de movimientos en pantalla (notación algebraica)
+- Exportar e importar partidas en PGN
+- Deshacer/rehacer movimientos (undo/redo)
 
 ---
 
@@ -167,6 +172,9 @@ Ejemplos: `feat/deteccion-ahogado`, `fix/enroque-largo`, `docs/arquitectura`
 - Registra todo cambio relevante en `CHANGELOG.md`, bajo la sección `[Sin publicar]`.
 - Sigue el formato [Keep a Changelog](https://keepachangelog.com/es/1.1.0/):
   agrupa las entradas en `Añadido`, `Cambiado`, `Eliminado`, etc.
+- **Al completar una tarea de un `feat` o de un hito**, actualiza `docs/roadmap.md`
+  (marca la casilla correspondiente) y el «Estado actual» de este archivo para que
+  ambos reflejen lo que ya está implementado.
 
 ### Al compilar
 - Compila con `cmake -S . -B build && cmake --build build`.
