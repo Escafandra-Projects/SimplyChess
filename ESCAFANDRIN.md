@@ -55,16 +55,22 @@ El tablero (`Board`) mantiene **dos representaciones** sincronizadas manualmente
 - Detección de ahogado (stalemate)
 - Regla de los 50 movimientos
 - Triple repetición de posición
+- Animaciones de movimiento (interpolación) y mover arrastrando (drag & drop)
+- Resaltado de movimientos legales y del último movimiento
+- Efectos de sonido (mover, capturar, jaque, fin de partida)
+- Coordenadas en el tablero (números 1-8 y letras A-H)
 - Menú principal con botones
 - Menú de pausa (Esc)
+- Menú de Ajustes (tiempo base e incremento)
+- Reloj de ajedrez configurable (incluido tiempo infinito)
 - Sistema de puntos por capturas
 - Configuración de ventana vía archivos `.ini`
 
 ### ❌ Pendiente (ver `docs/roadmap.md`)
-- Animaciones de movimiento
-- Resaltado de movimientos legales
-- Efectos de sonido
-- Botón de Settings (visible pero sin funcionalidad)
+- Lemniscata (símbolo ∞) para la opción de tiempo infinito
+- Historial de movimientos en pantalla (notación algebraica)
+- Exportar e importar partidas en PGN
+- Deshacer/rehacer movimientos (undo/redo)
 
 ---
 

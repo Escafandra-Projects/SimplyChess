@@ -59,7 +59,7 @@ expandirse a otras áreas.
 - [ ] **Añadir la lemniscata**
   - Cargar una fuente que soporte el símbolo de infinito o usar una textura para mostrar la lemniscata en la opción de tiempo infinito de los ajustes.
 
-- [ ] **Animaciones de movimiento**
+- [x] **Animaciones de movimiento**
   - Reemplazar el movimiento instantáneo (teletransporte) por interpolación fluida
     entre origen y destino.
   - Opciones: interpolación lineal (lerp) o easing (ease-in-out) usando delta-time.
@@ -73,7 +73,7 @@ expandirse a otras áreas.
   - Marcar visualmente las casillas de origen y destino del último movimiento realizado.
   - Almacenar las coordenadas del último movimiento completado.
 
-- [ ] **Efectos de sonido**
+- [x] **Efectos de sonido**
   - Integrar `sfml-audio` para añadir efectos sonoros:
     - Movimiento normal
     - Captura
