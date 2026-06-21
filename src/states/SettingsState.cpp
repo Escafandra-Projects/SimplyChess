@@ -109,8 +109,9 @@ void SettingsState::initButtons() {
 void SettingsState::updateButtonTexts() {
 	int bt = baseTimeOptions[currentBaseTimeIdx];
 	if (bt == 0) {
-		// The font doesn't support the infinity symbol, so we use "Infinite"
-		this->buttons["TIME_CYCLE"]->setText("Infinite");
+		// Tiempo infinito: la fuente Factory LJDS incluye el glifo ∞ (U+221E). Se construye
+		// como sf::String UTF-32 para que SFML no decodifique los bytes UTF-8 como Latin-1.
+		this->buttons["TIME_CYCLE"]->setText(sf::String(static_cast<sf::Uint32>(0x221E)));
 	} else {
 		std::string btStr = std::to_string(bt / 60) + " min";
 		this->buttons["TIME_CYCLE"]->setText(btStr);

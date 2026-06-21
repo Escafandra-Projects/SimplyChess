@@ -173,6 +173,9 @@ Ejemplos: `feat/deteccion-ahogado`, `fix/enroque-largo`, `docs/arquitectura`
 - Registra todo cambio relevante en `CHANGELOG.md`, bajo la sección `[Sin publicar]`.
 - Sigue el formato [Keep a Changelog](https://keepachangelog.com/es/1.1.0/):
   agrupa las entradas en `Añadido`, `Cambiado`, `Eliminado`, etc.
+- **Al completar una tarea de un `feat` o de un hito**, actualiza `docs/roadmap.md`
+  (marca la casilla correspondiente) y el «Estado actual» de este archivo para que
+  ambos reflejen lo que ya está implementado.
 
 ### Al compilar
 - Compila con `cmake -S . -B build && cmake --build build`.
