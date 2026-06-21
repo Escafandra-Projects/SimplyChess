@@ -2,13 +2,14 @@
 
 #include <SFML/Audio.hpp>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 class AudioSystem {
 private:
     std::map<std::string, sf::SoundBuffer> buffers;
-    std::vector<sf::Sound> sounds;
+    std::vector<std::unique_ptr<sf::Sound>> sounds;
     
     // Constructor privado para Singleton
     AudioSystem();

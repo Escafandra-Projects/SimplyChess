@@ -147,6 +147,7 @@ void GameState::handleEvent(const sf::Event& event) {
 	}
 }
 
+void GameState::updateInput(float /*dt*/) {
 	// Movimiento: admite dos clics (clic en pieza, clic en destino) y arrastrar-soltar.
 	bool mouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 	if (!this->paused && !this->board->getEndGame() && !this->board->isPromoting()) {

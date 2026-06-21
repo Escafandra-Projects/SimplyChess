@@ -50,13 +50,17 @@ jobs:
             cp -r resources config "$DIR/"
           elif [ "${{ matrix.name }}" = "macos" ]; then
             cp -R build/SimplyChess.app "$DIR/"
-            mkdir -p "$DIR/SimplyChess.app/Contents/Frameworks"
-            cp -R build/_deps/sfml-src/extlibs/libs-osx/Frameworks/freetype.framework "$DIR/SimplyChess.app/Contents/Frameworks/"
+            codesign --force --deep -s - "$DIR/SimplyChess.app"
           else
             cp build/SimplyChess "$DIR/"
             cp -r resources config "$DIR/"
           fi
-          cmake -E tar cf "$DIR.zip" --format=zip "$DIR"
+
+          if [ "${{ matrix.name }}" = "macos" ]; then
+            ditto -c -k --sequesterRsrc --keepParent "$DIR" "$DIR.zip"
+          else
+            cmake -E tar cf "$DIR.zip" --format=zip "$DIR"
+          fi
 
       - name: Subir artefacto del workflow
         uses: actions/upload-artifact@v4

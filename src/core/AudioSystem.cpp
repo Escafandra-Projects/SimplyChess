@@ -28,8 +28,9 @@ void AudioSystem::playSound(const std::string& name) {
     cleanup(); // Limpiar sonidos terminados
 
     if (buffers.find(name) != buffers.end()) {
-        sounds.emplace_back(buffers[name]);
-        sounds.back().play();
+        auto sound = std::make_unique<sf::Sound>(buffers[name]);
+        sound->play();
+        sounds.push_back(std::move(sound));
     }
 }
 
@@ -37,6 +38,6 @@ void AudioSystem::cleanup() {
     // Eliminar sonidos que ya terminaron de reproducirse
     sounds.erase(
         std::remove_if(sounds.begin(), sounds.end(),
-                       [](const sf::Sound& s) { return s.getStatus() == sf::Sound::Stopped; }),
+                       [](const std::unique_ptr<sf::Sound>& s) { return s->getStatus() == sf::Sound::Stopped; }),
         sounds.end());
 }
