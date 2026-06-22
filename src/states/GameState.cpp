@@ -147,6 +147,12 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 	this->initBoard(this->textures);
 }
 
+GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states, bool forceAiMode)
+    : GameState(window, supportedKeys, states)
+{
+    this->aiMode = forceAiMode;
+}
+
 GameState::~GameState() {
 	this->aiStopFlag = true;
 	if (this->aiFutureMove.valid()) {

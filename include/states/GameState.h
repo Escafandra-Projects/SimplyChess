@@ -86,6 +86,7 @@ private:
 public:
 	// Constructor y destructor
 	GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states);
+	GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states, bool aiMode);
 	virtual ~GameState();
 
 	// Funciones
