@@ -4,8 +4,10 @@
 #include "chess/Piece.h"
 #include "chess/Board.h"
 #include <memory>
+#include <array>
 #include "ui/MessageBox.h"
 #include "ui/MoveListPanel.h"
+#include "ui/MenuButton.h"
 #include "chess/GameSnapshot.h"
 #include "chess/AIEngine.h"
 #include <thread>
@@ -19,6 +21,7 @@ private:
 	// Variables
 	/* Interfaz */
 	sf::Font font;
+	sf::Font panelFont;     // Gameplay.ttf para panel lateral
 	std::unique_ptr<PauseMenu> pauseMenu;
 	std::unique_ptr<MessageBox> gameOverBox;
 	std::unique_ptr<MoveListPanel> moveListPanel;
@@ -26,6 +29,38 @@ private:
 	std::unique_ptr<Button> btnRedo;
 	sf::Text gameInfoText;
 	sf::Sprite background;
+
+	// ── Nuevo panel lateral (dark-wood theme) ──────────────────
+	sf::RectangleShape bgRect;
+	sf::VertexArray vignetteVA;
+	sf::RectangleShape sidePanel, sidePanelInner;
+
+	// Labels tablero
+	sf::Text labelNegras, labelBlancas;
+	sf::RectangleShape dotNegras, dotBlancas;
+
+	// Fila jugador negro (top)
+	sf::RectangleShape blackRowBg;
+	sf::RectangleShape blackKingBox;
+	sf::Text blackKingTxt;
+	sf::Text blackNameTxt, blackStatusTxt, blackTimerTxt;
+
+	// Fila jugador blanco (bottom, activo)
+	sf::RectangleShape whiteRowBg, turnBar;
+	sf::RectangleShape whiteKingBox;
+	sf::Text whiteKingTxt;
+	sf::Text whiteNameTxt, whiteStatusTxt, whiteTimerTxt;
+
+	// Separadores y ventaja
+	std::array<sf::RectangleShape, 5> sepLines;
+	sf::Text blackAdvTxt, whiteAdvTxt;
+
+	// Botones de acción
+	std::vector<MenuButton> actionBtns;
+	bool mouseHeldForActionBtns;
+
+	sf::Clock glowClock;
+	// ───────────────────────────────────────────────────────────
 	/* Tablero */
 	std::unique_ptr<Board> board;
 	/* Info de la partida */
@@ -82,6 +117,10 @@ private:
 	void initBoard(std::map<std::string, sf::Texture>& textures);
 	/// Prepara el texto informativo de la partida.
 	void initText();
+	/// Construye el panel lateral con tema oscuro de madera.
+	void initGamePanel();
+	/// Actualiza timers, indicador de turno y botones del panel lateral.
+	void updateGamePanel();
 
 public:
 	// Constructor y destructor

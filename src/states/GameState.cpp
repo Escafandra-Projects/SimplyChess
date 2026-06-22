@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cstdlib>
+#include <cmath>
 #include "chess/PGNManager.h"
 
 #include <stdexcept>
@@ -47,9 +48,10 @@ void GameState::initVariables() {
    
 
 void GameState::initFonts() {
-	if (!this->font.loadFromFile("resources/fonts/Factory LJDS.ttf")) {
+	if (!this->font.loadFromFile("resources/fonts/Factory LJDS.ttf"))
 		throw std::runtime_error("ERROR::GAME_STATE::COULD NOT LOAD FONT");
-	}
+	if (!this->panelFont.loadFromFile("resources/fonts/Gameplay.ttf"))
+		throw std::runtime_error("ERROR::GAME_STATE::COULD NOT LOAD PANEL FONT");
 }
 
 void GameState::initTextures() {
@@ -70,6 +72,195 @@ void GameState::initPauseMenu() {
 	this->pauseMenu->addButton("EXIT", 50.f, 370.f, "Exit", this->textures["BUTTONS"]);
 	this->pauseMenu->addButton("SAVE_PGN", 50.f, 270.f, "Save PGN", this->textures["BUTTONS"]);
 	this->pauseMenu->addButton("CONTINUE", 50.f, 170.f, "Continue", this->textures["BUTTONS"]);
+}
+
+void GameState::initGamePanel() {
+	// ── Layout constants ──────────────────────────────────────────────────
+	constexpr float W = 1280.f, H = 820.f;
+	// Full dark background
+	bgRect.setSize({W, H});
+	bgRect.setFillColor(sf::Color(26, 12, 6));
+
+	// Radial vignette
+	constexpr int N = 32;
+	vignetteVA.setPrimitiveType(sf::TriangleFan);
+	vignetteVA.resize(N + 2);
+	float cx = 640.f, cy = H * 0.5f;
+	vignetteVA[0].position = {cx, cy};
+	vignetteVA[0].color    = sf::Color(7, 2, 0, 0);
+	float R = std::sqrt(W * W + H * H) * 0.6f;
+	for (int i = 0; i <= N; ++i) {
+		float a = (float(i) / N) * 2.f * 3.14159265f;
+		vignetteVA[i+1].position = {cx + std::cos(a) * R, cy + std::sin(a) * R};
+		vignetteVA[i+1].color    = sf::Color(7, 2, 0, 204);
+	}
+
+	// ── Side panel ────────────────────────────────────────────────────────
+	constexpr float SX = 822.f, SY = 6.f, SW = 452.f, SH = 808.f;
+	sidePanel.setSize({SW, SH});
+	sidePanel.setPosition(SX, SY);
+	sidePanel.setFillColor(sf::Color(148, 110, 72));
+	sidePanel.setOutlineColor(sf::Color(60, 30, 12));
+	sidePanel.setOutlineThickness(3.f);
+
+	sidePanelInner.setSize({SW - 14.f, SH - 14.f});
+	sidePanelInner.setPosition(SX + 7.f, SY + 7.f);
+	sidePanelInner.setFillColor(sf::Color::Transparent);
+	sidePanelInner.setOutlineColor(sf::Color(208, 158, 78, 35));
+	sidePanelInner.setOutlineThickness(1.f);
+
+	// ── Board labels ──────────────────────────────────────────────────────
+	auto setupLabel = [&](sf::Text& t, const std::string& s, sf::RectangleShape& dot,
+	                      float x, float y, bool white) {
+		t.setFont(panelFont);
+		t.setString(s);
+		t.setCharacterSize(10);
+		t.setLetterSpacing(2.f);
+		t.setFillColor(white ? sf::Color(240,220,170,166) : sf::Color(210,175,120,128));
+		t.setPosition(x, y);
+		dot.setSize({7.f, 7.f});
+		dot.setPosition(x - 12.f, y + 2.f);
+		dot.setFillColor(white ? sf::Color(237, 224, 196) : sf::Color(42, 26, 16));
+		dot.setOutlineColor(sf::Color(200, 152, 72, 102));
+		dot.setOutlineThickness(1.f);
+	};
+	// NEGRAS top-left of board; BLANCAS bottom-right
+	setupLabel(labelNegras, "NEGRAS", dotNegras, 33.f, 2.f,  false);
+	setupLabel(labelBlancas,"BLANCAS",dotBlancas, 686.f, 803.f, true);
+
+	// ── Helper: absolute content coords ──────────────────────────────────
+	// content X starts inside panel with 14px horizontal pad
+	constexpr float CX = SX + 3.f + 14.f; // 839
+	constexpr float CW = SW - 6.f - 28.f;  // 424
+
+	// ── Black player row (top) ────────────────────────────────────────────
+	constexpr float BLACK_Y = 21.f;
+	blackRowBg.setSize({SW - 6.f, 62.f});
+	blackRowBg.setPosition(SX + 3.f, BLACK_Y);
+	blackRowBg.setFillColor(sf::Color(20, 10, 4, 71));
+	blackRowBg.setOutlineColor(sf::Color(200, 148, 70, 30));
+	blackRowBg.setOutlineThickness(1.f);
+
+	blackKingBox.setSize({38.f, 38.f});
+	blackKingBox.setPosition(CX, BLACK_Y + 12.f);
+	blackKingBox.setFillColor(sf::Color(42, 26, 12));
+	blackKingBox.setOutlineColor(sf::Color(200, 148, 70, 51));
+	blackKingBox.setOutlineThickness(1.f);
+
+	blackKingTxt.setFont(panelFont);
+	blackKingTxt.setString("K");
+	blackKingTxt.setCharacterSize(20);
+	blackKingTxt.setFillColor(sf::Color(200, 170, 120, 178));
+	auto bklb = blackKingTxt.getLocalBounds();
+	blackKingTxt.setPosition(CX + 19.f - bklb.width * 0.5f - bklb.left,
+	                         BLACK_Y + 31.f - bklb.height * 0.5f - bklb.top);
+
+	blackNameTxt.setFont(panelFont);
+	blackNameTxt.setString("JUGADOR 2");
+	blackNameTxt.setCharacterSize(11);
+	blackNameTxt.setLetterSpacing(1.8f);
+	blackNameTxt.setFillColor(sf::Color(221, 208, 176));
+	blackNameTxt.setPosition(CX + 46.f, BLACK_Y + 14.f);
+
+	blackStatusTxt.setFont(panelFont);
+	blackStatusTxt.setString("EN ESPERA");
+	blackStatusTxt.setCharacterSize(9);
+	blackStatusTxt.setLetterSpacing(1.2f);
+	blackStatusTxt.setFillColor(sf::Color(200, 160, 100, 107));
+	blackStatusTxt.setPosition(CX + 46.f, BLACK_Y + 34.f);
+
+	blackTimerTxt.setFont(panelFont);
+	blackTimerTxt.setString("--:--");
+	blackTimerTxt.setCharacterSize(20);
+	blackTimerTxt.setLetterSpacing(1.5f);
+	blackTimerTxt.setFillColor(sf::Color(210, 175, 110, 122));
+	auto btlb = blackTimerTxt.getLocalBounds();
+	blackTimerTxt.setPosition(SX + SW - 3.f - 14.f - btlb.width - btlb.left, BLACK_Y + 20.f);
+
+	// ── White player row (bottom) ─────────────────────────────────────────
+	constexpr float WHITE_Y = 680.f;
+	whiteRowBg.setSize({SW - 6.f, 62.f});
+	whiteRowBg.setPosition(SX + 3.f, WHITE_Y);
+	whiteRowBg.setFillColor(sf::Color(200, 168, 90, 26));
+	whiteRowBg.setOutlineColor(sf::Color(202, 168, 90, 71));
+	whiteRowBg.setOutlineThickness(1.f);
+
+	turnBar.setSize({3.f, 62.f});
+	turnBar.setPosition(SX + 3.f, WHITE_Y);
+	turnBar.setFillColor(sf::Color(202, 164, 72));
+
+	whiteKingBox.setSize({38.f, 38.f});
+	whiteKingBox.setPosition(CX, WHITE_Y + 12.f);
+	whiteKingBox.setFillColor(sf::Color(200, 184, 136));
+	whiteKingBox.setOutlineColor(sf::Color(202, 168, 90, 89));
+	whiteKingBox.setOutlineThickness(1.f);
+
+	whiteKingTxt.setFont(panelFont);
+	whiteKingTxt.setString("K");
+	whiteKingTxt.setCharacterSize(20);
+	whiteKingTxt.setFillColor(sf::Color(60, 30, 10, 229));
+	auto wklb = whiteKingTxt.getLocalBounds();
+	whiteKingTxt.setPosition(CX + 19.f - wklb.width * 0.5f - wklb.left,
+	                         WHITE_Y + 31.f - wklb.height * 0.5f - wklb.top);
+
+	whiteNameTxt.setFont(panelFont);
+	whiteNameTxt.setString("JUGADOR 1");
+	whiteNameTxt.setCharacterSize(11);
+	whiteNameTxt.setLetterSpacing(1.8f);
+	whiteNameTxt.setFillColor(sf::Color(242, 228, 194));
+	whiteNameTxt.setPosition(CX + 46.f, WHITE_Y + 14.f);
+
+	whiteStatusTxt.setFont(panelFont);
+	whiteStatusTxt.setString("TU TURNO");
+	whiteStatusTxt.setCharacterSize(9);
+	whiteStatusTxt.setLetterSpacing(1.2f);
+	whiteStatusTxt.setFillColor(sf::Color(202, 168, 90, 173));
+	whiteStatusTxt.setPosition(CX + 46.f, WHITE_Y + 34.f);
+
+	whiteTimerTxt.setFont(panelFont);
+	whiteTimerTxt.setString("--:--");
+	whiteTimerTxt.setCharacterSize(20);
+	whiteTimerTxt.setLetterSpacing(1.5f);
+	whiteTimerTxt.setFillColor(sf::Color(202, 170, 88));
+	auto wtlb = whiteTimerTxt.getLocalBounds();
+	whiteTimerTxt.setPosition(SX + SW - 3.f - 14.f - wtlb.width - wtlb.left, WHITE_Y + 20.f);
+
+	// ── Separator lines ───────────────────────────────────────────────────
+	const float SEP_X = SX + 3.f;
+	const float SEP_W = SW - 6.f;
+	const sf::Color sepC(200, 148, 70, 50);
+	auto setSep = [&](int idx, float y) {
+		sepLines[idx].setSize({SEP_W, 1.f});
+		sepLines[idx].setPosition(SEP_X, y);
+		sepLines[idx].setFillColor(sepC);
+	};
+	setSep(0, BLACK_Y + 62.f + 5.f);   // below black row
+	setSep(1, 91.f + 26.f + 3.f);      // below cap black
+	setSep(2, 124.f + 518.f + 3.f);    // below move list
+	setSep(3, 648.f + 26.f + 3.f);     // below cap white
+	setSep(4, WHITE_Y + 62.f + 7.f);   // below white row
+
+	// ── Advantage texts ───────────────────────────────────────────────────
+	auto setupAdv = [&](sf::Text& t, float x, float y) {
+		t.setFont(panelFont);
+		t.setString("+0");
+		t.setCharacterSize(9);
+		t.setLetterSpacing(1.2f);
+		t.setFillColor(sf::Color(200, 160, 100, 82));
+		t.setPosition(x, y);
+	};
+	setupAdv(blackAdvTxt, SX + SW - 3.f - 14.f - 20.f, 93.f);
+	setupAdv(whiteAdvTxt, SX + SW - 3.f - 14.f - 20.f, 650.f);
+
+	// ── Action buttons ────────────────────────────────────────────────────
+	constexpr float BTN_Y   = 752.f;
+	constexpr float BTN_H   = 40.f;
+	constexpr float BTN_GAP = 8.f;
+	float bw = (CW - BTN_GAP) * 0.5f;
+	actionBtns.emplace_back(CX,            BTN_Y, bw, BTN_H, &panelFont, "RENDIRSE");
+	actionBtns.emplace_back(CX + bw + BTN_GAP, BTN_Y, bw, BTN_H, &panelFont, "TABLAS");
+
+	mouseHeldForActionBtns = false;
 }
 
 void GameState::initBoard(std::map<std::string, sf::Texture>& textures) {
@@ -106,7 +297,7 @@ void GameState::initText() {
 	this->gameInfoText.setString(this->buildScoreText());
 	this->gameInfoText.setPosition(850, 50);
 
-	this->moveListPanel = std::make_unique<MoveListPanel>(this->font, sf::FloatRect(850.f, 400.f, 380.f, 340.f));
+	this->moveListPanel = std::make_unique<MoveListPanel>(this->panelFont, sf::FloatRect(839.f, 124.f, 424.f, 518.f), true);
 	
 	this->btnUndo = std::make_unique<Button>(850.f, 750.f, 100.f, 61.0f,
 		&this->font, "Undo", 30,
@@ -145,6 +336,7 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 	this->initText();
 	this->initPauseMenu();
 	this->initBoard(this->textures);
+	this->initGamePanel();
 }
 
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states, bool forceAiMode)
@@ -274,14 +466,94 @@ void GameState::updatePauseMenuButtons() {
 	}
 }
 
+void GameState::updateGamePanel() {
+	// ── Timer strings ─────────────────────────────────────────────────
+	std::string bTime = (this->baseTime > 0.f) ? formatTime(this->timeBlack) : "--:--";
+	std::string wTime = (this->baseTime > 0.f) ? formatTime(this->timeWhite) : "--:--";
+
+	blackTimerTxt.setString(bTime);
+	whiteTimerTxt.setString(wTime);
+
+	// Recentrar timers (texto de ancho variable)
+	constexpr float SX = 822.f, SW = 452.f;
+	constexpr float CX = SX + 3.f + 14.f;
+	auto rightX = [&](sf::Text& t) {
+		auto lb = t.getLocalBounds();
+		return SX + SW - 3.f - 14.f - lb.width - lb.left;
+	};
+	blackTimerTxt.setPosition(rightX(blackTimerTxt), blackTimerTxt.getPosition().y);
+	whiteTimerTxt.setPosition(rightX(whiteTimerTxt), whiteTimerTxt.getPosition().y);
+
+	// ── Turn indicator (highlight active player) ─────────────────────
+	if (this->turn) {
+		// Blancas al turno
+		whiteRowBg.setFillColor(sf::Color(200, 168, 90, 26));
+		whiteRowBg.setOutlineColor(sf::Color(202, 168, 90, 71));
+		turnBar.setFillColor(sf::Color(202, 164, 72));
+		whiteStatusTxt.setString("TU TURNO");
+		whiteStatusTxt.setFillColor(sf::Color(202, 168, 90, 173));
+		whiteTimerTxt.setFillColor(sf::Color(202, 170, 88));
+
+		blackRowBg.setFillColor(sf::Color(20, 10, 4, 71));
+		blackRowBg.setOutlineColor(sf::Color(200, 148, 70, 30));
+		blackStatusTxt.setString("EN ESPERA");
+		blackStatusTxt.setFillColor(sf::Color(200, 160, 100, 107));
+		blackTimerTxt.setFillColor(sf::Color(210, 175, 110, 122));
+	} else {
+		// Negras al turno
+		blackRowBg.setFillColor(sf::Color(200, 168, 90, 26));
+		blackRowBg.setOutlineColor(sf::Color(202, 168, 90, 71));
+		blackStatusTxt.setString("SU TURNO");
+		blackStatusTxt.setFillColor(sf::Color(202, 168, 90, 173));
+		blackTimerTxt.setFillColor(sf::Color(202, 170, 88));
+
+		whiteRowBg.setFillColor(sf::Color(20, 10, 4, 71));
+		whiteRowBg.setOutlineColor(sf::Color(200, 148, 70, 30));
+		turnBar.setFillColor(sf::Color::Transparent);
+		whiteStatusTxt.setString("EN ESPERA");
+		whiteStatusTxt.setFillColor(sf::Color(200, 160, 100, 107));
+		whiteTimerTxt.setFillColor(sf::Color(210, 175, 110, 122));
+	}
+
+	// ── Timer glow on active player ──────────────────────────────────
+	float g = 0.5f + 0.5f * std::sin(glowClock.getElapsedTime().asSeconds() * 3.14159f);
+	uint8_t gA = static_cast<uint8_t>(180.f + 75.f * g);
+	if (this->turn) {
+		sf::Color c = whiteTimerTxt.getFillColor(); c.a = gA;
+		whiteTimerTxt.setFillColor(c);
+	} else {
+		sf::Color c = blackTimerTxt.getFillColor(); c.a = gA;
+		blackTimerTxt.setFillColor(c);
+	}
+
+	// ── Advantage texts ──────────────────────────────────────────────
+	int adv1 = this->points1 - this->points2;
+	int adv2 = this->points2 - this->points1;
+	blackAdvTxt.setString(adv2 > 0 ? "+" + std::to_string(adv2) : "");
+	whiteAdvTxt.setString(adv1 > 0 ? "+" + std::to_string(adv1) : "");
+
+	// ── Action buttons ───────────────────────────────────────────────
+	for (auto& btn : actionBtns)
+		btn.update(this->mousePosWindow);
+
+	bool mouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+	if (!mouseHeldForActionBtns) {
+		if (!actionBtns.empty() && actionBtns[0].isPressed())
+			this->pauseState(); // RENDIRSE → abre pausa (con opción Exit)
+		// TABLAS: sin implementar todavía
+	}
+	mouseHeldForActionBtns = mouseDown;
+}
+
 void GameState::update(float dt) {
 
 	this->updateMousePositions();
-	
+
 	this->updateKeytime(dt);
 
 	this->updateInput(dt);
-	
+	this->updateGamePanel();
+
 	if (!this->paused) {
 		if (this->moveListPanel) {
 			this->moveListPanel->update(this->board->getMoveHistory());
@@ -388,35 +660,67 @@ void GameState::update(float dt) {
 }
 
 void GameState::render(sf::RenderTarget* target) {
-	// Si no se pasa target, se usa la ventana
-	if (!target) {
-		target = this->window;
-	}
+	if (!target) target = this->window;
 
-	// Tablero y piezas
+	// ── Fondo oscuro de madera ──────────────────────────────────────────
+	target->draw(this->bgRect);
+	target->draw(this->vignetteVA);
+
+	// ── Tablero y piezas ───────────────────────────────────────────────
 	this->board->render(*target);
 
-	// Interfaz
-	target->draw(this->background);
-	target->draw(this->gameInfoText);
+	// Labels tablero
+	target->draw(this->dotNegras);
+	target->draw(this->labelNegras);
+	target->draw(this->dotBlancas);
+	target->draw(this->labelBlancas);
 
-	if (this->moveListPanel) {
+	// ── Panel lateral ──────────────────────────────────────────────────
+	target->draw(this->sidePanel);
+	target->draw(this->sidePanelInner);
+
+	// Fila jugador negro
+	target->draw(this->blackRowBg);
+	target->draw(this->blackKingBox);
+	target->draw(this->blackKingTxt);
+	target->draw(this->blackNameTxt);
+	target->draw(this->blackStatusTxt);
+	target->draw(this->blackTimerTxt);
+
+	// Separadores y ventajas
+	target->draw(this->sepLines[0]);
+	target->draw(this->blackAdvTxt);
+	target->draw(this->sepLines[1]);
+
+	// Lista de movimientos
+	if (this->moveListPanel)
 		this->moveListPanel->render(*target);
-	}
-	
-	if (this->baseTime == 0.0f) { // Only render if undo/redo is active (clock disabled)
-	    if (this->btnUndo) this->btnUndo->render(*target);
-	    if (this->btnRedo) this->btnRedo->render(*target);
-	}
 
-	if (this->board->getEndGame()) {
+	target->draw(this->sepLines[2]);
+	target->draw(this->whiteAdvTxt);
+	target->draw(this->sepLines[3]);
+
+	// Fila jugador blanco
+	target->draw(this->whiteRowBg);
+	target->draw(this->turnBar);
+	target->draw(this->whiteKingBox);
+	target->draw(this->whiteKingTxt);
+	target->draw(this->whiteNameTxt);
+	target->draw(this->whiteStatusTxt);
+	target->draw(this->whiteTimerTxt);
+
+	target->draw(this->sepLines[4]);
+
+	// Botones de acción
+	for (auto& btn : this->actionBtns)
+		btn.render(*target);
+
+	// Game over y pausa
+	if (this->board->getEndGame())
 		this->gameOverBox->render(*target);
-	}
 
-	if (this->paused) {
+	if (this->paused)
 		this->pauseMenu->render(*target);
-	}
-
 }
 
 void GameState::captureStateForUndo() {
