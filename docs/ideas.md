@@ -6,23 +6,11 @@ del [roadmap](roadmap.md) estén completados.
 
 ---
 
-## 🤖 Inteligencia Artificial (modo solitario)
+## 🤖 Integración de Motores UCI (IA Avanzada)
 
-Añadir la capacidad de jugar contra el ordenador.
-
-### Motor propio (Minimax)
-- Implementar el algoritmo **Minimax** con evaluación heurística del tablero.
-- Evaluación básica: asignar valores a las piezas (Peón=1, Caballo/Alfil=3, Torre=5,
-  Dama=9) con bonificaciones por posiciones centrales y control del tablero.
-- Optimización con **poda alfa-beta** para reducir el número de nodos evaluados y
-  permitir mayor profundidad de búsqueda en tiempo razonable.
-
-### Integración UCI (alternativa avanzada)
-- En lugar de crear un motor desde cero, preparar SimplyChess para comunicarse con
-  motores open source de alto nivel como **Stockfish**.
-- Usar el protocolo **UCI** (*Universal Chess Interface*) para enviar/recibir
-  movimientos vía entrada/salida estándar.
-- Permitiría distintos niveles de dificultad configurando la profundidad del motor.
+- Actualmente contamos con nuestro propio motor "Escafandrín" basado en Minimax. 
+- Como paso futuro, podríamos preparar SimplyChess para comunicarse con motores open source de alto nivel competitivo como **Stockfish**.
+- Usar el protocolo **UCI** (*Universal Chess Interface*) para enviar/recibir movimientos vía entrada/salida estándar.
 
 ---
 

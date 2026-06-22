@@ -15,18 +15,31 @@ private:
 	sf::Text titleText;
 	sf::Text timeLabel;
 	sf::Text incrementLabel;
+	sf::Text modeLabel;
+	sf::Text diffLabel;
 	
 	std::map<std::string, std::unique_ptr<Button>> buttons;
 
 	// Configuraciones
 	int baseTime;
 	int increment;
+	bool aiMode;
+	int aiDepth;
 
 	// Opciones de configuración
 	const std::vector<int> baseTimeOptions = {0, 60, 180, 300, 600};
 	const std::vector<int> incrementOptions = {0, 1, 2, 3, 5};
+	const std::vector<std::string> modeOptions = {"Local 2P", "Escafandrin"};
+	const std::vector<int> diffOptions = {2, 4, 5};
+	const std::vector<std::string> diffNames = {"Easy", "Normal", "Hard"};
+	
 	int currentBaseTimeIdx;
 	int currentIncrementIdx;
+	int currentModeIdx;
+	int currentDiffIdx;
+
+	enum SettingsTab { TAB_BOT, TAB_TIME };
+	SettingsTab currentTab;
 
 	// Inicialización
 	void initVariables();
