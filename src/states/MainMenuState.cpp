@@ -12,7 +12,7 @@ void MainMenuState::initVariables()
 	this->titleText.setCharacterSize(100);
 	//this->titleText.setColor(sf::Color::White);
 	this->titleText.setString("Simply Chess");
-	this->titleText.setPosition(300.f, 130.f);
+	this->titleText.setPosition(380.f, 130.f);
 
 	this->mousePressedLastFrame = false;
 }
@@ -24,7 +24,7 @@ void MainMenuState::initTextures()
 		throw std::runtime_error("ERROR::MAIN_MENU_STATE::FAILED TO LOAD BACKGROUND");
 	}
 	this->background.setTexture(this->textures["BACKGROUND"]);
-	this->background.scale(4.49f, 4.1f);
+	this->background.scale(5.12f, 4.1f);
 
 	// Botones
 	if (!this->textures["BUTTONS"].loadFromFile("resources/images/interface/buttons.png")) {
@@ -55,7 +55,7 @@ void MainMenuState::initFonts() {
 }
 
 void MainMenuState::initButtons() {
-	this->buttons["GAME_STATE"] = std::make_unique<Button>(415.0f, 550.0f, 100.f, 61.0f, 
+	this->buttons["GAME_STATE"] = std::make_unique<Button>(495.0f, 550.0f, 100.f, 61.0f, 
 		&this->font, "Start", 50,
 		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
 		this->textures["BUTTONS"]);
@@ -63,7 +63,7 @@ void MainMenuState::initButtons() {
 	
 
 
-	this->buttons["SETTINGS_STATE"] = std::make_unique<Button>(100.0f, 400.0f, 100.f, 61.0f,
+	this->buttons["SETTINGS_STATE"] = std::make_unique<Button>(180.0f, 400.0f, 100.f, 61.0f,
 		&this->font, "Settings", 50,
 		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
 		this->textures["BUTTONS"]);
@@ -71,7 +71,7 @@ void MainMenuState::initButtons() {
 		
 
 
-	this->buttons["EXIT_STATE"] = std::make_unique<Button>(740.0f, 400.0f, 100.0f, 61.0f,
+	this->buttons["EXIT_STATE"] = std::make_unique<Button>(820.0f, 400.0f, 100.0f, 61.0f,
 		&this->font, "Exit", 50,
 		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
 		this->textures["BUTTONS"]);

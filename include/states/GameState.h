@@ -5,6 +5,8 @@
 #include "chess/Board.h"
 #include <memory>
 #include "ui/MessageBox.h"
+#include "ui/MoveListPanel.h"
+#include "chess/GameSnapshot.h"
 
 /// Estado de partida: contiene el tablero, el marcador, el menú de pausa
 /// y el mensaje de fin de juego.
@@ -15,6 +17,9 @@ private:
 	sf::Font font;
 	std::unique_ptr<PauseMenu> pauseMenu;
 	std::unique_ptr<MessageBox> gameOverBox;
+	std::unique_ptr<MoveListPanel> moveListPanel;
+	std::unique_ptr<Button> btnUndo;
+	std::unique_ptr<Button> btnRedo;
 	sf::Text gameInfoText;
 	sf::Sprite background;
 	/* Tablero */
@@ -40,6 +45,14 @@ private:
 	// Estado del botón izquierdo el frame anterior, para detectar los flancos de
 	// pulsación y de soltar (necesario para distinguir clic de arrastre).
 	bool mouseHeldLastFrame;
+	bool mouseHeldForButtons;
+
+	// Undo/Redo
+	std::vector<GameSnapshot> undoStack;
+	int currentMoveIndex;
+	void captureStateForUndo();
+	void undo();
+	void redo();
 
 	// Inicialización
 	/// Inicializa las variables y el mensaje de fin de partida.

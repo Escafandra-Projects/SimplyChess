@@ -45,7 +45,7 @@ void SettingsState::initTextures() {
 		throw std::runtime_error("ERROR::SETTINGS_STATE::FAILED TO LOAD BACKGROUND");
 	}
 	this->background.setTexture(this->textures["BACKGROUND"]);
-	this->background.scale(4.49f, 4.1f);
+	this->background.scale(5.12f, 4.1f);
 
 	if (!this->textures["BUTTONS"].loadFromFile("resources/images/interface/buttons.png")) {
 		throw std::runtime_error("ERROR::SETTINGS_STATE::FAILED TO LOAD BUTTONS");
@@ -66,40 +66,40 @@ void SettingsState::initText() {
 	this->titleText.setCharacterSize(80);
 	this->titleText.setString("Settings");
 	// Centrar el título sobre el banner (el banner de fondo tiene su propio diseño, ajustamos acorde)
-	this->titleText.setPosition(420.f, 130.f);
+	this->titleText.setPosition(500.f, 130.f);
 
 	this->timeLabel.setFont(this->font);
 	this->timeLabel.setCharacterSize(40);
 	this->timeLabel.setString("Base Time:");
-	this->timeLabel.setPosition(250.f, 300.f);
+	this->timeLabel.setPosition(330.f, 300.f);
 
 	this->incrementLabel.setFont(this->font);
 	this->incrementLabel.setCharacterSize(40);
 	this->incrementLabel.setString("Increment:");
-	this->incrementLabel.setPosition(250.f, 450.f);
+	this->incrementLabel.setPosition(330.f, 450.f);
 }
 
 void SettingsState::initButtons() {
 	// Aumentamos la escala para que el texto de las opciones quepa correctamente sin distorsionarse
-	this->buttons["TIME_CYCLE"] = std::make_unique<Button>(550.0f, 280.0f, 100.f, 61.0f, 
+	this->buttons["TIME_CYCLE"] = std::make_unique<Button>(630.0f, 280.0f, 100.f, 61.0f, 
 		&this->font, "5 min", 30,
 		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
 		this->textures["BUTTONS"]);
 	this->buttons["TIME_CYCLE"]->scale(2.5f, 2.5f);
 
-	this->buttons["INC_CYCLE"] = std::make_unique<Button>(550.0f, 430.0f, 100.f, 61.0f, 
+	this->buttons["INC_CYCLE"] = std::make_unique<Button>(630.0f, 430.0f, 100.f, 61.0f, 
 		&this->font, "0 sec", 30,
 		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
 		this->textures["BUTTONS"]);
 	this->buttons["INC_CYCLE"]->scale(2.5f, 2.5f);
 
-	this->buttons["CANCEL"] = std::make_unique<Button>(200.0f, 600.0f, 100.0f, 61.0f,
+	this->buttons["CANCEL"] = std::make_unique<Button>(280.0f, 600.0f, 100.0f, 61.0f,
 		&this->font, "Cancel", 40,
 		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
 		this->textures["BUTTONS"]);
 	this->buttons["CANCEL"]->scale(3.0f, 3.0f);
 
-	this->buttons["CONFIRM"] = std::make_unique<Button>(600.0f, 600.0f, 100.0f, 61.0f,
+	this->buttons["CONFIRM"] = std::make_unique<Button>(680.0f, 600.0f, 100.0f, 61.0f,
 		&this->font, "Confirm", 40,
 		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
 		this->textures["BUTTONS"]);

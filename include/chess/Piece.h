@@ -91,6 +91,10 @@ public:
     /// Mueve la pieza a la casilla de rejilla (x, y).
     void move(int x, int y);
 
+    /// Mueve la pieza a una posición de grid inmediatamente (sin animación)
+    void setGridPositionImmediate(unsigned x, unsigned y);
+
+
     /// Coloca el sprite directamente en píxeles (para arrastrarlo, sin animación
     /// ni cambiar la casilla lógica).
     void setRenderPosition(float x, float y);
