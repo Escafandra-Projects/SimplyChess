@@ -1,6 +1,8 @@
 #include "states/GameState.h"
 #include <iomanip>
 #include <sstream>
+#include <cstdlib>
+#include "chess/PGNManager.h"
 
 #include <stdexcept>
 
@@ -14,8 +16,10 @@ void GameState::initVariables() {
 	this->player2 = "Player 2";
 	this->points1 = 0;
 	this->points2 = 0;
+	this->points2 = 0;
 	this->gameOverReady = false;
 	this->mouseHeldLastFrame = false;
+	this->mouseHeldForButtons = false;
 	this->background.setPosition(sf::Vector2f(820.f, 0.f));
 
 	std::ifstream ifs("config/game.ini");
@@ -51,17 +55,20 @@ void GameState::initTextures() {
 		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD BACKGROUND");
 	}
 	this->background.setTexture(this->textures["BACKGROUND"]);
-	this->background.scale(2.f, 2.f);
+	this->background.scale(3.067f, 2.0f);
 }
 
 void GameState::initPauseMenu() {
 	this->pauseMenu = std::make_unique<PauseMenu>(this->font);
-	this->pauseMenu->addButton("EXIT", 50.f, 375.f, "Exit", this->textures["BUTTONS"]);
-	this->pauseMenu->addButton("CONTINUE", 50.f, 250.f, "Continue", this->textures["BUTTONS"]);
+	this->pauseMenu->addButton("EXIT", 50.f, 370.f, "Exit", this->textures["BUTTONS"]);
+	this->pauseMenu->addButton("SAVE_PGN", 50.f, 270.f, "Save PGN", this->textures["BUTTONS"]);
+	this->pauseMenu->addButton("CONTINUE", 50.f, 170.f, "Continue", this->textures["BUTTONS"]);
 }
 
 void GameState::initBoard(std::map<std::string, sf::Texture>& textures) {
 	this->board = std::make_unique<Board>(textures);
+	this->currentMoveIndex = -1;
+	this->captureStateForUndo();
 }
 
 static std::string formatTime(float t) {
@@ -75,24 +82,34 @@ static std::string formatTime(float t) {
 
 std::string GameState::buildScoreText() const {
 	if (this->baseTime == 0.0f) {
-		return "White: \n" + this->player1 + ". \nPoints: " + std::to_string(this->points1) +
-			"\n\n\nBlack: \n" + this->player2 + ". \nPoints: " + std::to_string(this->points2);
+		return "White: " + this->player1 + "\nPoints: " + std::to_string(this->points1) +
+			"\n\nBlack: " + this->player2 + "\nPoints: " + std::to_string(this->points2);
 	}
-	return "White: \n" + this->player1 + ". \nPoints: " + std::to_string(this->points1) +
+	return "White: " + this->player1 + "\nPoints: " + std::to_string(this->points1) +
 		"\nTime: " + formatTime(this->timeWhite) + 
-		"\n\n\nBlack: \n" + this->player2 + ". \nPoints: " + std::to_string(this->points2) +
+		"\n\nBlack: " + this->player2 + "\nPoints: " + std::to_string(this->points2) +
 		"\nTime: " + formatTime(this->timeBlack);
 }
 
 void GameState::initText() {
 
 	this->gameInfoText.setFont(this->font);
-	this->gameInfoText.setCharacterSize(40);
+	this->gameInfoText.setCharacterSize(35);
 	this->gameInfoText.setFillColor(sf::Color(75, 53, 47, 255));
 	this->gameInfoText.setString(this->buildScoreText());
 	this->gameInfoText.setPosition(850, 50);
 
-
+	this->moveListPanel = std::make_unique<MoveListPanel>(this->font, sf::FloatRect(850.f, 400.f, 380.f, 340.f));
+	
+	this->btnUndo = std::make_unique<Button>(850.f, 750.f, 100.f, 61.0f,
+		&this->font, "Undo", 30,
+		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
+		this->textures["BUTTONS"]);
+	
+	this->btnRedo = std::make_unique<Button>(1130.f, 750.f, 100.f, 61.0f,
+		&this->font, "Redo", 30,
+		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
+		this->textures["BUTTONS"]);
 }
 
 void GameState::initKeybinds() {
@@ -145,6 +162,23 @@ void GameState::handleEvent(const sf::Event& event) {
 			}
 		}
 	}
+
+	if (event.type == sf::Event::KeyPressed) {
+		// Undo (Ctrl + Z or Left Arrow)
+		if ((event.key.code == sf::Keyboard::Z && event.key.control && !event.key.shift) || event.key.code == sf::Keyboard::Left) {
+			this->undo();
+		}
+		// Redo (Ctrl + Y or Ctrl + Shift + Z or Right Arrow)
+		if ((event.key.code == sf::Keyboard::Y && event.key.control) || 
+			(event.key.code == sf::Keyboard::Z && event.key.control && event.key.shift) ||
+			event.key.code == sf::Keyboard::Right) {
+			this->redo();
+		}
+	}
+
+	if (this->moveListPanel) {
+		this->moveListPanel->handleEvent(event, *this->window);
+	}
 }
 
 void GameState::updateInput(float /*dt*/) {
@@ -191,6 +225,32 @@ void GameState::updatePauseMenuButtons() {
 	if (this->pauseMenu->isButtonPressed("CONTINUE")) {
 		this->unpauseState();
 	}
+
+	// Botón de guardar PGN
+	if (this->pauseMenu->isButtonPressed("SAVE_PGN")) {
+		std::time_t t = std::time(nullptr);
+		std::tm* now = std::localtime(&t);
+		char dateStr[30];
+		std::strftime(dateStr, sizeof(dateStr), "%Y%m%d_%H%M%S", now);
+		
+		std::string desktopPath = "";
+		if (const char* home = std::getenv("HOME")) {
+			desktopPath = std::string(home) + "/Desktop/SimplyChess_Partidas/";
+		} else {
+			desktopPath = "partidas/"; // Fallback
+		}
+		
+		std::filesystem::create_directory(desktopPath);
+		std::string filename = desktopPath + "game_" + std::string(dateStr) + ".pgn";
+		
+		PGNManager::exportToFile(filename,
+								 this->board->getMoveHistory(),
+								 "White", "Black",
+								 this->board->getGameStatus(),
+								 this->baseTime, this->increment);
+		
+		// Unpause after saving or keep it paused, let's keep it paused.
+	}
 }
 
 void GameState::update(float dt) {
@@ -202,6 +262,9 @@ void GameState::update(float dt) {
 	this->updateInput(dt);
 	
 	if (!this->paused) {
+		if (this->moveListPanel) {
+			this->moveListPanel->update(this->board->getMoveHistory());
+		}
 		if (!this->board->getEndGame()) {
 			// Reloj: no corre hasta que las blancas hacen su primer movimiento.
 			// Solo se pausa durante una coronación pendiente: en ese momento el turno
@@ -233,8 +296,23 @@ void GameState::update(float dt) {
 				}
 				this->previousTurn = this->turn;
 				this->clockStarted = true;
+				this->captureStateForUndo();
 			}
 			this->updateText();
+			
+			if (this->btnUndo) {
+			    this->btnUndo->update(this->mousePosWindow);
+			    if (this->btnUndo->isPressed() && !this->mouseHeldForButtons) {
+			        this->undo();
+			    }
+			}
+			if (this->btnRedo) {
+			    this->btnRedo->update(this->mousePosWindow);
+			    if (this->btnRedo->isPressed() && !this->mouseHeldForButtons) {
+			        this->redo();
+			    }
+			}
+			this->mouseHeldForButtons = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 		}
 
 		if (this->board->getEndGame()) {
@@ -285,6 +363,15 @@ void GameState::render(sf::RenderTarget* target) {
 	target->draw(this->background);
 	target->draw(this->gameInfoText);
 
+	if (this->moveListPanel) {
+		this->moveListPanel->render(*target);
+	}
+	
+	if (this->baseTime == 0.0f) { // Only render if undo/redo is active (clock disabled)
+	    if (this->btnUndo) this->btnUndo->render(*target);
+	    if (this->btnRedo) this->btnRedo->render(*target);
+	}
+
 	if (this->board->getEndGame()) {
 		this->gameOverBox->render(*target);
 	}
@@ -295,14 +382,52 @@ void GameState::render(sf::RenderTarget* target) {
 
 }
 
+void GameState::captureStateForUndo() {
+	if (this->baseTime > 0.0f) return; // Undo/Redo is disabled when clock is active
 
+	if (this->currentMoveIndex < (int)this->undoStack.size() - 1) {
+		this->undoStack.erase(this->undoStack.begin() + this->currentMoveIndex + 1, this->undoStack.end());
+	}
+	
+	GameSnapshot snap = this->board->captureSnapshot();
+	snap.turn = this->turn;
+	snap.points1 = this->points1;
+	snap.points2 = this->points2;
+	snap.timeWhite = this->timeWhite;
+	snap.timeBlack = this->timeBlack;
+	
+	this->undoStack.push_back(snap);
+	this->currentMoveIndex++;
+}
 
+void GameState::undo() {
+	if (this->baseTime > 0.0f) return;
+	if (this->currentMoveIndex > 0) {
+		this->currentMoveIndex--;
+		const GameSnapshot& snap = this->undoStack[this->currentMoveIndex];
+		this->board->restoreSnapshot(snap, this->textures);
+		this->turn = snap.turn;
+		this->points1 = snap.points1;
+		this->points2 = snap.points2;
+		this->timeWhite = snap.timeWhite;
+		this->timeBlack = snap.timeBlack;
+		this->previousTurn = this->turn;
+		this->updateText();
+	}
+}
 
-
-
-
-
-
-
-
-
+void GameState::redo() {
+	if (this->baseTime > 0.0f) return;
+	if (this->currentMoveIndex < (int)this->undoStack.size() - 1) {
+		this->currentMoveIndex++;
+		const GameSnapshot& snap = this->undoStack[this->currentMoveIndex];
+		this->board->restoreSnapshot(snap, this->textures);
+		this->turn = snap.turn;
+		this->points1 = snap.points1;
+		this->points2 = snap.points2;
+		this->timeWhite = snap.timeWhite;
+		this->timeBlack = snap.timeBlack;
+		this->previousTurn = this->turn;
+		this->updateText();
+	}
+}

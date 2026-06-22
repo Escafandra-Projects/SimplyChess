@@ -8,6 +8,8 @@
 #include "chess/Piece.h"
 #include "ui/PauseMenu.h"
 #include "ui/PromotionMenu.h"
+#include "chess/MoveHistory.h"
+#include "chess/GameSnapshot.h"
 
 // Lado del tablero, en píxeles.
 constexpr int BOARD_SIZE = 800;
@@ -75,6 +77,7 @@ private:
 	GameStatus status;
 	int halfMoveClock;
 	std::map<std::string, int> positionHistory;
+	MoveHistory moveHistory;
 
 	sf::Vector2i mousePos;
 	sf::Vector2i promotionGridPos;
@@ -109,6 +112,9 @@ private:
 	void promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting);
 	/// Elimina el peón capturado en una captura al paso.
 	void peonPasoMovement(bool turn, sf::Vector2i startPos, sf::Vector2i desPos);
+
+	bool needsDisambiguation(bool turn, PieceType type, sf::Vector2i from, sf::Vector2i to) const;
+	bool isMoveLegal(bool turn, sf::Vector2i from, sf::Vector2i to) const;
 
 public:
 	// Constructor y destructor
@@ -166,6 +172,17 @@ public:
 	void updateAnimations(float dt);
 	/// Dibuja el tablero, casillas resaltadas, piezas y el menú de coronación.
 	void render(sf::RenderTarget& target);
+
+	const MoveHistory& getMoveHistory() const { return moveHistory; }
+
+	/// Captura un snapshot del estado actual del tablero
+	GameSnapshot captureSnapshot() const;
+
+	/// Restaura el estado del tablero desde un snapshot
+	void restoreSnapshot(const GameSnapshot& snapshot, std::map<std::string, sf::Texture>& textures);
+
+	/// Obtiene la textura correcta para un tipo y color de pieza
+	static std::string getTextureKey(PieceType type, bool color);
 
 	// DEPURACIÓN
 	/// Imprime el tablero por consola (utilidad de depuración).

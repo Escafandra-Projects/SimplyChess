@@ -284,6 +284,7 @@ void Board::startMove(sf::Vector2i mousePos, bool& turn) {
 }
 
 void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points2) {
+	if (!movingPiece) return;
 
 	sf::Vector2i pieceDesGridPos;
 	pieceDesGridPos.y = (mousePos.x - BOARD_OFFSET_X) / CELL_SIZE;
@@ -293,6 +294,79 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	pieceStartGridPos.x = movingPiece->getGridPosition().x;
 
 	this->menacedPiece = getPiece(pieceDesGridPos.x, pieceDesGridPos.y);
+
+	// Construct and populate MoveRecord before the board is modified
+	MoveRecord record;
+	record.pieceType = movingPiece->getType();
+	record.color = turn;
+	record.from = pieceStartGridPos;
+	record.to = pieceDesGridPos;
+	
+	// Determine special flags
+	record.isEnPassant = (movingPiece->getType() == PieceType::PEON && pieceStartGridPos.y != pieceDesGridPos.y && peonPaso[pieceDesGridPos.y][!turn] && menacedPiece == nullptr);
+	record.isCapture = (menacedPiece != nullptr) || record.isEnPassant;
+	record.isCastleShort = (movingPiece->getType() == PieceType::REY && (pieceDesGridPos.y - pieceStartGridPos.y == 2));
+	record.isCastleLong = (movingPiece->getType() == PieceType::REY && (pieceDesGridPos.y - pieceStartGridPos.y == -2));
+	record.isPromotion = (movingPiece->getType() == PieceType::PEON && (pieceDesGridPos.x == 0 || pieceDesGridPos.x == 7));
+	record.promotedTo = PieceType::PEON; // placeholder
+	record.isCheck = false; // will be updated at the end of endMove()
+	record.isCheckmate = false; // will be updated at the end of endMove()
+
+	// captured piece info
+	Piece* capturedPiece = menacedPiece;
+	if (!capturedPiece && record.isEnPassant) {
+		int capRow = turn ? 3 : 4;
+		capturedPiece = const_cast<Board*>(this)->getPiece(capRow, pieceDesGridPos.y);
+	}
+	record.capturedPieceIndex = -1;
+	record.capturedType = PieceType::PEON; // default
+	if (capturedPiece) {
+		record.capturedType = capturedPiece->getType();
+		for (int i = 0; i < 16; ++i) {
+			if (pieces[i][!turn].get() == capturedPiece) {
+				record.capturedPieceIndex = i;
+				break;
+			}
+		}
+	}
+
+	// Disambiguation
+	bool fileConflict = false;
+	bool rankConflict = false;
+	bool otherCanMove = false;
+	if (record.pieceType != PieceType::PEON && record.pieceType != PieceType::REY) {
+		for (int i = 0; i < 16; ++i) {
+			Piece* p2 = pieces[i][turn].get();
+			if (p2 && p2->isActive() && p2->getType() == record.pieceType) {
+				sf::Vector2i p2Pos = p2->getGridPosition();
+				if (p2Pos != pieceStartGridPos) {
+					if (isMoveLegal(turn, p2Pos, pieceDesGridPos)) {
+						otherCanMove = true;
+						if (p2Pos.y == pieceStartGridPos.y) {
+							fileConflict = true;
+						}
+						if (p2Pos.x == pieceStartGridPos.x) {
+							rankConflict = true;
+						}
+					}
+				}
+			}
+		}
+	}
+	record.needsFileDisambiguation = false;
+	record.needsRankDisambiguation = false;
+	if (otherCanMove) {
+		if (fileConflict && !rankConflict) {
+			record.needsRankDisambiguation = true;
+		} else if (!fileConflict && rankConflict) {
+			record.needsFileDisambiguation = true;
+		} else if (fileConflict && rankConflict) {
+			record.needsFileDisambiguation = true;
+			record.needsRankDisambiguation = true;
+		} else {
+			record.needsFileDisambiguation = true;
+		}
+	}
 
 	// ========== FASE 1: Validar geometria en una COPIA del tablero ==========
 	// checkMoveKing tiene efectos secundarios (mueve torre en el string del board para enroques)
@@ -346,7 +420,7 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	this->legalMovesShapes.clear();
 
 	// Peon al paso
-	if (this->peonPaso[pieceDesGridPos.y][!turn] && pieceStartGridPos.y != pieceDesGridPos.y && this->movingPiece->getType() == PieceType::PEON) {
+	if (this->peonPaso[pieceDesGridPos.y][!turn] && pieceStartGridPos.y != pieceDesGridPos.y && this->movingPiece->getType() == PieceType::PEON && menacedPiece == nullptr) {
 		this->peonPasoMovement(turn, pieceStartGridPos, pieceDesGridPos);
 	}
 	for (int i = 0; i < 8; i++) {
@@ -435,6 +509,10 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	} else {
 		AudioSystem::getInstance().playSound("move");
 	}
+
+	record.isCheck = this->jaque[turn];
+	record.isCheckmate = (this->status == GameStatus::CHECKMATE);
+	this->moveHistory.addMove(record);
 }
 
 void Board::capturePiece(Piece* menacedPiece, bool turn, int& points1, int& points2) {
@@ -528,6 +606,13 @@ void Board::promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting)
 			AudioSystem::getInstance().playSound("game_over");
 		} else if (this->jaque[opponentTurn]) {
 			AudioSystem::getInstance().playSound("check");
+		}
+
+		if (this->moveHistory.size() > 0) {
+			MoveRecord& lastMove = this->moveHistory.getLastMoveRef();
+			lastMove.promotedTo = this->promotionPiece;
+			lastMove.isCheck = this->jaque[opponentTurn];
+			lastMove.isCheckmate = (this->status == GameStatus::CHECKMATE);
 		}
 	}
 	else {
@@ -981,3 +1066,149 @@ void Board::updateAnimations(float dt) {
 		if (this->pieces[i][1] && this->pieces[i][1]->isActive()) this->pieces[i][1]->update(dt);
 	}
 }
+
+bool Board::isMoveLegal(bool turn, sf::Vector2i from, sf::Vector2i to) const {
+    Piece* p = const_cast<Board*>(this)->getPiece(from.x, from.y);
+    if (!p || p->getColor() != turn) return false;
+    
+    Piece* targetPiece = const_cast<Board*>(this)->getPiece(to.x, to.y);
+    
+    BoardGrid testBoard = this->board;
+    CastlingState testCastling = this->castling;
+    EnPassantState testPeonPaso = this->peonPaso;
+    
+    if (!const_cast<Board*>(this)->checkMove(turn, from, to, p, targetPiece, testCastling, testBoard, testPeonPaso)) {
+        return false;
+    }
+    
+    bool isCastling = (p->getType() == PieceType::REY && std::abs(from.y - to.y) == 2);
+    if (isCastling) {
+        if (!const_cast<Board*>(this)->isCastlingLegal(turn, from, to, const_cast<BoardGrid&>(this->board))) {
+            return false;
+        }
+    }
+    
+    testBoard[to.x][to.y] = testBoard[from.x][from.y];
+    if ((from.x + from.y) % 2 != 0)
+        testBoard[from.x][from.y] = "-";
+    else
+        testBoard[from.x][from.y] = "+";
+        
+    if (testPeonPaso[to.y][!turn] && from.y != to.y && p->getType() == PieceType::PEON) {
+        int capRow = turn ? 3 : 4;
+        if ((capRow + to.y) % 2 != 0)
+            testBoard[capRow][to.y] = "-";
+        else
+            testBoard[capRow][to.y] = "+";
+    }
+        
+    if (const_cast<Board*>(this)->isInCheck(turn, testBoard)) {
+        return false;
+    }
+    
+    return true;
+}
+
+bool Board::needsDisambiguation(bool turn, PieceType type, sf::Vector2i from, sf::Vector2i to) const {
+    if (type == PieceType::PEON || type == PieceType::REY) return false;
+    for (int i = 0; i < 16; ++i) {
+        Piece* p2 = pieces[i][turn].get();
+        if (p2 && p2->isActive() && p2->getType() == type) {
+            sf::Vector2i p2Pos = p2->getGridPosition();
+            if (p2Pos != from) {
+                if (isMoveLegal(turn, p2Pos, to)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+std::string Board::getTextureKey(PieceType type, bool color) {
+    std::string key = "";
+    switch (type) {
+        case PieceType::PEON: key = "P"; break;
+        case PieceType::TORRE: key = "T"; break;
+        case PieceType::CABALLO: key = "C"; break;
+        case PieceType::ALFIL: key = "A"; break;
+        case PieceType::REINA: key = "Q"; break;
+        case PieceType::REY: key = "K"; break;
+    }
+    key += color ? "B" : "N";
+    return key;
+}
+
+GameSnapshot Board::captureSnapshot() const {
+    GameSnapshot snap;
+    snap.board = this->board;
+    for (int i = 0; i < 16; ++i) {
+        for (int c = 0; c < 2; ++c) {
+            Piece* p = pieces[i][c].get();
+            int index = i * 2 + c;
+            snap.pieces[index].gridPos = p->getGridPosition();
+            snap.pieces[index].active = p->isActive();
+            snap.pieces[index].type = p->getType();
+            snap.pieces[index].color = p->getColor();
+        }
+    }
+    snap.castling = this->castling;
+    snap.peonPaso = this->peonPaso;
+    snap.jaque = this->jaque;
+    snap.status = this->status;
+    snap.halfMoveClock = this->halfMoveClock;
+    snap.positionHistory = this->positionHistory;
+    snap.moveHistory = this->moveHistory;
+    
+    // UI Visuals
+    snap.hasLastMove = this->hasLastMove;
+    snap.lastMoveStartPos = this->lastMoveStartCell.getPosition();
+    snap.lastMoveEndPos = this->lastMoveEndCell.getPosition();
+    return snap;
+}
+
+void Board::restoreSnapshot(const GameSnapshot& snap, std::map<std::string, sf::Texture>& textures) {
+    this->board = snap.board;
+    for (int i = 0; i < 16; ++i) {
+        for (int c = 0; c < 2; ++c) {
+            int index = i * 2 + c;
+            Piece* p = pieces[i][c].get();
+            const auto& pSnap = snap.pieces[index];
+            
+            p->setActive(pSnap.active);
+            if (pSnap.active) {
+                p->setGridPositionImmediate(pSnap.gridPos.x, pSnap.gridPos.y);
+            } else {
+                p->setGridPositionImmediate(-100, -100);
+            }
+            
+            if (p->getType() != pSnap.type) {
+                p->setPieceType(pSnap.type);
+                p->setTexture(textures[getTextureKey(pSnap.type, pSnap.color)]);
+            }
+        }
+    }
+    this->castling = snap.castling;
+    this->peonPaso = snap.peonPaso;
+    this->jaque = snap.jaque;
+    this->status = snap.status;
+    this->halfMoveClock = snap.halfMoveClock;
+    this->positionHistory = snap.positionHistory;
+    this->moveHistory = snap.moveHistory;
+    
+    // UI Visuals
+    this->hasLastMove = snap.hasLastMove;
+    if (this->hasLastMove) {
+        this->lastMoveStartCell.setPosition(snap.lastMoveStartPos);
+        this->lastMoveEndCell.setPosition(snap.lastMoveEndPos);
+    }
+    
+    // Reset any moving state
+    this->isMoving = false;
+    this->isDragging = false;
+    this->legalMovesShapes.clear();
+    this->movingPiece = nullptr;
+    this->menacedPiece = nullptr;
+    this->peonPiece = nullptr;
+}
+

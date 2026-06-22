@@ -145,6 +145,16 @@ void Piece::move(int x, int y){
 	this->isAnimating = true;
 }
 
+void Piece::setGridPositionImmediate(unsigned x, unsigned y) {
+	this->gridPos.x = x;
+	this->gridPos.y = y;
+	this->pos.x = y * CELL_SIZE + BOARD_OFFSET_X;
+	this->pos.y = x * CELL_SIZE + BOARD_OFFSET_Y;
+	this->targetPos = this->pos;
+	this->piece.setPosition(this->pos);
+	this->isAnimating = false;
+}
+
 void Piece::setRenderPosition(float x, float y){
 	// Mueve solo el sprite (arrastre): sin animación y sin tocar la casilla lógica.
 	this->pos.x = x;
