@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cstdlib>
+#include <filesystem>
 #include "chess/PGNManager.h"
 
 #include <stdexcept>

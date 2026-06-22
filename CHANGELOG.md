@@ -21,6 +21,7 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 - **Ajustes de UI**: Reemplazado el botón único "Back" del menú de Ajustes por botones separados de "Cancel" (descartar cambios) y "Confirm" (aplicar cambios), mejorando el espaciado para evitar clics accidentales.
 
 ### Corregido
+- Corregido un fallo de compilación en `GameState.cpp`: faltaba el `#include <filesystem>` necesario para `std::filesystem::create_directory`. La inclusión transitiva variaba según la versión del compilador, por lo que la compilación fallaba en toolchains recientes (p. ej. GCC 16).
 - Arreglada la distribución en macOS: el ejecutable ahora resuelve las rutas de los recursos correctamente independientemente del directorio de ejecución, y el paquete de release es más ligero al incluir solo el framework necesario (`freetype`).
 - La tecla **Escape** para pausar/reanudar la partida ahora funciona correctamente en macOS gracias a la refactorización de la lectura de teclado (usando la cola de eventos en lugar de la consulta de estado global, la cual fallaba por restricciones de permisos en los App Bundles).
 
