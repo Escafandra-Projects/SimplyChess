@@ -31,12 +31,14 @@ struct GameSnapshot {
     std::map<std::string, int> positionHistory;  // Historial de posiciones
     MoveHistory moveHistory;                     // Historial de movimientos
     
-    // Estado de la partida (en GameState)
-    bool turn;
-    int points1;
-    int points2;
-    float timeWhite;
-    float timeBlack;
+    // Estado de la partida (en GameState).
+    // captureSnapshot() no rellena estos campos (son propiedad de GameState),
+    // así que los inicializamos para evitar lecturas de memoria indeterminada.
+    bool turn = true;
+    int points1 = 0;
+    int points2 = 0;
+    float timeWhite = 0.f;
+    float timeBlack = 0.f;
     
     // Último movimiento (visual)
     bool hasLastMove;

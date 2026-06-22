@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cstdlib>
+#include <filesystem>
 #include "chess/PGNManager.h"
 
 #include <stdexcept>
@@ -469,7 +470,9 @@ void GameState::startAIThinking() {
 	
 	GameSnapshot snap = this->board->captureSnapshot();
 	FastBoard fastBoard;
-	fastBoard.initFromBoardGrid(snap.board, snap.turn, snap.castling, snap.peonPaso);
+	// captureSnapshot() no rellena snap.turn (es estado de GameState, no de Board),
+	// así que usamos el turno actual autoritativo en lugar de un valor indeterminado.
+	fastBoard.initFromBoardGrid(snap.board, this->turn, snap.castling, snap.peonPaso);
 	
 	this->aiFutureMove = std::async(std::launch::async, [fastBoard, this]() {
 		return AIEngine::getBestMove(fastBoard, this->aiDifficulty, this->aiStopFlag);
