@@ -116,6 +116,20 @@ void MainMenuState::initLogo()
         PANEL_Y + PANEL_H - ESMALL - 10.f
     );
     escafandraSprite.setColor(sf::Color(242, 226, 192, 80));
+
+    // Label a la izquierda del logo
+    escafandraLabel.setFont(font);
+    escafandraLabel.setString("Made by Escafandra Projects");
+    escafandraLabel.setCharacterSize(8);
+    escafandraLabel.setLetterSpacing(1.4f);
+    escafandraLabel.setFillColor(sf::Color(192, 152, 96, 60));
+    auto elb = escafandraLabel.getLocalBounds();
+    float esLogoX = PANEL_X + PANEL_W - ESMALL - 12.f;
+    float esLogoY = PANEL_Y + PANEL_H - ESMALL - 10.f;
+    escafandraLabel.setPosition(
+        esLogoX - elb.width - elb.left - 6.f,
+        esLogoY + ESMALL * 0.5f - elb.height * 0.5f - elb.top
+    );
 }
 
 void MainMenuState::initTitle()
@@ -233,6 +247,7 @@ void MainMenuState::applyAlpha(float t)
 
     logoSprite.setColor(ca({255, 255, 255}, panelA));
     escafandraSprite.setColor(ca({242, 226, 192}, static_cast<uint8_t>(80u * panelA / 255u)));
+    escafandraLabel.setFillColor(ca({192, 152, 96}, static_cast<uint8_t>(60u * panelA / 255u)));
     titleText.setFillColor(ca({242, 226, 192}, panelA));
 
     for (auto& d : divider) {
@@ -307,6 +322,7 @@ void MainMenuState::render(sf::RenderTarget* target)
     target->draw(panel);
     target->draw(panelInnerFrame);
     target->draw(logoSprite);
+    target->draw(escafandraLabel);
     target->draw(escafandraSprite);
     target->draw(titleText);
     for (auto& d : divider)

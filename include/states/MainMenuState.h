@@ -15,6 +15,7 @@ private:
     sf::Sprite logoSprite;
     sf::Texture escafandraTex;
     sf::Sprite escafandraSprite;
+    sf::Text escafandraLabel;
 
     // --- fondo y viñeta ---
     sf::RectangleShape bgRect;
