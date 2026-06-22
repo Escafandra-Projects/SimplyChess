@@ -58,104 +58,84 @@ void SettingsState::saveSettings() {
 }
 
 void SettingsState::initTextures() {
-	if (!this->textures["BACKGROUND"].loadFromFile("resources/images/menu/background.png")) {
-		throw std::runtime_error("ERROR::SETTINGS_STATE::FAILED TO LOAD BACKGROUND");
-	}
-	this->background.setTexture(this->textures["BACKGROUND"]);
-	this->background.scale(5.12f, 4.1f);
+	// 1. Dark background overlay (covers 1280x820 window)
+	this->bgRect.setSize({1280.f, 820.f});
+	this->bgRect.setFillColor(sf::Color(26, 12, 6)); // Dark brown canvas
 
-	if (!this->textures["BUTTONS"].loadFromFile("resources/images/interface/buttons.png")) {
-		throw std::runtime_error("ERROR::SETTINGS_STATE::FAILED TO LOAD BUTTONS");
-	}
+	// 2. Central wooden panel
+	this->panel.setSize({900.f, 700.f});
+	this->panel.setPosition(190.f, 60.f); // Centered
+	this->panel.setFillColor(sf::Color(140, 102, 68)); // Wooden fill
+	this->panel.setOutlineColor(sf::Color(60, 30, 12)); // Border color
+	this->panel.setOutlineThickness(3.f);
+
+	// 3. Golden inner frame
+	this->panelInnerFrame.setSize({900.f - 14.f, 700.f - 14.f});
+	this->panelInnerFrame.setPosition(190.f + 7.f, 60.f + 7.f);
+	this->panelInnerFrame.setFillColor(sf::Color::Transparent);
+	this->panelInnerFrame.setOutlineColor(sf::Color(208, 158, 78, 38)); // Gold with ~15% alpha
+	this->panelInnerFrame.setOutlineThickness(1.f);
 }
 
 void SettingsState::initKeybinds() {
 }
 
 void SettingsState::initFonts() {
-	if (!this->font.loadFromFile("resources/fonts/Factory LJDS.ttf")) {
+	if (!this->font.loadFromFile("resources/fonts/Gameplay.ttf")) {
 		throw std::runtime_error("ERROR::SETTINGS_STATE::COULD NOT LOAD FONT");
 	}
 }
 
 void SettingsState::initText() {
 	this->titleText.setFont(this->font);
-	this->titleText.setCharacterSize(80);
+	this->titleText.setCharacterSize(50);
 	this->titleText.setString("Settings");
-	// Centrar el título sobre el banner (el banner de fondo tiene su propio diseño, ajustamos acorde)
-	this->titleText.setPosition(500.f, 130.f);
+	this->titleText.setFillColor(sf::Color(238, 224, 194));
+	
+	// Center the title horizontally
+	auto titleBounds = this->titleText.getLocalBounds();
+	this->titleText.setOrigin(titleBounds.left + titleBounds.width / 2.0f, titleBounds.top + titleBounds.height / 2.0f);
+	this->titleText.setPosition(1280.f / 2.0f, 115.f);
 
 	this->modeLabel.setFont(this->font);
-	this->modeLabel.setCharacterSize(40);
+	this->modeLabel.setCharacterSize(28);
 	this->modeLabel.setString("Opponent:");
-	this->modeLabel.setPosition(330.f, 420.f);
+	this->modeLabel.setFillColor(sf::Color(238, 224, 194));
+	this->modeLabel.setPosition(350.f, 300.f);
 
 	this->diffLabel.setFont(this->font);
-	this->diffLabel.setCharacterSize(40);
+	this->diffLabel.setCharacterSize(28);
 	this->diffLabel.setString("Difficulty:");
-	this->diffLabel.setPosition(330.f, 530.f);
+	this->diffLabel.setFillColor(sf::Color(238, 224, 194));
+	this->diffLabel.setPosition(350.f, 410.f);
 
 	this->timeLabel.setFont(this->font);
-	this->timeLabel.setCharacterSize(40);
+	this->timeLabel.setCharacterSize(28);
 	this->timeLabel.setString("Base Time:");
-	this->timeLabel.setPosition(330.f, 420.f);
+	this->timeLabel.setFillColor(sf::Color(238, 224, 194));
+	this->timeLabel.setPosition(350.f, 300.f);
 
 	this->incrementLabel.setFont(this->font);
-	this->incrementLabel.setCharacterSize(40);
+	this->incrementLabel.setCharacterSize(28);
 	this->incrementLabel.setString("Increment:");
-	this->incrementLabel.setPosition(330.f, 530.f);
+	this->incrementLabel.setFillColor(sf::Color(238, 224, 194));
+	this->incrementLabel.setPosition(350.f, 410.f);
 }
 
 void SettingsState::initButtons() {
 	// Pestañas
-	this->buttons["TAB_BOT"] = std::make_unique<Button>(350.0f, 285.0f, 100.f, 61.0f, 
-		&this->font, "Bot", 30,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["TAB_BOT"]->scale(2.0f, 2.0f);
+	this->buttons["TAB_BOT"] = std::make_unique<MenuButton>(350.f, 180.f, 200.f, 50.f, &this->font, "Bot", 24);
+	this->buttons["TAB_TIME"] = std::make_unique<MenuButton>(650.f, 180.f, 200.f, 50.f, &this->font, "Time", 24);
 
-	this->buttons["TAB_TIME"] = std::make_unique<Button>(650.0f, 285.0f, 100.f, 61.0f, 
-		&this->font, "Time", 30,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["TAB_TIME"]->scale(2.0f, 2.0f);
+	// Opciones
+	this->buttons["MODE_CYCLE"] = std::make_unique<MenuButton>(650.f, 290.f, 250.f, 50.f, &this->font, "Escafandrin", 24);
+	this->buttons["DIFF_CYCLE"] = std::make_unique<MenuButton>(650.f, 400.f, 250.f, 50.f, &this->font, "Normal", 24);
+	this->buttons["TIME_CYCLE"] = std::make_unique<MenuButton>(650.f, 290.f, 250.f, 50.f, &this->font, "5 min", 24);
+	this->buttons["INC_CYCLE"] = std::make_unique<MenuButton>(650.f, 400.f, 250.f, 50.f, &this->font, "0 sec", 24);
 
-	// Aumentamos la escala para que el texto de las opciones quepa correctamente sin distorsionarse
-	this->buttons["MODE_CYCLE"] = std::make_unique<Button>(630.0f, 395.0f, 100.f, 61.0f, 
-		&this->font, "Escafandrin", 30,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["MODE_CYCLE"]->scale(2.5f, 2.5f);
-
-	this->buttons["DIFF_CYCLE"] = std::make_unique<Button>(630.0f, 505.0f, 100.f, 61.0f, 
-		&this->font, "Normal", 30,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["DIFF_CYCLE"]->scale(2.5f, 2.5f);
-
-	this->buttons["TIME_CYCLE"] = std::make_unique<Button>(630.0f, 395.0f, 100.f, 61.0f, 
-		&this->font, "5 min", 30,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["TIME_CYCLE"]->scale(2.5f, 2.5f);
-
-	this->buttons["INC_CYCLE"] = std::make_unique<Button>(630.0f, 505.0f, 100.f, 61.0f, 
-		&this->font, "0 sec", 30,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["INC_CYCLE"]->scale(2.5f, 2.5f);
-
-	this->buttons["CANCEL"] = std::make_unique<Button>(280.0f, 620.0f, 100.0f, 61.0f, 
-		&this->font, "Cancel", 40,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["CANCEL"]->scale(2.5f, 2.5f);
-
-	this->buttons["CONFIRM"] = std::make_unique<Button>(780.0f, 620.0f, 100.0f, 61.0f, 
-		&this->font, "Confirm", 40,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["CONFIRM"]->scale(3.0f, 3.0f);
+	// Controles
+	this->buttons["CANCEL"] = std::make_unique<MenuButton>(350.f, 560.f, 200.f, 50.f, &this->font, "Cancel", 28);
+	this->buttons["CONFIRM"] = std::make_unique<MenuButton>(650.f, 560.f, 200.f, 50.f, &this->font, "Confirm", 28);
 }
 
 void SettingsState::updateButtonTexts() {
@@ -168,9 +148,7 @@ void SettingsState::updateButtonTexts() {
 
 	int bt = baseTimeOptions[currentBaseTimeIdx];
 	if (bt == 0) {
-		// Tiempo infinito: la fuente Factory LJDS incluye el glifo ∞ (U+221E). Se construye
-		// como sf::String UTF-32 para que SFML no decodifique los bytes UTF-8 como Latin-1.
-		this->buttons["TIME_CYCLE"]->setText(sf::String(static_cast<sf::Uint32>(0x221E)));
+		this->buttons["TIME_CYCLE"]->setText("INF");
 	} else {
 		std::string btStr = std::to_string(bt / 60) + " min";
 		this->buttons["TIME_CYCLE"]->setText(btStr);
@@ -289,7 +267,9 @@ void SettingsState::render(sf::RenderTarget* target) {
 	if (!target) {
 		target = this->window;
 	}
-	target->draw(this->background);
+	target->draw(this->bgRect);
+	target->draw(this->panel);
+	target->draw(this->panelInnerFrame);
 	target->draw(this->titleText);
 
 	if (currentTab == TAB_BOT) {

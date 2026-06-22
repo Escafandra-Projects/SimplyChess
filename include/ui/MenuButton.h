@@ -7,10 +7,11 @@ enum class MenuBtnState { Idle, Hover, Active };
 /// Botón de menú principal con efecto bisel 3D (sin hoja de sprites).
 class MenuButton {
 public:
-    MenuButton(float x, float y, float w, float h, sf::Font* font, const std::string& label);
+    MenuButton(float x, float y, float w, float h, sf::Font* font, const std::string& label, unsigned characterSize = 13);
 
     bool isPressed() const;
     void setAlpha(uint8_t a);
+    void setText(const sf::String& label);
     void update(const sf::Vector2i& mousePos);
     void render(sf::RenderTarget& target);
 

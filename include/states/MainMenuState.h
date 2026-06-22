@@ -19,6 +19,7 @@ private:
 
     // --- fondo y viñeta ---
     sf::RectangleShape bgRect;
+    sf::VertexArray gridVA;
     sf::VertexArray vignetteVA;
 
     // --- adornos de esquina (2 por esquina × 4 esquinas) ---
@@ -49,6 +50,7 @@ private:
     // --- init ---
     void initFonts();
     void initBackground();
+    void initGrid();
     void initCornerBrackets();
     void initPanel();
     void initLogo();

@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "chess/Piece.h"
 #include "ui/PauseMenu.h"
@@ -177,6 +178,8 @@ public:
 	void render(sf::RenderTarget& target);
 
 	const MoveHistory& getMoveHistory() const { return moveHistory; }
+
+	std::vector<Piece*> getCapturedPieces(bool color) const;
 
 	/// Captura un snapshot del estado actual del tablero
 	GameSnapshot captureSnapshot() const;

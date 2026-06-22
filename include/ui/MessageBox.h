@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "ui/Button.h"
+#include "ui/MenuButton.h"
 #include <memory>
 
 /// Cuadro de mensaje con texto y un botón (p. ej. el aviso de fin de partida).
@@ -13,13 +13,14 @@ private:
     sf::Text titleText;
     sf::Text bodyText;
     sf::RectangleShape container;
-    std::unique_ptr<Button> button;
+    sf::RectangleShape innerFrame;
+    std::unique_ptr<MenuButton> button;
 
     /// Centra el texto dentro del cuadro.
     void centerText();
 
 public:
-    MessageBox(sf::Font& font, std::string message, std::string buttonText, sf::Texture& buttonTexture);
+    MessageBox(sf::Font& font, std::string message, std::string buttonText);
     virtual ~MessageBox();
 
     /// Devuelve true si se ha pulsado el botón.

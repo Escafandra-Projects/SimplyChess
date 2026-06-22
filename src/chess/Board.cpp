@@ -625,13 +625,13 @@ void Board::promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting)
 		if (this->movingPiece->getType() == PieceType::PEON) {
 
 				if (gridPos.x == 0) {
-					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE + BOARD_OFFSET_X, gridPos.x * CELL_SIZE + CELL_SIZE + BOARD_OFFSET_Y);
+					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE + BOARD_OFFSET_X + 15, gridPos.x * CELL_SIZE + CELL_SIZE + BOARD_OFFSET_Y);
 					this->promotionMenu->setShown(true, turn);
 					this->promotionTurn = turn;
 					this->promotionGridPos = gridPos;
 				}
 				if (gridPos.x == 7) {
-					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE + BOARD_OFFSET_X, gridPos.x * CELL_SIZE - 2 * CELL_SIZE + BOARD_OFFSET_Y);
+					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE + BOARD_OFFSET_X + 15, gridPos.x * CELL_SIZE - 2 * CELL_SIZE + BOARD_OFFSET_Y);
 					this->promotionMenu->setShown(true, turn);
 					this->promotionTurn = turn;
 					this->promotionGridPos = gridPos;
@@ -998,6 +998,7 @@ void Board::update(sf::Vector2i mousePos, sf::RenderWindow& window) {
 		this->mousePos = sf::Mouse::getPosition(window);
 	}
 	else {
+		this->promotionMenu->update(mousePos);
 		if (this->promotionMenu->isPressed(mousePos)) {
 			this->promotionPiece = this->promotionMenu->getSelectedPiece(mousePos);
 			this->promotionMenu->setShown(false, false);
@@ -1242,3 +1243,16 @@ bool Board::applyAIMove(int fromX, int fromY, int toX, int toY, PieceType promot
 	this->isAIMove = false;
 	return true;
 }
+
+std::vector<Piece*> Board::getCapturedPieces(bool color) const {
+	std::vector<Piece*> captured;
+	int colIdx = color ? 1 : 0;
+	for (int i = 0; i < 16; i++) {
+		Piece* p = this->pieces[i][colIdx].get();
+		if (p && !p->isActive() && p->getType() != PieceType::REY) {
+			captured.push_back(p);
+		}
+	}
+	return captured;
+}
+

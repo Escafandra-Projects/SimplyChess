@@ -5,17 +5,28 @@ PauseMenu::PauseMenu(sf::Font& font) : font(font) {
 	// Fondo   
 	this->container.setSize(sf::Vector2f(300.f, 430.f));
 	this->container.setPosition(490.f, 195.f);
-	this->container.setFillColor(sf::Color(255, 255, 255, 150));
-	this->container.setOutlineThickness(2.f);
+	this->container.setFillColor(sf::Color(140, 102, 68));
+	this->container.setOutlineColor(sf::Color(60, 30, 12));
+	this->container.setOutlineThickness(3.f);
 	
+	// Golden inner frame
+	this->innerFrame.setSize(sf::Vector2f(286.f, 416.f));
+	this->innerFrame.setPosition(497.f, 202.f);
+	this->innerFrame.setFillColor(sf::Color::Transparent);
+	this->innerFrame.setOutlineColor(sf::Color(208, 158, 78, 38));
+	this->innerFrame.setOutlineThickness(1.f);
 
 	// Titulo
 	this->menuText.setFont(font);
-	this->menuText.setCharacterSize(50);   
-	this->menuText.setFillColor(sf::Color(75, 53, 47, 255));
-	this->menuText.setPosition(this->container.getPosition().x + 100.f, this->container.getPosition().y + 15.f);
-	this->menuText.setString("Pause");
-
+	this->menuText.setCharacterSize(24);   
+	this->menuText.setFillColor(sf::Color(60, 30, 12));
+	this->menuText.setString("PAUSA");
+	
+	auto lb = this->menuText.getLocalBounds();
+	this->menuText.setPosition(
+		this->container.getPosition().x + (this->container.getSize().x - lb.width) / 2.f - lb.left,
+		this->container.getPosition().y + 25.f - lb.top
+	);
 }
 
 PauseMenu::~PauseMenu() {
@@ -25,13 +36,16 @@ bool PauseMenu::isButtonPressed(std::string key) {
 	return this->buttons[key]->isPressed();
 }
 
-void PauseMenu::addButton(std::string key, float x, float y, std::string text, sf::Texture& buttonTexture) {
-
-	this->buttons[key] = std::make_unique<Button>(this->container.getPosition().x + x, this->container.getPosition().y + y - 75.f, 100.f, 61.0f,
-		&this->font, text, 35,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		buttonTexture);
-	this->buttons[key]->scale(2, 2);
+void PauseMenu::addButton(std::string key, float x, float y, std::string text) {
+	this->buttons[key] = std::make_unique<MenuButton>(
+		this->container.getPosition().x + x,
+		this->container.getPosition().y + y - 75.f,
+		200.f,
+		40.f,
+		&this->font,
+		text,
+		15
+	);
 }
 
 void PauseMenu::update(sf::Vector2i& mousePosWindow) {
@@ -42,10 +56,10 @@ void PauseMenu::update(sf::Vector2i& mousePosWindow) {
 
 void PauseMenu::render(sf::RenderTarget& target) {
 	target.draw(this->container);
+	target.draw(this->innerFrame);
 
 	for (auto& [key, button] : this->buttons) {
 		button->render(target);
 	}
 	target.draw(this->menuText);
-
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "states/State.h"
-#include "ui/Button.h"
+#include "ui/MenuButton.h"
 #include <map>
 #include <string>
 #include <vector>
@@ -12,13 +12,17 @@ private:
 	// Variables
 	sf::Font font;
 	sf::Sprite background;
+	sf::RectangleShape bgRect;
+	sf::RectangleShape panel;
+	sf::RectangleShape panelInnerFrame;
+
 	sf::Text titleText;
 	sf::Text timeLabel;
 	sf::Text incrementLabel;
 	sf::Text modeLabel;
 	sf::Text diffLabel;
 	
-	std::map<std::string, std::unique_ptr<Button>> buttons;
+	std::map<std::string, std::unique_ptr<MenuButton>> buttons;
 
 	// Configuraciones
 	int baseTime;

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <cmath>
+#include <algorithm>
 #include "chess/PGNManager.h"
 
 #include <stdexcept>
@@ -20,7 +21,6 @@ void GameState::initVariables() {
 	this->points2 = 0;
 	this->gameOverReady = false;
 	this->mouseHeldLastFrame = false;
-	this->mouseHeldForButtons = false;
 	this->background.setPosition(sf::Vector2f(820.f, 0.f));
 
 	std::ifstream ifs("config/game.ini");
@@ -43,7 +43,7 @@ void GameState::initVariables() {
 	this->aiStopFlag = false;
 
 	// Mensaje fin del juego
-	this->gameOverBox = std::make_unique<MessageBox>(font, "Game over", "Exit", this->textures["BUTTONS"] );
+	this->gameOverBox = std::make_unique<MessageBox>(this->panelFont, "Game over", "Exit");
 }   
    
 
@@ -68,10 +68,10 @@ void GameState::initTextures() {
 }
 
 void GameState::initPauseMenu() {
-	this->pauseMenu = std::make_unique<PauseMenu>(this->font);
-	this->pauseMenu->addButton("EXIT", 50.f, 370.f, "Exit", this->textures["BUTTONS"]);
-	this->pauseMenu->addButton("SAVE_PGN", 50.f, 270.f, "Save PGN", this->textures["BUTTONS"]);
-	this->pauseMenu->addButton("CONTINUE", 50.f, 170.f, "Continue", this->textures["BUTTONS"]);
+	this->pauseMenu = std::make_unique<PauseMenu>(this->panelFont);
+	this->pauseMenu->addButton("EXIT", 50.f, 370.f, "Exit");
+	this->pauseMenu->addButton("SAVE_PGN", 50.f, 270.f, "Save PGN");
+	this->pauseMenu->addButton("CONTINUE", 50.f, 170.f, "Continue");
 }
 
 void GameState::initGamePanel() {
@@ -124,9 +124,14 @@ void GameState::initGamePanel() {
 		dot.setOutlineColor(sf::Color(200, 152, 72, 102));
 		dot.setOutlineThickness(1.f);
 	};
-	// NEGRAS top-left of board; BLANCAS bottom-right
+	// NEGRAS arriba-izq con casilla a la izquierda (☐ NEGRAS);
+	// BLANCAS abajo-der con casilla a la derecha (BLANCAS ☐), espejando el layout.
 	setupLabel(labelNegras, "NEGRAS", dotNegras, 33.f, 2.f,  false);
 	setupLabel(labelBlancas,"BLANCAS",dotBlancas, 686.f, 803.f, true);
+	{
+		auto lb = labelBlancas.getLocalBounds();
+		dotBlancas.setPosition(686.f + lb.left + lb.width + 8.f, 803.f + 2.f);
+	}
 
 	// ── Helper: absolute content coords ──────────────────────────────────
 	// content X starts inside panel with 14px horizontal pad
@@ -146,14 +151,9 @@ void GameState::initGamePanel() {
 	blackKingBox.setFillColor(sf::Color(42, 26, 12));
 	blackKingBox.setOutlineColor(sf::Color(200, 148, 70, 51));
 	blackKingBox.setOutlineThickness(1.f);
-
-	blackKingTxt.setFont(panelFont);
-	blackKingTxt.setString("K");
-	blackKingTxt.setCharacterSize(20);
-	blackKingTxt.setFillColor(sf::Color(200, 170, 120, 178));
-	auto bklb = blackKingTxt.getLocalBounds();
-	blackKingTxt.setPosition(CX + 19.f - bklb.width * 0.5f - bklb.left,
-	                         BLACK_Y + 31.f - bklb.height * 0.5f - bklb.top);
+	this->blackKingSprite.setTexture(this->textures["KN"]);
+	this->blackKingSprite.setScale(30.f / 100.f, 30.f / 100.f);
+	this->blackKingSprite.setPosition(CX + 4.f, BLACK_Y + 12.f + 4.f);
 
 	blackNameTxt.setFont(panelFont);
 	blackNameTxt.setString("JUGADOR 2");
@@ -194,14 +194,9 @@ void GameState::initGamePanel() {
 	whiteKingBox.setFillColor(sf::Color(200, 184, 136));
 	whiteKingBox.setOutlineColor(sf::Color(202, 168, 90, 89));
 	whiteKingBox.setOutlineThickness(1.f);
-
-	whiteKingTxt.setFont(panelFont);
-	whiteKingTxt.setString("K");
-	whiteKingTxt.setCharacterSize(20);
-	whiteKingTxt.setFillColor(sf::Color(60, 30, 10, 229));
-	auto wklb = whiteKingTxt.getLocalBounds();
-	whiteKingTxt.setPosition(CX + 19.f - wklb.width * 0.5f - wklb.left,
-	                         WHITE_Y + 31.f - wklb.height * 0.5f - wklb.top);
+	this->whiteKingSprite.setTexture(this->textures["KB"]);
+	this->whiteKingSprite.setScale(30.f / 100.f, 30.f / 100.f);
+	this->whiteKingSprite.setPosition(CX + 4.f, WHITE_Y + 12.f + 4.f);
 
 	whiteNameTxt.setFont(panelFont);
 	whiteNameTxt.setString("JUGADOR 1");
@@ -257,8 +252,8 @@ void GameState::initGamePanel() {
 	constexpr float BTN_H   = 40.f;
 	constexpr float BTN_GAP = 8.f;
 	float bw = (CW - BTN_GAP) * 0.5f;
-	actionBtns.emplace_back(CX,            BTN_Y, bw, BTN_H, &panelFont, "RENDIRSE");
-	actionBtns.emplace_back(CX + bw + BTN_GAP, BTN_Y, bw, BTN_H, &panelFont, "TABLAS");
+	actionBtns.emplace_back(CX,            BTN_Y, bw, BTN_H, &panelFont, "RENDIRSE", 12u);
+	actionBtns.emplace_back(CX + bw + BTN_GAP, BTN_Y, bw, BTN_H, &panelFont, "OFRECER TABLAS", 12u);
 
 	mouseHeldForActionBtns = false;
 }
@@ -298,16 +293,6 @@ void GameState::initText() {
 	this->gameInfoText.setPosition(850, 50);
 
 	this->moveListPanel = std::make_unique<MoveListPanel>(this->panelFont, sf::FloatRect(839.f, 124.f, 424.f, 518.f), true);
-	
-	this->btnUndo = std::make_unique<Button>(850.f, 750.f, 100.f, 61.0f,
-		&this->font, "Undo", 30,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	
-	this->btnRedo = std::make_unique<Button>(1130.f, 750.f, 100.f, 61.0f,
-		&this->font, "Redo", 30,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
 }
 
 void GameState::initKeybinds() {
@@ -592,20 +577,6 @@ void GameState::update(float dt) {
 				this->captureStateForUndo();
 			}
 			this->updateText();
-			
-			if (this->btnUndo) {
-			    this->btnUndo->update(this->mousePosWindow);
-			    if (this->btnUndo->isPressed() && !this->mouseHeldForButtons) {
-			        this->undo();
-			    }
-			}
-			if (this->btnRedo) {
-			    this->btnRedo->update(this->mousePosWindow);
-			    if (this->btnRedo->isPressed() && !this->mouseHeldForButtons) {
-			        this->redo();
-			    }
-			}
-			this->mouseHeldForButtons = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 		}
 
 		// Update animations ALWAYS, even if game is over
@@ -682,7 +653,7 @@ void GameState::render(sf::RenderTarget* target) {
 	// Fila jugador negro
 	target->draw(this->blackRowBg);
 	target->draw(this->blackKingBox);
-	target->draw(this->blackKingTxt);
+	target->draw(this->blackKingSprite);
 	target->draw(this->blackNameTxt);
 	target->draw(this->blackStatusTxt);
 	target->draw(this->blackTimerTxt);
@@ -690,6 +661,25 @@ void GameState::render(sf::RenderTarget* target) {
 	// Separadores y ventajas
 	target->draw(this->sepLines[0]);
 	target->draw(this->blackAdvTxt);
+
+	// Draw White pieces captured by Black (y = 92.f)
+	{
+		std::vector<Piece*> capturedWhite = this->board->getCapturedPieces(true);
+		std::sort(capturedWhite.begin(), capturedWhite.end(), [](const Piece* a, const Piece* b) {
+			if (a->getPoints() != b->getPoints()) return a->getPoints() < b->getPoints();
+			return static_cast<int>(a->getType()) < static_cast<int>(b->getType());
+		});
+		sf::Sprite capturedWhiteSprite;
+		capturedWhiteSprite.setScale(0.24f, 0.24f);
+		float startX = 839.f;
+		for (size_t i = 0; i < capturedWhite.size(); ++i) {
+			std::string textureKey = Board::getTextureKey(capturedWhite[i]->getType(), true);
+			capturedWhiteSprite.setTexture(this->textures[textureKey]);
+			capturedWhiteSprite.setPosition(startX + i * 26.f, 92.f);
+			target->draw(capturedWhiteSprite);
+		}
+	}
+
 	target->draw(this->sepLines[1]);
 
 	// Lista de movimientos
@@ -698,13 +688,32 @@ void GameState::render(sf::RenderTarget* target) {
 
 	target->draw(this->sepLines[2]);
 	target->draw(this->whiteAdvTxt);
+
+	// Draw Black pieces captured by White (y = 649.f)
+	{
+		std::vector<Piece*> capturedBlack = this->board->getCapturedPieces(false);
+		std::sort(capturedBlack.begin(), capturedBlack.end(), [](const Piece* a, const Piece* b) {
+			if (a->getPoints() != b->getPoints()) return a->getPoints() < b->getPoints();
+			return static_cast<int>(a->getType()) < static_cast<int>(b->getType());
+		});
+		sf::Sprite capturedBlackSprite;
+		capturedBlackSprite.setScale(0.24f, 0.24f);
+		float startX = 839.f;
+		for (size_t i = 0; i < capturedBlack.size(); ++i) {
+			std::string textureKey = Board::getTextureKey(capturedBlack[i]->getType(), false);
+			capturedBlackSprite.setTexture(this->textures[textureKey]);
+			capturedBlackSprite.setPosition(startX + i * 26.f, 649.f);
+			target->draw(capturedBlackSprite);
+		}
+	}
+
 	target->draw(this->sepLines[3]);
 
 	// Fila jugador blanco
 	target->draw(this->whiteRowBg);
 	target->draw(this->turnBar);
 	target->draw(this->whiteKingBox);
-	target->draw(this->whiteKingTxt);
+	target->draw(this->whiteKingSprite);
 	target->draw(this->whiteNameTxt);
 	target->draw(this->whiteStatusTxt);
 	target->draw(this->whiteTimerTxt);

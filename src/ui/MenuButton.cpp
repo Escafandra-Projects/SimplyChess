@@ -16,13 +16,13 @@ namespace {
     sf::Color withAlpha(sf::Color c, uint8_t a) { return {c.r, c.g, c.b, a}; }
 }
 
-MenuButton::MenuButton(float x, float y, float bw, float bh, sf::Font* font, const std::string& label)
+MenuButton::MenuButton(float x, float y, float bw, float bh, sf::Font* font, const std::string& label, unsigned characterSize)
     : state(MenuBtnState::Idle), baseX(x), baseY(y), w(bw), h(bh), alpha(255),
       body(sf::Quads, 4)
 {
     text.setFont(*font);
     text.setString(label);
-    text.setCharacterSize(13);
+    text.setCharacterSize(characterSize);
     text.setLetterSpacing(1.5f);
     rebuild();
     recolor();
@@ -34,6 +34,12 @@ bool MenuButton::isPressed() const {
 
 void MenuButton::setAlpha(uint8_t a) {
     alpha = a;
+    recolor();
+}
+
+void MenuButton::setText(const sf::String& label) {
+    text.setString(label);
+    rebuild();
     recolor();
 }
 

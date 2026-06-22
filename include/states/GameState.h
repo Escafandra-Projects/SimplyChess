@@ -25,8 +25,6 @@ private:
 	std::unique_ptr<PauseMenu> pauseMenu;
 	std::unique_ptr<MessageBox> gameOverBox;
 	std::unique_ptr<MoveListPanel> moveListPanel;
-	std::unique_ptr<Button> btnUndo;
-	std::unique_ptr<Button> btnRedo;
 	sf::Text gameInfoText;
 	sf::Sprite background;
 
@@ -42,13 +40,13 @@ private:
 	// Fila jugador negro (top)
 	sf::RectangleShape blackRowBg;
 	sf::RectangleShape blackKingBox;
-	sf::Text blackKingTxt;
+	sf::Sprite blackKingSprite;
 	sf::Text blackNameTxt, blackStatusTxt, blackTimerTxt;
 
 	// Fila jugador blanco (bottom, activo)
 	sf::RectangleShape whiteRowBg, turnBar;
 	sf::RectangleShape whiteKingBox;
-	sf::Text whiteKingTxt;
+	sf::Sprite whiteKingSprite;
 	sf::Text whiteNameTxt, whiteStatusTxt, whiteTimerTxt;
 
 	// Separadores y ventaja
@@ -84,7 +82,6 @@ private:
 	// Estado del botón izquierdo el frame anterior, para detectar los flancos de
 	// pulsación y de soltar (necesario para distinguir clic de arrastre).
 	bool mouseHeldLastFrame;
-	bool mouseHeldForButtons;
 
 	// Undo/Redo
 	std::vector<GameSnapshot> undoStack;

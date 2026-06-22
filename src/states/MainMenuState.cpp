@@ -53,6 +53,36 @@ void MainMenuState::initBackground()
     }
 }
 
+void MainMenuState::initGrid()
+{
+    // Rejilla de ajedrez tenue de fondo (coherente con el tablero de la partida).
+    // Casillas claras y oscuras dibujadas como quads de muy baja opacidad sobre
+    // la base de madera; la viñeta luego oscurece los bordes y el panel cubre el centro.
+    constexpr float CELL = 80.f;
+    const int cols = static_cast<int>(WIN_W / CELL) + 1; // 17
+    const int rows = static_cast<int>(WIN_H / CELL) + 1; // 11
+
+    const sf::Color lightSq(150, 112, 74, 26);
+    const sf::Color darkSq(8, 4, 1, 46);
+
+    gridVA.setPrimitiveType(sf::Quads);
+    gridVA.resize(cols * rows * 4);
+
+    int v = 0;
+    for (int r = 0; r < rows; ++r) {
+        for (int c = 0; c < cols; ++c) {
+            float x = c * CELL, y = r * CELL;
+            const sf::Color& col = ((r + c) & 1) ? darkSq : lightSq;
+            gridVA[v + 0].position = {x, y};
+            gridVA[v + 1].position = {x + CELL, y};
+            gridVA[v + 2].position = {x + CELL, y + CELL};
+            gridVA[v + 3].position = {x, y + CELL};
+            for (int k = 0; k < 4; ++k) gridVA[v + k].color = col;
+            v += 4;
+        }
+    }
+}
+
 void MainMenuState::initCornerBrackets()
 {
     // Each corner: 1 horizontal + 1 vertical thin rect
@@ -224,6 +254,7 @@ MainMenuState::MainMenuState(sf::RenderWindow* window,
 {
     initFonts();
     initBackground();
+    initGrid();
     initCornerBrackets();
     initPanel();
     initLogo();
@@ -314,6 +345,7 @@ void MainMenuState::render(sf::RenderTarget* target)
     if (!target) target = this->window;
 
     target->draw(bgRect);
+    target->draw(gridVA);
     target->draw(vignetteVA);
 
     for (auto& b : cornerBrackets)
