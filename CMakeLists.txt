@@ -62,6 +62,7 @@ if (APPLE)
         COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:SimplyChess>/../Frameworks
         COMMAND ditto
         ${CMAKE_BINARY_DIR}/_deps/sfml-src/extlibs/libs-osx/Frameworks $<TARGET_FILE_DIR:SimplyChess>/../Frameworks
+        COMMAND cp -R ${CMAKE_BINARY_DIR}/_deps/sfml-build/lib/*.dylib $<TARGET_FILE_DIR:SimplyChess>/../Frameworks/
     )
 else()
     add_custom_command(TARGET SimplyChess POST_BUILD

@@ -73,6 +73,7 @@ private:
 	bool isDragging;
 	bool endGame;
 	bool promotionTurn;
+	bool isAIMove;
 
 	GameStatus status;
 	int halfMoveClock;
@@ -130,6 +131,8 @@ public:
 	void movePiece(bool& turn, int& points1, int& points2);
 	/// Flanco de pulsación: selecciona una pieza, la re-agarra o completa un movimiento (modo dos clics).
 	void onPress(sf::Vector2i mousePos, bool& turn, int& points1, int& points2);
+	/// Ejecuta un movimiento del bot
+	bool applyAIMove(int fromX, int fromY, int toX, int toY, PieceType promotion, bool& turn, int& points1, int& points2);
 	/// Mientras se mantiene pulsado: la pieza agarrada sigue al cursor.
 	void onDrag(sf::Vector2i mousePos);
 	/// Flanco de soltar: suelta la pieza en la casilla destino o cancela el arrastre.

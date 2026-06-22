@@ -7,6 +7,10 @@
 #include "ui/MessageBox.h"
 #include "ui/MoveListPanel.h"
 #include "chess/GameSnapshot.h"
+#include "chess/AIEngine.h"
+#include <thread>
+#include <atomic>
+#include <future>
 
 /// Estado de partida: contiene el tablero, el marcador, el menú de pausa
 /// y el mensaje de fin de juego.
@@ -53,6 +57,15 @@ private:
 	void captureStateForUndo();
 	void undo();
 	void redo();
+
+	// AI
+	bool aiMode;
+	int aiDifficulty; // Profundidad máxima
+	bool aiIsThinking;
+	std::atomic<bool> aiStopFlag;
+	std::future<FastMove> aiFutureMove;
+	void startAIThinking();
+	void processAIMove();
 
 	// Inicialización
 	/// Inicializa las variables y el mensaje de fin de partida.

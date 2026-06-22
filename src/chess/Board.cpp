@@ -11,6 +11,8 @@ void Board::initVariables() {
 	this->isDragging = false;
 	this->endGame = false;
 	this->promotionTurn = false;
+	this->isAIMove = false;
+	this->promotionPiece = PieceType::REINA;
 	this->status = GameStatus::PLAYING;
 	this->halfMoveClock = 0;
 	this->positionHistory.clear();
@@ -431,7 +433,11 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	this->movingPiece->move(pieceDesGridPos.x, pieceDesGridPos.y);
 
 	// Coronación
-	this->promotion(turn, pieceDesGridPos, false);
+	if (this->isAIMove && this->movingPiece->getType() == PieceType::PEON && (pieceDesGridPos.x == 0 || pieceDesGridPos.x == 7)) {
+		this->promotion(turn, pieceDesGridPos, true); // Aplicar directamente
+	} else {
+		this->promotion(turn, pieceDesGridPos, false);
+	}
 
 	// Movimiento de la torre en caso de enroques
 	if (!castling[0]) {
@@ -1212,3 +1218,27 @@ void Board::restoreSnapshot(const GameSnapshot& snap, std::map<std::string, sf::
     this->peonPiece = nullptr;
 }
 
+bool Board::applyAIMove(int fromX, int fromY, int toX, int toY, PieceType promotion, bool& turn, int& points1, int& points2) {
+	Piece* p = getPiece(fromX, fromY);
+	if (!p || p->getColor() != turn) return false;
+
+	this->movingPiece = p;
+	this->isMoving = true;
+	this->legalMovesShapes.clear();
+	this->calculateLegalMoves(turn, sf::Vector2i(fromX, fromY));
+
+	Piece* targetPiece = getPiece(toX, toY);
+	if (!targetPiece && p->getType() == PieceType::PEON && fromY != toY) {
+		targetPiece = getPiece(fromX, toY); // En passant
+	}
+	
+	this->menacedPiece = targetPiece;
+	this->isAIMove = true;
+	this->promotionPiece = promotion;
+	
+	sf::Vector2i pixelPos(toY * CELL_SIZE + BOARD_OFFSET_X + CELL_SIZE/2, toX * CELL_SIZE + BOARD_OFFSET_Y + CELL_SIZE/2);
+	endMove(pixelPos, turn, points1, points2);
+	
+	this->isAIMove = false;
+	return true;
+}

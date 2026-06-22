@@ -28,6 +28,7 @@ graph TB
     subgraph "states/"
         STATE["State (abstracta)"]
         MAINMENU["MainMenuState"]
+        SETTINGS["SettingsState"]
         GAMESTATE["GameState"]
     end
 
@@ -41,6 +42,9 @@ graph TB
     subgraph "chess/"
         BOARD["Board"]
         PIECE["Piece"]
+        FASTBOARD["FastBoard"]
+        MOVEGEN["MoveGen"]
+        AI["AIEngine"]
     end
 
     subgraph "config/"
@@ -53,19 +57,25 @@ graph TB
     MAIN --> GAME
     GAME -->|"posee pila de"| STATE
     STATE --> MAINMENU
+    STATE --> SETTINGS
     STATE --> GAMESTATE
 
     MAINMENU -->|"usa"| BUTTON
+    SETTINGS -->|"usa"| BUTTON
 
     GAMESTATE -->|"posee"| BOARD
     GAMESTATE -->|"usa"| PAUSEMENU
     GAMESTATE -->|"usa"| MSGBOX
+    GAMESTATE -->|"usa"| AI
 
     PAUSEMENU -->|"contiene"| BUTTON
     MSGBOX -->|"contiene"| BUTTON
 
     BOARD -->|"posee 32"| PIECE
     BOARD -->|"posee"| PROMOMENU
+    AI -.->|"usa"| FASTBOARD
+    AI -.->|"usa"| MOVEGEN
+    BOARD -.->|"convierte a"| FASTBOARD
 
     GAME -.->|"lee"| WININI
     GAME -.->|"lee"| KEYSINI
@@ -105,17 +115,24 @@ classDiagram
         +renderButtons(RenderTarget&)
     }
 
+    class SettingsState {
+        -map~string, unique_ptr~Button~~ buttons
+        +updateButtons()
+    }
+
     class GameState {
         -unique_ptr~Board~ board
         -unique_ptr~PauseMenu~ pauseMenu
         -unique_ptr~MessageBox~ gameOverBox
         -bool turn
         -int points1, points2
+        -future~FastMove~ aiFuture
         +updatePauseMenuButtons()
         +buildScoreText() string
     }
 
     State <|-- MainMenuState
+    State <|-- SettingsState
     State <|-- GameState
 ```
 

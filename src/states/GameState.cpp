@@ -25,14 +25,21 @@ void GameState::initVariables() {
 	std::ifstream ifs("config/game.ini");
 	if (ifs.is_open()) {
 		ifs >> this->baseTime >> this->increment;
+		if (!(ifs >> this->aiMode)) this->aiMode = true;
+		if (!(ifs >> this->aiDifficulty)) this->aiDifficulty = 4;
 		ifs.close();
 	} else {
 		this->baseTime = 300.0f;
 		this->increment = 0.0f;
+		this->aiMode = true;
+		this->aiDifficulty = 4;
 	}
 	this->timeWhite = this->baseTime;
 	this->timeBlack = this->baseTime;
 	this->clockStarted = false;
+
+	this->aiIsThinking = false;
+	this->aiStopFlag = false;
 
 	// Mensaje fin del juego
 	this->gameOverBox = std::make_unique<MessageBox>(font, "Game over", "Exit", this->textures["BUTTONS"] );
@@ -82,13 +89,13 @@ static std::string formatTime(float t) {
 
 std::string GameState::buildScoreText() const {
 	if (this->baseTime == 0.0f) {
-		return "White: " + this->player1 + "\nPoints: " + std::to_string(this->points1) +
-			"\n\nBlack: " + this->player2 + "\nPoints: " + std::to_string(this->points2);
+		return "Black: " + this->player2 + "\nPoints: " + std::to_string(this->points2) +
+			"\n\nWhite: " + this->player1 + "\nPoints: " + std::to_string(this->points1);
 	}
-	return "White: " + this->player1 + "\nPoints: " + std::to_string(this->points1) +
-		"\nTime: " + formatTime(this->timeWhite) + 
-		"\n\nBlack: " + this->player2 + "\nPoints: " + std::to_string(this->points2) +
-		"\nTime: " + formatTime(this->timeBlack);
+	return "Black: " + this->player2 + "\nPoints: " + std::to_string(this->points2) +
+		"\nTime: " + formatTime(this->timeBlack) + 
+		"\n\nWhite: " + this->player1 + "\nPoints: " + std::to_string(this->points1) +
+		"\nTime: " + formatTime(this->timeWhite);
 }
 
 void GameState::initText() {
@@ -141,6 +148,10 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 }
 
 GameState::~GameState() {
+	this->aiStopFlag = true;
+	if (this->aiFutureMove.valid()) {
+		this->aiFutureMove.wait();
+	}
 }
 
 
@@ -185,6 +196,10 @@ void GameState::updateInput(float /*dt*/) {
 	// Movimiento: admite dos clics (clic en pieza, clic en destino) y arrastrar-soltar.
 	bool mouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 	if (!this->paused && !this->board->getEndGame() && !this->board->isPromoting()) {
+		// Bloquear entrada del usuario si es el turno de la IA
+		bool isAITurn = this->aiMode && !this->turn;
+		if (isAITurn) return;
+
 		if (mouseDown && !this->mouseHeldLastFrame) {
 			// Flanco de pulsación: seleccionar, re-agarrar o soltar destino (dos clics).
 			if (!this->board->isAnyPieceAnimating()) {
@@ -315,32 +330,48 @@ void GameState::update(float dt) {
 			this->mouseHeldForButtons = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 		}
 
+		// Update animations ALWAYS, even if game is over
+		this->board->updateAnimations(dt);
+
 		if (this->board->getEndGame()) {
-			GameStatus status = this->board->getGameStatus();
-			if (status == GameStatus::TIMEOUT) {
-				if (this->turn) {
-					this->gameOverBox->setText("Game over.\nTime Out. " + this->player2 + " wins");
+			if (!this->board->isAnyPieceAnimating()) {
+				if (!this->gameOverReady) {
+					GameStatus status = this->board->getGameStatus();
+					if (status == GameStatus::TIMEOUT) {
+						if (this->turn) {
+							this->gameOverBox->setText("Game over.\nTime Out. " + this->player2 + " wins");
+						} else {
+							this->gameOverBox->setText("Game over.\nTime Out. " + this->player1 + " wins");
+						}
+					} else if (status == GameStatus::CHECKMATE) {
+						if (this->turn) {
+							this->gameOverBox->setText("Game over.\n" + this->player2 + " wins");
+						} else {
+							this->gameOverBox->setText("Game over.\n" + this->player1 + " wins");
+						}
+					} else if (status == GameStatus::STALEMATE) {
+						this->gameOverBox->setText("Game over.\nDraw by stalemate");
+					} else if (status == GameStatus::FIFTY_MOVE_RULE) {
+						this->gameOverBox->setText("Game over.\nDraw by 50-move rule");
+					} else if (status == GameStatus::REPETITION) {
+						this->gameOverBox->setText("Game over.\nDraw by repetition");
+					}
+					this->gameOverReady = true;
 				} else {
-					this->gameOverBox->setText("Game over.\nTime Out. " + this->player1 + " wins");
+					this->gameOverBox->update(this->mousePosWindow);
 				}
-			} else if (status == GameStatus::CHECKMATE) {
-				if (this->turn) {
-					this->gameOverBox->setText("Game over.\n" + this->player2 + " wins");
-				} else {
-					this->gameOverBox->setText("Game over.\n" + this->player1 + " wins");
-				}
-			} else if (status == GameStatus::STALEMATE) {
-				this->gameOverBox->setText("Game over.\nDraw by stalemate");
-			} else if (status == GameStatus::FIFTY_MOVE_RULE) {
-				this->gameOverBox->setText("Game over.\nDraw by 50-move rule");
-			} else if (status == GameStatus::REPETITION) {
-				this->gameOverBox->setText("Game over.\nDraw by repetition");
 			}
-			this->gameOverBox->update(this->mousePosWindow);
 		}
 		else {
-			this->board->updateAnimations(dt);
 			this->board->update(this->mousePosWindow, *this->window);
+			
+			if (this->aiMode && !this->turn && !this->board->getEndGame() && !this->board->isAnyPieceAnimating()) {
+				if (!this->aiIsThinking) {
+					this->startAIThinking();
+				} else {
+					this->processAIMove();
+				}
+			}
 		}
 	}
 	else {
@@ -429,5 +460,38 @@ void GameState::redo() {
 		this->timeBlack = snap.timeBlack;
 		this->previousTurn = this->turn;
 		this->updateText();
+	}
+}
+
+void GameState::startAIThinking() {
+	this->aiIsThinking = true;
+	this->aiStopFlag = false;
+	
+	GameSnapshot snap = this->board->captureSnapshot();
+	FastBoard fastBoard;
+	fastBoard.initFromBoardGrid(snap.board, snap.turn, snap.castling, snap.peonPaso);
+	
+	this->aiFutureMove = std::async(std::launch::async, [fastBoard, this]() {
+		return AIEngine::getBestMove(fastBoard, this->aiDifficulty, this->aiStopFlag);
+	});
+}
+
+void GameState::processAIMove() {
+	if (this->aiFutureMove.valid() && this->aiFutureMove.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+		FastMove move = this->aiFutureMove.get();
+		this->aiIsThinking = false;
+		
+		if (move.movedPiece != FAST_EMPTY) {
+			PieceType promo = PieceType::REINA;
+			if (move.isPromotion) {
+				switch (move.promotionType) {
+					case FAST_QUEEN: promo = PieceType::REINA; break;
+					case FAST_ROOK: promo = PieceType::TORRE; break;
+					case FAST_BISHOP: promo = PieceType::ALFIL; break;
+					case FAST_KNIGHT: promo = PieceType::CABALLO; break;
+				}
+			}
+			this->board->applyAIMove(move.fromY, move.fromX, move.toY, move.toX, promo, this->turn, this->points1, this->points2);
+		}
 	}
 }

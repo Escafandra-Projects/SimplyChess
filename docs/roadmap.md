@@ -87,6 +87,10 @@ expandirse a otras áreas.
   - Dar funcionalidad al botón *Settings* del menú principal.
   - Permitir cambiar parámetros como los de tiempo base e incremento desde la interfaz.
 
+- [ ] **Piezas Capturadas en Panel Lateral**
+  - Mostrar visualmente en la barra de la derecha (donde el marcador) los iconos de las piezas capturadas por cada jugador.
+  - Calcular la ventaja material y mostrarla numéricamente (ej: +2).
+
 ---
 
 ## 🟡 Hito 3 — Gestión de partidas
@@ -112,3 +116,22 @@ expandirse a otras áreas.
 - [x] **Reloj de ajedrez (Tiempo)**
   - Añadir soporte para partidas con límite de tiempo por jugador (ej: 5 min, 10 min).
   - Implementar cuenta regresiva y fin de partida por tiempo agotado.
+
+---
+
+## 🟢 Hito 4 — IA y Juego contra Bot (Minimax)
+
+**Prioridad:** Alta
+**Objetivo:** Permitir al usuario jugar contra la computadora usando un motor de inteligencia artificial local.
+
+- [x] **Motor de IA basado en Minimax**
+  - Implementar el algoritmo Minimax con poda Alfa-Beta para la búsqueda del mejor movimiento.
+  - Generación rápida de movimientos y evaluación heurística basada en tablas de piezas (Piece-Square Tables).
+  - Estructuras de datos optimizadas (`FastBoard`, `FastMove`) para realizar cálculos rápidos e independientes del renderizado.
+
+- [x] **Integración y Multithreading**
+  - Desacoplar el cálculo de la IA de la interfaz gráfica usando `std::async` para evitar que el juego se congele.
+  - Inyección del movimiento de la IA directamente al estado del tablero.
+
+- [x] **Ajuste de dificultad**
+  - Permitir escoger distintos niveles de profundidad de búsqueda (Depth) desde el menú de inicio para hacer la IA más o menos agresiva.
