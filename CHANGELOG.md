@@ -17,6 +17,7 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 - Soporte para eventos de teclado basados en cola de eventos (`handleEvent`) en la arquitectura de estados, mejorando la compatibilidad con macOS.
 
 ### Cambiado
+- **Tiempo infinito**: la opción de tiempo infinito del menú de Ajustes muestra ahora el símbolo ∞ (lemniscata) en lugar del texto "Infinite", usando el glifo Unicode de la fuente `Factory LJDS`.
 - **Ajustes de UI**: Reemplazado el botón único "Back" del menú de Ajustes por botones separados de "Cancel" (descartar cambios) y "Confirm" (aplicar cambios), mejorando el espaciado para evitar clics accidentales.
 
 ### Corregido

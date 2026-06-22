@@ -56,7 +56,7 @@ expandirse a otras áreas.
 **Prioridad:** Media
 **Objetivo:** Hacer que el juego se sienta más moderno, responsivo y dinámico.
 
-- [ ] **Añadir la lemniscata**
+- [x] **Añadir la lemniscata**
   - Cargar una fuente que soporte el símbolo de infinito o usar una textura para mostrar la lemniscata en la opción de tiempo infinito de los ajustes.
 
 - [x] **Animaciones de movimiento**
@@ -73,10 +73,11 @@ expandirse a otras áreas.
   - Marcar visualmente las casillas de origen y destino del último movimiento realizado.
   - Almacenar las coordenadas del último movimiento completado.
 
-- [ ] **Efectos de sonido**
-  - [x] Integrar `sfml-audio` y añadir a `target_link_libraries`.
-  - [x] Efectos de movimiento normal, captura y enroque.
-  - [ ] Reemplazar los sonidos temporales (placeholders) de:
+- [x] **Efectos de sonido**
+  - Integrar `sfml-audio` para añadir efectos sonoros:
+    - Movimiento normal
+    - Captura
+    - Enroque
     - Jaque
     - Jaque mate / fin de partida
 
