@@ -59,7 +59,7 @@ expandirse a otras áreas.
 - [ ] **Añadir la lemniscata**
   - Cargar una fuente que soporte el símbolo de infinito o usar una textura para mostrar la lemniscata en la opción de tiempo infinito de los ajustes.
 
-- [ ] **Animaciones de movimiento**
+- [x] **Animaciones de movimiento**
   - Reemplazar el movimiento instantáneo (teletransporte) por interpolación fluida
     entre origen y destino.
   - Opciones: interpolación lineal (lerp) o easing (ease-in-out) usando delta-time.
@@ -74,13 +74,11 @@ expandirse a otras áreas.
   - Almacenar las coordenadas del último movimiento completado.
 
 - [ ] **Efectos de sonido**
-  - Integrar `sfml-audio` para añadir efectos sonoros:
-    - Movimiento normal
-    - Captura
-    - Enroque
+  - [x] Integrar `sfml-audio` y añadir a `target_link_libraries`.
+  - [x] Efectos de movimiento normal, captura y enroque.
+  - [ ] Reemplazar los sonidos temporales (placeholders) de:
     - Jaque
     - Jaque mate / fin de partida
-  - Añadir `sfml-audio` a `target_link_libraries` en CMakeLists.txt.
 
 - [x] **Coordenadas en el tablero**
   - Mostrar los números (1-8) a la izquierda y las letras (A-H) en la parte inferior para ayudar a la lectura.
@@ -96,16 +94,16 @@ expandirse a otras áreas.
 **Prioridad:** Media
 **Objetivo:** Permitir el seguimiento, guardado y análisis de partidas.
 
-- [ ] **Historial de movimientos en pantalla**
+- [x] **Historial de movimientos en pantalla**
   - Mostrar la notación algebraica estándar de la partida en curso
     (ej: `1. e4 e5 2. Nf3 Nc6`).
   - Requiere un registro de movimientos con formato de notación.
 
 - [ ] **Exportar e importar partidas en PGN**
-  - Guardar partidas en el formato estándar *Portable Game Notation* (`.pgn`).
-  - Cargar archivos `.pgn` para reproducir o continuar partidas.
+  - [x] Guardar partidas en el formato estándar *Portable Game Notation* (`.pgn`).
+  - [ ] Cargar archivos `.pgn` para reproducir o continuar partidas.
 
-- [ ] **Deshacer/Rehacer movimientos (Undo/Redo)**
+- [x] **Deshacer/Rehacer movimientos (Undo/Redo)**
   - Guardar el estado completo de la partida en una pila (`std::stack`) tras cada
     movimiento.
   - Permitir retroceder y avanzar movimientos para análisis o práctica.
