@@ -34,7 +34,7 @@ private:
 	const std::vector<int> baseTimeOptions = {0, 60, 180, 300, 600};
 	const std::vector<int> incrementOptions = {0, 1, 2, 3, 5};
 	const std::vector<std::string> modeOptions = {"2 Jugadores", "Escafandrin"};
-	const std::vector<int> diffOptions = {2, 4, 5};
+	const std::vector<int> diffOptions = {2, 3, 4};
 	const std::vector<std::string> diffNames = {"Baja", "Normal", "Alta"};
 	
 	int currentBaseTimeIdx;

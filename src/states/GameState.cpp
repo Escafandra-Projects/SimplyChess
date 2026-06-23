@@ -14,8 +14,8 @@ void GameState::initVariables() {
 	this->turn = true;
 	this->previousTurn = true;
 
-	this->player1 = "Player 1";
-	this->player2 = "Player 2";
+	this->player1 = "Jugador 1";
+	this->player2 = "Jugador 2";
 	this->points1 = 0;
 	this->points2 = 0;
 	this->points2 = 0;
@@ -35,6 +35,7 @@ void GameState::initVariables() {
 		this->aiMode = true;
 		this->aiDifficulty = 4;
 	}
+	this->player2 = this->aiMode ? "Escafandrin" : "Jugador 2";
 	this->timeWhite = this->baseTime;
 	this->timeBlack = this->baseTime;
 	this->clockStarted = false;
@@ -42,8 +43,15 @@ void GameState::initVariables() {
 	this->aiIsThinking = false;
 	this->aiStopFlag = false;
 
+	this->confirmResignActive = false;
+	this->drawOfferActive = false;
+	this->drawRejectedActive = false;
+
 	// Mensaje fin del juego
 	this->gameOverBox = std::make_unique<MessageBox>(this->panelFont, "Fin de la partida", "Salir");
+	this->confirmResignBox = std::make_unique<MessageBox>(this->panelFont, "Quieres rendirte?", "Si", "No");
+	this->drawOfferBox = std::make_unique<MessageBox>(this->panelFont, "Ofrecen tablas.\nAceptas el empate?", "Aceptar", "Rechazar");
+	this->drawRejectedBox = std::make_unique<MessageBox>(this->panelFont, "Tablas rechazadas\nEscafandrin no perdona", "Continuar");
 }   
    
 
@@ -116,11 +124,14 @@ void GameState::initGamePanel() {
 	};
 	// NEGRAS arriba-izq con casilla a la izquierda (☐ NEGRAS);
 	// BLANCAS abajo-der con casilla a la derecha (BLANCAS ☐), espejando el layout.
-	setupLabel(labelNegras, "NEGRAS", dotNegras, 33.f, 2.f,  false);
-	setupLabel(labelBlancas,"BLANCAS",dotBlancas, 686.f, 803.f, true);
+	// Rediseñado para quedar completamente fuera del tablero (y=4 para negras, y=804 para blancas)
+	setupLabel(labelNegras, "NEGRAS", dotNegras, 33.f, 4.f,  false);
+	setupLabel(labelBlancas, "BLANCAS", dotBlancas, 0.f, 804.f, true);
 	{
 		auto lb = labelBlancas.getLocalBounds();
-		dotBlancas.setPosition(686.f + lb.left + lb.width + 8.f, 803.f + 2.f);
+		float xText = 800.f - 7.f - 8.f - lb.width - lb.left;
+		labelBlancas.setPosition(xText, 804.f);
+		dotBlancas.setPosition(xText + lb.left + lb.width + 8.f, 804.f + 2.f);
 	}
 
 	// ── Helper: absolute content coords ──────────────────────────────────
@@ -146,7 +157,7 @@ void GameState::initGamePanel() {
 	this->blackKingSprite.setPosition(CX + 4.f, BLACK_Y + 12.f + 4.f);
 
 	blackNameTxt.setFont(panelFont);
-	blackNameTxt.setString("JUGADOR 2");
+	blackNameTxt.setString(this->player2);
 	blackNameTxt.setCharacterSize(11);
 	blackNameTxt.setLetterSpacing(1.8f);
 	blackNameTxt.setFillColor(sf::Color(221, 208, 176));
@@ -189,7 +200,7 @@ void GameState::initGamePanel() {
 	this->whiteKingSprite.setPosition(CX + 4.f, WHITE_Y + 12.f + 4.f);
 
 	whiteNameTxt.setFont(panelFont);
-	whiteNameTxt.setString("JUGADOR 1");
+	whiteNameTxt.setString(this->player1);
 	whiteNameTxt.setCharacterSize(11);
 	whiteNameTxt.setLetterSpacing(1.8f);
 	whiteNameTxt.setFillColor(sf::Color(242, 228, 194));
@@ -229,9 +240,9 @@ void GameState::initGamePanel() {
 	auto setupAdv = [&](sf::Text& t, float x, float y) {
 		t.setFont(panelFont);
 		t.setString("+0");
-		t.setCharacterSize(9);
+		t.setCharacterSize(13);
 		t.setLetterSpacing(1.2f);
-		t.setFillColor(sf::Color(200, 160, 100, 82));
+		t.setFillColor(sf::Color(210, 175, 110, 200));
 		t.setPosition(x, y);
 	};
 	setupAdv(blackAdvTxt, SX + SW - 3.f - 14.f - 20.f, 93.f);
@@ -368,7 +379,8 @@ void GameState::handleEvent(const sf::Event& event) {
 void GameState::updateInput(float /*dt*/) {
 	// Movimiento: admite dos clics (clic en pieza, clic en destino) y arrastrar-soltar.
 	bool mouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-	if (!this->paused && !this->board->getEndGame() && !this->board->isPromoting()) {
+	if (!this->paused && !this->board->getEndGame() && !this->board->isPromoting() &&
+	    !this->confirmResignActive && !this->drawOfferActive && !this->drawRejectedActive) {
 		// Bloquear entrada del usuario si es el turno de la IA
 		bool isAITurn = this->aiMode && !this->turn;
 		if (isAITurn) return;
@@ -508,16 +520,36 @@ void GameState::updateGamePanel() {
 	whiteAdvTxt.setString(adv1 > 0 ? "+" + std::to_string(adv1) : "");
 
 	// ── Action buttons ───────────────────────────────────────────────
-	for (auto& btn : actionBtns)
-		btn.update(this->mousePosWindow);
+	bool isAITurn = this->aiMode && !this->turn;
+	if (this->paused || this->board->getEndGame() || this->confirmResignActive || this->drawOfferActive || this->drawRejectedActive || isAITurn) {
+		for (auto& btn : actionBtns)
+			btn.update({-1000, -1000}); // Desactivar hover
+	} else {
+		for (auto& btn : actionBtns)
+			btn.update(this->mousePosWindow);
 
-	bool mouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-	if (!mouseHeldForActionBtns) {
-		if (!actionBtns.empty() && actionBtns[0].isPressed())
-			this->pauseState(); // RENDIRSE → abre pausa (con opción Exit)
-		// TABLAS: sin implementar todavía
+		bool mouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+		if (!mouseHeldForActionBtns) {
+			if (!actionBtns.empty() && actionBtns[0].isPressed()) {
+				this->confirmResignActive = true;
+			}
+			if (actionBtns.size() > 1 && actionBtns[1].isPressed()) {
+				if (this->aiMode) {
+					GameSnapshot snap = this->board->captureSnapshot();
+					FastBoard fastBoard;
+					fastBoard.initFromBoardGrid(snap.board, snap.turn, snap.castling, snap.peonPaso);
+					if (AIEngine::shouldAcceptDraw(fastBoard)) {
+						this->board->forceEndGame(GameStatus::DRAW_AGREEMENT);
+					} else {
+						this->drawRejectedActive = true;
+					}
+				} else {
+					this->drawOfferActive = true;
+				}
+			}
+		}
+		mouseHeldForActionBtns = mouseDown;
 	}
-	mouseHeldForActionBtns = mouseDown;
 }
 
 void GameState::update(float dt) {
@@ -538,7 +570,8 @@ void GameState::update(float dt) {
 			// Solo se pausa durante una coronación pendiente: en ese momento el turno
 			// ya ha cambiado al rival, así que su reloj no debe correr mientras el
 			// jugador elige la pieza. Seleccionar/mover una pieza NO pausa el reloj.
-			if (this->baseTime > 0.0f && this->clockStarted && !this->board->isPromoting()) {
+			if (this->baseTime > 0.0f && this->clockStarted && !this->board->isPromoting() &&
+			    !this->confirmResignActive && !this->drawOfferActive && !this->drawRejectedActive) {
 				if (this->turn) {
 					this->timeWhite -= dt;
 					if (this->timeWhite <= 0) {
@@ -594,6 +627,14 @@ void GameState::update(float dt) {
 						this->gameOverBox->setText("Fin de la partida.\nTablas por regla de 50 movimientos");
 					} else if (status == GameStatus::REPETITION) {
 						this->gameOverBox->setText("Fin de la partida.\nTablas por repeticion");
+					} else if (status == GameStatus::RESIGNATION) {
+						if (this->turn) {
+							this->gameOverBox->setText("Fin de la partida.\nGana " + this->player2 + " por abandono");
+						} else {
+							this->gameOverBox->setText("Fin de la partida.\nGana " + this->player1 + " por abandono");
+						}
+					} else if (status == GameStatus::DRAW_AGREEMENT) {
+						this->gameOverBox->setText("Fin de la partida.\nTablas por acuerdo");
 					}
 					this->gameOverReady = true;
 				} else {
@@ -602,13 +643,36 @@ void GameState::update(float dt) {
 			}
 		}
 		else {
-			this->board->update(this->mousePosWindow, *this->window);
-			
-			if (this->aiMode && !this->turn && !this->board->getEndGame() && !this->board->isAnyPieceAnimating()) {
-				if (!this->aiIsThinking) {
-					this->startAIThinking();
-				} else {
-					this->processAIMove();
+			if (this->confirmResignActive) {
+				this->confirmResignBox->update(this->mousePosWindow);
+				if (this->confirmResignBox->isButtonPressed()) {
+					this->confirmResignActive = false;
+					this->board->forceEndGame(GameStatus::RESIGNATION);
+				} else if (this->confirmResignBox->isButton2Pressed()) {
+					this->confirmResignActive = false;
+				}
+			} else if (this->drawOfferActive) {
+				this->drawOfferBox->update(this->mousePosWindow);
+				if (this->drawOfferBox->isButtonPressed()) {
+					this->drawOfferActive = false;
+					this->board->forceEndGame(GameStatus::DRAW_AGREEMENT);
+				} else if (this->drawOfferBox->isButton2Pressed()) {
+					this->drawOfferActive = false;
+				}
+			} else if (this->drawRejectedActive) {
+				this->drawRejectedBox->update(this->mousePosWindow);
+				if (this->drawRejectedBox->isButtonPressed()) {
+					this->drawRejectedActive = false;
+				}
+			} else {
+				this->board->update(this->mousePosWindow, *this->window);
+				
+				if (this->aiMode && !this->turn && !this->board->getEndGame() && !this->board->isAnyPieceAnimating()) {
+					if (!this->aiIsThinking) {
+						this->startAIThinking();
+					} else {
+						this->processAIMove();
+					}
 				}
 			}
 		}
@@ -719,6 +783,15 @@ void GameState::render(sf::RenderTarget* target) {
 
 	if (this->paused)
 		this->pauseMenu->render(*target);
+
+	if (this->confirmResignActive)
+		this->confirmResignBox->render(*target);
+
+	if (this->drawOfferActive)
+		this->drawOfferBox->render(*target);
+
+	if (this->drawRejectedActive)
+		this->drawRejectedBox->render(*target);
 }
 
 void GameState::captureStateForUndo() {
@@ -799,7 +872,65 @@ void GameState::processAIMove() {
 					case FAST_KNIGHT: promo = PieceType::CABALLO; break;
 				}
 			}
+			
+			bool turnBefore = this->turn;
 			this->board->applyAIMove(move.fromY, move.fromX, move.toY, move.toX, promo, this->turn, this->points1, this->points2);
+			
+			if (this->turn == turnBefore) {
+				// Fallback de seguridad: la jugada elegida fue rechazada (ilegal).
+				// Escaneamos el tablero real por la primera jugada legal para evitar que el juego se congele.
+				bool foundBackup = false;
+				for (int fx = 0; fx < 8; ++fx) {
+					for (int fy = 0; fy < 8; ++fy) {
+						Piece* p = this->board->getPiece(fx, fy);
+						if (p && !p->getColor() && p->isActive()) { // Pieza negra activa de la IA
+							sf::Vector2i startPos(fx, fy);
+							for (int tx = 0; tx < 8; ++tx) {
+								for (int ty = 0; ty < 8; ++ty) {
+									sf::Vector2i desPos(tx, ty);
+									if (startPos == desPos) continue;
+									
+									GameSnapshot snap = this->board->captureSnapshot();
+									BoardGrid testBoard = snap.board;
+									CastlingState testCastling = snap.castling;
+									EnPassantState testPeonPaso = snap.peonPaso;
+									
+									Piece* target = this->board->getPiece(tx, ty);
+									if (this->board->checkMove(false, startPos, desPos, p, target, testCastling, testBoard, testPeonPaso)) {
+										testBoard[desPos.x][desPos.y] = testBoard[startPos.x][startPos.y];
+										if ((startPos.x + startPos.y) % 2 != 0) testBoard[startPos.x][startPos.y] = "-";
+										else testBoard[startPos.x][startPos.y] = "+";
+										
+										if (!this->board->isInCheck(false, testBoard)) {
+											this->board->applyAIMove(startPos.x, startPos.y, desPos.x, desPos.y, PieceType::REINA, this->turn, this->points1, this->points2);
+											foundBackup = true;
+											break;
+										}
+									}
+								}
+								if (foundBackup) break;
+							}
+						}
+						if (foundBackup) break;
+					}
+					if (foundBackup) break;
+				}
+				
+				if (!foundBackup) {
+					if (this->board->isInCheck(false)) {
+						this->board->forceEndGame(GameStatus::CHECKMATE);
+					} else {
+						this->board->forceEndGame(GameStatus::STALEMATE);
+					}
+				}
+			}
+		} else {
+			// Fallback: si la IA no encuentra movimientos legales (jaque mate o ahogado)
+			if (this->board->isInCheck(false)) {
+				this->board->forceEndGame(GameStatus::CHECKMATE);
+			} else {
+				this->board->forceEndGame(GameStatus::STALEMATE);
+			}
 		}
 	}
 }

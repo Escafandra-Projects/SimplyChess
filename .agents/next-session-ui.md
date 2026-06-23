@@ -1,92 +1,34 @@
-# Próxima sesión: homogeneizar y pulir UI
+# Próxima sesión: refinar Game Screen + funcionalidades
 
-## Estado actual (rama `feat/menu-dark-wood-redesign`)
+## Estado (rama `feat/menu-dark-wood-redesign`)
 
-El **menú principal** está muy bien — sirve como referencia de calidad estética:
-- Fondo madera oscura con viñeta radial
-- Panel central con borde dorado, sombra, marco interior
-- Logo (peón negro) + título con letra-spacing amplio
-- Separador ornamental con diamante dorado
-- Botones `MenuButton` con bisel 3D, gradiente madera, hover/active
-- Escafandra pequeña + crédito "Made by Escafandra Projects" abajo derecha
-- Fade-in escalonado del panel y botones
-
-El **Game Screen** no alcanzó ese nivel. Necesita otro pase completo.
+Hecho (commit `e02b0d6` y anteriores):
+- `WoodPanel` reutilizable (gradiente vertical + veta + borde `(60,30,12)` + marco dorado).
+  Usado en menú, partida, ajustes, pausa, fin de partida y coronación. Paleta única.
+- `MoveListPanel`: sin cabecera en tema oscuro.
+- Idioma unificado a **español** (sin glifos acentuados — `Gameplay.ttf` no los tiene).
+- Títulos crema sobre madera con sombra.
 
 ---
 
-## Referencias de diseño
-
-El proyecto de diseño está en **Claude Design**, accesible via MCP (`DesignSync`):
-- **Project ID:** `77d770d3-87a3-46bb-9823-62558b8daec4`
-- **Archivo menú:** `Menu Screen.dc.html` ← referencia de calidad ya implementada
-- **Archivo partida:** `Game Screen.dc.html` ← pendiente de aplicar bien
-
-Para importarlos: usar `DesignSync` con `method: get_file` y el `projectId` y `path` indicados.
+## Pendiente 1 — El tablero no respira (labels solapados) — COMPLETADO
+- **Solución:** Se redefinió `CELL_SIZE` a `95.f` (offsets `40.f`/`20.f`), reescalando el tablero y piezas a `0.95f`. Se reubicaron los labels de "NEGRAS" y "BLANCAS" totalmente fuera del tablero (zona de padding superior e inferior).
+- **Distorsión visual:** Se activó el suavizado de la textura del tablero (`setSmooth(true)`) para eliminar dientes de sierra y distorsiones en las coordenadas en la esquina inferior izquierda.
 
 ---
 
-## Pendiente: Game Screen
-
-El diseño original (`Game Screen.dc.html`) define:
-
-### Layout
-- Columna izquierda (55% ancho): tablero centrado + label "NEGRAS" arriba / "BLANCAS" abajo
-- Columna derecha (45% ancho): panel de madera igual que el menú
-
-### Panel derecho (de arriba a abajo)
-1. **Fila jugador negro** — fondo oscuro semi-transparente, caja con ♚, nombre, estado, timer
-2. **Piezas capturadas por negras** — símbolos unicode de piezas + ventaja (+N)
-3. **Lista de movimientos** — fondo transparente, 3 columnas (nº, blancas, negras), scroll
-4. **Piezas capturadas por blancas** — igual que negras
-5. **Fila jugador blanco** — borde izquierdo dorado cuando activo, ♔, timer con glow pulsante
-6. **Botones acción** — RENDIRSE y OFRECIR TABLAS (mismo estilo `MenuButton`)
-
-### Colores clave (copiar del diseño, no inventar)
-- Panel madera: gradiente `#A88060 → #8A6240 → #987050` (igual que menú)
-- Borde panel: `#3C1E0C`
-- Marco interior: `rgba(208,158,82,0.18)`
-- Jugador activo bg: `rgba(200,168,90,0.10)` + borde `rgba(202,168,90,0.28)`
-- Barra activo: gradiente `#CAA448 → #A07830` (3px izquierda)
-- Timer activo: `#CAAA58` con animación glow
-- Timer inactivo: `rgba(210,175,110,0.48)`
-- Líneas separadoras: `rgba(200,148,70,0.10)`
-- Texto movimiento blancas: `rgba(235,215,170,0.75)`
-- Texto movimiento negras: `rgba(200,175,130,0.62)`
-- Nº movimiento: `rgba(200,160,100,0.36)`
-
-### Problemas conocidos de la implementación actual
-- El tablero (800px) y la ventana (1280×820) dejan poco espacio lateral — revisar si ajustar proporciones
-- Las piezas capturadas no se rastrean en `Board` — actualmente solo hay puntos numéricos (`points1`, `points2`); para mostrar símbolos de piezas habría que añadir tracking en `Board::capturePiece`
-- `OFRECIR TABLAS` sin funcionalidad real aún
-- La lista de movimientos (`MoveListPanel`) necesita mejor integración visual dentro del panel
+## Pendiente 2 — Funcionalidad "Rendirse" y "Ofrecer tablas" — COMPLETADO
+- **Rendirse:** Botón operativo. Muestra popup de confirmación `Si`/`No` y fuerza el fin de partida por abandono (`RESIGNATION`), deteniendo relojes y control de inputs.
+- **Ofrecer tablas:** Botón operativo. Extendido `MessageBox` para soportar dos botones.
+  - En modo local (2 jugadores): Envía ofrecimiento al rival ("Aceptar" / "Rechazar").
+  - En modo contra IA (Escafandrín): Acepta si va perdiendo por una ventaja sustancial (> 4 peones), de lo contrario rechaza con el diálogo personalizado "Escafandrin no perdona".
 
 ---
 
-## Pendiente: Settings Screen y otros
-
-- Settings screen: sin diseño en Claude Design, pero debería seguir el mismo tema madera
-- Pause menu: actualmente usa fondo semi-transparente blanco — adaptar al tema oscuro
-- MessageBox (game over): misma adaptación pendiente
-- Promotion menu: posiblemente necesita actualización
-
----
-
-## Estándar de calidad — usar el menú como referencia
-
-Al implementar cualquier pantalla nueva:
-1. Usar `Gameplay.ttf` (pixel font) para todo el texto del tema oscuro
-2. Fondos con `sf::VertexArray` TriangleFan para viñeta radial
-3. Paneles como `sf::RectangleShape` con `sf::Color(140,102,68)` y borde `sf::Color(60,30,12)` 3px
-4. Marco interior dorado: `rgba(208,158,78,0.15)` 1px, inset 7px
-5. Botones con clase `MenuButton` (bisel 3D, gradiente madera)
-6. Letter-spacing amplio en todos los textos del panel
-7. Animaciones de fade-in donde sea apropiado
-
----
-
-## Rama de trabajo
-`feat/menu-dark-wood-redesign` — commits hasta aquí:
-- `feat(menu)`: rediseño completo menú
-- `feat(game)`: primer pase Game Screen (incompleto)
-- `feat(menu)`: crédito Escafandra Projects
+## Optimización de IA y Correcciones de FastBoard — COMPLETADO
+- **Rendimiento (Poda Alfa-Beta)**: Implementada poda Alfa-Beta directamente en el bucle de búsqueda raíz (`AIEngine::getBestMove`) cuando la profundidad $\ge 4$ (dificultad Alta). La respuesta en modo difícil es ahora instantánea en lugar de congelar el juego.
+- **Mapeo de Dificultad**: Corregido para que en dificultad "Normal" (profundidad 3) aplique la probabilidad del 20% de error, y en dificultad "Alta" (profundidad 4) elija siempre el movimiento óptimo.
+- **Bugs en FastBoard**:
+  - Corregido desfase de índices de enroque (`castlingRights`) que leían de `1..4` en lugar de `0..3`.
+  - Corregido cálculo de fila `targetY` de peón al paso (fila 4 para blancas, fila 3 para negras) e índice de columna del chequeo de vulnerabilidad.
+- **Red de Seguridad (IA Fallback)**: Añadido escaneo y fallback en `GameState::processAIMove` que realiza un movimiento de emergencia legal si la jugada del bot es rechazada por el tablero real, previniendo congelamientos por completo.

@@ -25,6 +25,12 @@ private:
 	sf::Font panelFont;     // Gameplay.ttf para panel lateral
 	std::unique_ptr<PauseMenu> pauseMenu;
 	std::unique_ptr<MessageBox> gameOverBox;
+	std::unique_ptr<MessageBox> confirmResignBox;
+	bool confirmResignActive;
+	std::unique_ptr<MessageBox> drawOfferBox;
+	bool drawOfferActive;
+	std::unique_ptr<MessageBox> drawRejectedBox;
+	bool drawRejectedActive;
 	std::unique_ptr<MoveListPanel> moveListPanel;
 	sf::Text gameInfoText;
 	sf::Sprite background;

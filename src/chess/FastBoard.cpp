@@ -37,42 +37,25 @@ void FastBoard::initFromBoardGrid(const BoardGrid& boardGrid, bool turn, const C
         }
     }
     
-    // castling: 0=Blancas (bool_general), 1=Rey Blanco, 2=Reina Blanca, 3=Rey Negro, 4=Reina Negra
-    // castling[0] is not directly useful here since we track specific rights
-    castlingRights[0] = castling[1]; // Corto Blanco (Rey)
-    castlingRights[1] = castling[2]; // Largo Blanco (Reina)
-    castlingRights[2] = castling[3]; // Corto Negro (Rey)
-    castlingRights[3] = castling[4]; // Largo Negro (Reina)
+    // castling: 0=Corto Blanco, 1=Largo Blanco, 2=Corto Negro, 3=Largo Negro
+    castlingRights[0] = castling[0]; // Corto Blanco
+    castlingRights[1] = castling[1]; // Largo Blanco
+    castlingRights[2] = castling[2]; // Corto Negro
+    castlingRights[3] = castling[3]; // Largo Negro
     
     // En Passant
     hasEnPassant = false;
-    for (int y = 0; y < 8; ++y) {
-        for (int x = 0; x < 8; ++x) {
-            // peonPaso contiene si hay un peón vulnerable al paso.
-            // turnBlack es el turno actual, entonces buscamos si el rival dejó un peón vulnerable
-            // El array peonPaso tiene 2 booleanos por fila. El original es extraño (un array 8x2 en Y).
-            // Revisemos cómo funciona exactamente en la base de código.
-            // Para ser seguros, si encontramos un peón que se movió 2 casillas en el turno anterior, 
-            // su Y será 3 (blancas) o 4 (negras). 
-            if (peonPaso[y][0] || peonPaso[y][1]) {
-                hasEnPassant = true;
-                // Asumimos que x es la columna (aunque peonPaso no almacena X tan fácil, pero sí Y).
-                // Necesitaremos buscar qué peón causó esto. Por ahora lo dejamos desactivado o lo buscamos:
-            }
-        }
-    }
+    uint8_t targetColor = turnBlack ? COLOR_WHITE : COLOR_BLACK;
+    uint8_t targetY = turnBlack ? 4 : 3; // Si es turno negro, buscamos peón blanco que saltó a fila 4. Si es blanco, peón negro que saltó a fila 3.
+    int gameColorIndex = (targetColor == COLOR_WHITE) ? 1 : 0; // 1 = blancas, 0 = negras en el juego original
     
-    // Buscar la posición exacta del peón al paso si existe
-    if (hasEnPassant) {
-        uint8_t targetColor = turnBlack ? COLOR_WHITE : COLOR_BLACK;
-        uint8_t targetY = turnBlack ? 3 : 4; // Blancas están en 3 (movidas desde 1), Negras en 4 (movidas desde 6)
-        for (int x = 0; x < 8; ++x) {
-            if (grid[targetY][x] == (FAST_PAWN | targetColor)) {
-                if (peonPaso[targetY][targetColor == COLOR_WHITE ? 1 : 0]) { // Color en el juego 1=blancas, 0=negras
-                    enPassantX = x;
-                    enPassantY = targetY;
-                    break;
-                }
+    for (int x = 0; x < 8; ++x) {
+        if (grid[targetY][x] == (FAST_PAWN | targetColor)) {
+            if (peonPaso[x][gameColorIndex]) {
+                hasEnPassant = true;
+                enPassantX = x;
+                enPassantY = targetY;
+                break;
             }
         }
     }
