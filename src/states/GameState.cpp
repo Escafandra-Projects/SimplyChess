@@ -13,28 +13,29 @@ void GameState::initVariables() {
 	this->turn = true;
 	this->previousTurn = true;
 
-	this->player1 = "Player 1";
-	this->player2 = "Player 2";
+	// Nombres y opciones provienen de la configuración elegida en GameSetupState.
+	this->player1 = this->config.whiteName;
+	this->player2 = this->config.blackName;
 	this->points1 = 0;
-	this->points2 = 0;
 	this->points2 = 0;
 	this->gameOverReady = false;
 	this->mouseHeldLastFrame = false;
 	this->mouseHeldForButtons = false;
 	this->background.setPosition(sf::Vector2f(820.f, 0.f));
 
-	std::ifstream ifs("config/game.ini");
-	if (ifs.is_open()) {
-		ifs >> this->baseTime >> this->increment;
-		if (!(ifs >> this->aiMode)) this->aiMode = true;
-		if (!(ifs >> this->aiDifficulty)) this->aiDifficulty = 4;
-		ifs.close();
-	} else {
-		this->baseTime = 300.0f;
-		this->increment = 0.0f;
-		this->aiMode = true;
-		this->aiDifficulty = 4;
-	}
+	this->baseTime = this->config.baseTime;
+	this->increment = this->config.increment;
+	this->aiMode = this->config.aiMode;
+	this->aiDifficulty = this->config.aiDifficulty;
+
+	// Orientación y bando de la IA: si el jugador lleva negras frente a la IA,
+	// el tablero se voltea y la IA juega con blancas.
+	this->flipped = this->config.aiMode && !this->config.playerIsWhite;
+	this->aiPlaysWhite = this->flipped;
+	// Fija la orientación de la vista antes de crear el tablero y las piezas,
+	// que calculan su posición en píxeles según este flag.
+	setBoardFlipped(this->flipped);
+
 	this->timeWhite = this->baseTime;
 	this->timeBlack = this->baseTime;
 	this->clockStarted = false;
@@ -137,7 +138,8 @@ void GameState::initKeybinds() {
 }
 
 // Constructor y destructor
-GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states) : State(window, supportedKeys, states) {
+GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states, const GameConfig& config)
+	: State(window, supportedKeys, states), config(config) {
 
 	this->initKeybinds();
 	this->initTextures();
@@ -198,7 +200,7 @@ void GameState::updateInput(float /*dt*/) {
 	bool mouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 	if (!this->paused && !this->board->getEndGame() && !this->board->isPromoting()) {
 		// Bloquear entrada del usuario si es el turno de la IA
-		bool isAITurn = this->aiMode && !this->turn;
+		bool isAITurn = this->aiMode && (this->turn == this->aiPlaysWhite);
 		if (isAITurn) return;
 
 		if (mouseDown && !this->mouseHeldLastFrame) {
@@ -366,7 +368,7 @@ void GameState::update(float dt) {
 		else {
 			this->board->update(this->mousePosWindow, *this->window);
 			
-			if (this->aiMode && !this->turn && !this->board->getEndGame() && !this->board->isAnyPieceAnimating()) {
+			if (this->aiMode && (this->turn == this->aiPlaysWhite) && !this->board->getEndGame() && !this->board->isAnyPieceAnimating()) {
 				if (!this->aiIsThinking) {
 					this->startAIThinking();
 				} else {

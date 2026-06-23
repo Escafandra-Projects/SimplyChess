@@ -84,4 +84,4 @@ Expandir el juego al terreno online usando `sfml-network`.
 
 ## 🖱️ Interfaz y Experiencia de Usuario (UX)
 
-- **Entrada por teclado de los nombres:** Reemplazar los nombres fijos ("Player 1", "Player 2") por cuadros de texto que permitan a los jugadores escribir su propio nombre antes de empezar la partida.
+- ~~**Entrada por teclado de los nombres:** Reemplazar los nombres fijos ("Player 1", "Player 2") por cuadros de texto que permitan a los jugadores escribir su propio nombre antes de empezar la partida.~~ ✅ Implementado en la pantalla de configuración de partida.

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "states/State.h"
+#include "states/GameConfig.h"
 #include "chess/Piece.h"
 #include "chess/Board.h"
 #include <memory>
@@ -59,6 +60,9 @@ private:
 	void redo();
 
 	// AI
+	GameConfig config;
+	bool flipped;       // true = tablero volteado (jugador con negras frente a la IA)
+	bool aiPlaysWhite;  // color que juega la IA en modo IA
 	bool aiMode;
 	int aiDifficulty; // Profundidad máxima
 	bool aiIsThinking;
@@ -85,7 +89,7 @@ private:
 
 public:
 	// Constructor y destructor
-	GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states);
+	GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states, const GameConfig& config);
 	virtual ~GameState();
 
 	// Funciones

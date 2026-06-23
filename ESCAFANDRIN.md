@@ -58,8 +58,10 @@ El tablero (`Board`) mantiene **dos representaciones** sincronizadas manualmente
 - Animaciones de movimiento (interpolación) y mover arrastrando (drag & drop)
 - Resaltado de movimientos legales y del último movimiento
 - Efectos de sonido (mover, capturar, jaque, fin de partida)
-- Coordenadas en el tablero (números 1-8 y letras A-H)
+- Coordenadas en el tablero (números 1-8 y letras A-H), dibujadas dinámicamente y reorientadas según la perspectiva
 - Menú principal con botones
+- Pantalla previa de partida: entrada de nombres por teclado y elección de rival (IA / local 2 jugadores)
+- Partida contra la IA con elección de color (blancas/negras/aleatorio) y tablero orientado a la perspectiva del jugador
 - Menú de pausa (Esc)
 - Menú de Ajustes (tiempo base e incremento)
 - Reloj de ajedrez configurable (incluido tiempo infinito)

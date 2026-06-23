@@ -13,6 +13,22 @@ constexpr int CELL_SIZE = 100;
 constexpr int BOARD_OFFSET_X = 20;
 constexpr int BOARD_OFFSET_Y = 0;
 
+// --- Orientación de la vista del tablero ---
+// Si la vista está volteada (perspectiva de negras), la fila/columna 0 se dibuja
+// en la esquina opuesta. Afecta solo al render y a la conversión de coordenadas;
+// la lógica del tablero (BoardGrid) es independiente de la orientación.
+void setBoardFlipped(bool flipped);
+bool isBoardFlipped();
+
+/// Convierte una columna (gridPos.y) en la coordenada X en píxeles de la casilla.
+float colToPixelX(int col);
+/// Convierte una fila (gridPos.x) en la coordenada Y en píxeles de la casilla.
+float rowToPixelY(int row);
+/// Convierte una coordenada X en píxeles en índice de columna.
+int pixelXToCol(int px);
+/// Convierte una coordenada Y en píxeles en índice de fila.
+int pixelYToRow(int py);
+
 // Tipo de pieza. El valor subyacente coincide con el orden histórico del proyecto.
 enum class PieceType : unsigned short { PEON = 0, TORRE, CABALLO, ALFIL, REINA, REY };
 

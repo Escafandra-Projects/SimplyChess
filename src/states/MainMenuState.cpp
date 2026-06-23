@@ -1,5 +1,5 @@
 #include "states/MainMenuState.h"
-#include "states/GameState.h"
+#include "states/GameSetupState.h"
 #include "states/SettingsState.h"
 
 #include <stdexcept>
@@ -110,9 +110,9 @@ void MainMenuState::updateButtons() {
 	bool mousePressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 
 	if (!this->mousePressedLastFrame) {
-		// Nuevo juego
+		// Nuevo juego: primero la pantalla de configuración (nombres, rival, color).
 		if (this->buttons["GAME_STATE"]->isPressed()) {
-			this->states->push(std::make_unique<GameState>(this->window, this->supportedKeys, this->states));
+			this->states->push(std::make_unique<GameSetupState>(this->window, this->supportedKeys, this->states));
 		}
 		// Ajustes
 		else if (this->buttons["SETTINGS_STATE"]->isPressed()) {
