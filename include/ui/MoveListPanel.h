@@ -43,11 +43,12 @@ private:
     
     std::vector<RowData> rows;
     int lastHistorySize;
+    bool dark;
 
     void rebuildRows(const MoveHistory& history);
 
 public:
-    MoveListPanel(const sf::Font& font, sf::FloatRect bounds);
+    MoveListPanel(const sf::Font& font, sf::FloatRect bounds, bool darkTheme = false);
     ~MoveListPanel();
 
     void update(const MoveHistory& history);

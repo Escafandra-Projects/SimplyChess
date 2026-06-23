@@ -1,7 +1,8 @@
 #pragma once
 
 #include "states/State.h"
-#include "ui/Button.h"
+#include "ui/MenuButton.h"
+#include "ui/WoodPanel.h"
 #include <map>
 #include <string>
 #include <vector>
@@ -12,13 +13,16 @@ private:
 	// Variables
 	sf::Font font;
 	sf::Sprite background;
+	sf::RectangleShape bgRect;
+	WoodPanel panel;
+
 	sf::Text titleText;
 	sf::Text timeLabel;
 	sf::Text incrementLabel;
 	sf::Text modeLabel;
 	sf::Text diffLabel;
 	
-	std::map<std::string, std::unique_ptr<Button>> buttons;
+	std::map<std::string, std::unique_ptr<MenuButton>> buttons;
 
 	// Configuraciones
 	int baseTime;
@@ -29,9 +33,9 @@ private:
 	// Opciones de configuración
 	const std::vector<int> baseTimeOptions = {0, 60, 180, 300, 600};
 	const std::vector<int> incrementOptions = {0, 1, 2, 3, 5};
-	const std::vector<std::string> modeOptions = {"Local 2P", "Escafandrin"};
-	const std::vector<int> diffOptions = {2, 4, 5};
-	const std::vector<std::string> diffNames = {"Easy", "Normal", "Hard"};
+	const std::vector<std::string> modeOptions = {"2 Jugadores", "Escafandrin"};
+	const std::vector<int> diffOptions = {2, 3, 4};
+	const std::vector<std::string> diffNames = {"Baja", "Normal", "Alta"};
 	
 	int currentBaseTimeIdx;
 	int currentIncrementIdx;

@@ -11,6 +11,9 @@ public:
     // 'stopFlag' permite detener la búsqueda asíncronamente (multithreading).
     static FastMove getBestMove(const FastBoard& board, int maxDepth, std::atomic<bool>& stopFlag);
     
+    // Evaluar si la IA acepta una oferta de tablas (Escafandrin)
+    static bool shouldAcceptDraw(const FastBoard& board);
+    
 private:
     static int evaluate(const FastBoard& board);
     static int evaluatePiece(uint8_t piece, int x, int y, bool isEndgame);
