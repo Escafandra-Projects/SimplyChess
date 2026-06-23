@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "chess/Piece.h"
 #include "ui/PauseMenu.h"
@@ -12,7 +13,7 @@
 #include "chess/GameSnapshot.h"
 
 // Lado del tablero, en píxeles.
-constexpr int BOARD_SIZE = 800;
+constexpr float BOARD_SIZE = 760.f;
 
 enum class GameStatus {
 	PLAYING,
@@ -20,7 +21,9 @@ enum class GameStatus {
 	STALEMATE,
 	FIFTY_MOVE_RULE,
 	REPETITION,
-	TIMEOUT
+	TIMEOUT,
+	RESIGNATION,
+	DRAW_AGREEMENT
 };
 
 /// El tablero: mantiene la representación de la posición, las piezas y las
@@ -158,6 +161,8 @@ public:
 	bool isMenaced(bool turn, sf::Vector2i targetPos, Piece* targetPiece, BoardGrid& board, CastlingState& castling);
 	/// Indica si el rey del color dado está en jaque en el tablero dado.
 	bool isInCheck(bool color, BoardGrid& board);
+	/// Indica si el rey del color dado está en jaque.
+	bool isInCheck(bool color);
 	/// Indica si el color dado está en jaque mate (sin movimientos legales).
 	bool isCheckmate(bool color);
 	/// Comprueba que el enroque es legal (rey no en jaque ni pasa por casilla amenazada).
@@ -181,6 +186,8 @@ public:
 	void render(sf::RenderTarget& target);
 
 	const MoveHistory& getMoveHistory() const { return moveHistory; }
+
+	std::vector<Piece*> getCapturedPieces(bool color) const;
 
 	/// Captura un snapshot del estado actual del tablero
 	GameSnapshot captureSnapshot() const;

@@ -5,8 +5,11 @@
 #include "chess/Piece.h"
 #include "chess/Board.h"
 #include <memory>
+#include <array>
 #include "ui/MessageBox.h"
 #include "ui/MoveListPanel.h"
+#include "ui/MenuButton.h"
+#include "ui/WoodPanel.h"
 #include "chess/GameSnapshot.h"
 #include "chess/AIEngine.h"
 #include <thread>
@@ -20,13 +23,50 @@ private:
 	// Variables
 	/* Interfaz */
 	sf::Font font;
+	sf::Font panelFont;     // Gameplay.ttf para panel lateral
 	std::unique_ptr<PauseMenu> pauseMenu;
 	std::unique_ptr<MessageBox> gameOverBox;
+	std::unique_ptr<MessageBox> confirmResignBox;
+	bool confirmResignActive;
+	std::unique_ptr<MessageBox> drawOfferBox;
+	bool drawOfferActive;
+	std::unique_ptr<MessageBox> drawRejectedBox;
+	bool drawRejectedActive;
 	std::unique_ptr<MoveListPanel> moveListPanel;
-	std::unique_ptr<Button> btnUndo;
-	std::unique_ptr<Button> btnRedo;
 	sf::Text gameInfoText;
 	sf::Sprite background;
+
+	// ── Nuevo panel lateral (dark-wood theme) ──────────────────
+	sf::RectangleShape bgRect;
+	sf::VertexArray vignetteVA;
+	WoodPanel sidePanel;
+
+	// Labels tablero
+	sf::Text labelNegras, labelBlancas;
+	sf::RectangleShape dotNegras, dotBlancas;
+
+	// Fila jugador negro (top)
+	sf::RectangleShape blackRowBg;
+	sf::RectangleShape blackKingBox;
+	sf::Sprite blackKingSprite;
+	sf::Text blackNameTxt, blackStatusTxt, blackTimerTxt;
+
+	// Fila jugador blanco (bottom, activo)
+	sf::RectangleShape whiteRowBg, turnBar;
+	sf::RectangleShape whiteKingBox;
+	sf::Sprite whiteKingSprite;
+	sf::Text whiteNameTxt, whiteStatusTxt, whiteTimerTxt;
+
+	// Separadores y ventaja
+	std::array<sf::RectangleShape, 5> sepLines;
+	sf::Text blackAdvTxt, whiteAdvTxt;
+
+	// Botones de acción
+	std::vector<MenuButton> actionBtns;
+	bool mouseHeldForActionBtns;
+
+	sf::Clock glowClock;
+	// ───────────────────────────────────────────────────────────
 	/* Tablero */
 	std::unique_ptr<Board> board;
 	/* Info de la partida */
@@ -50,7 +90,6 @@ private:
 	// Estado del botón izquierdo el frame anterior, para detectar los flancos de
 	// pulsación y de soltar (necesario para distinguir clic de arrastre).
 	bool mouseHeldLastFrame;
-	bool mouseHeldForButtons;
 
 	// Undo/Redo
 	std::vector<GameSnapshot> undoStack;
@@ -86,6 +125,10 @@ private:
 	void initBoard(std::map<std::string, sf::Texture>& textures);
 	/// Prepara el texto informativo de la partida.
 	void initText();
+	/// Construye el panel lateral con tema oscuro de madera.
+	void initGamePanel();
+	/// Actualiza timers, indicador de turno y botones del panel lateral.
+	void updateGamePanel();
 
 public:
 	// Constructor y destructor

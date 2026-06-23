@@ -25,18 +25,18 @@ void Board::initVariables() {
 
 	// Ultimo movimiento
 	this->hasLastMove = false;
-	this->lastMoveStartCell.setSize(sf::Vector2f(100.f, 100.f));
+	this->lastMoveStartCell.setSize(sf::Vector2f(CELL_SIZE, CELL_SIZE));
 	this->lastMoveStartCell.setFillColor(sf::Color(222, 235, 127, 100));
-	this->lastMoveEndCell.setSize(sf::Vector2f(100.f, 100.f));
+	this->lastMoveEndCell.setSize(sf::Vector2f(CELL_SIZE, CELL_SIZE));
 	this->lastMoveEndCell.setFillColor(sf::Color(222, 235, 127, 100));
 	this->legalMovesShapes.clear();
 
 	// Casilla seleccionada
-	this->selectedCell.setSize(sf::Vector2f(100.f, 100.f));
+	this->selectedCell.setSize(sf::Vector2f(CELL_SIZE, CELL_SIZE));
 	this->selectedCell.setFillColor(sf::Color(222, 235, 127, 100));
 
 	// Casilla de jaque
-	this->jaqueCell.setSize(sf::Vector2f(100.f, 100.f));
+	this->jaqueCell.setSize(sf::Vector2f(CELL_SIZE, CELL_SIZE));
 	this->jaqueCell.setFillColor(sf::Color(255, 0, 0, 100));
 
 	//Casillas blancas (+) y negras(-)
@@ -86,6 +86,7 @@ void Board::initTextures(std::map<std::string, sf::Texture>& textures) {
 	if (!textures["BOARD"].loadFromFile("resources/images/Tablero.png")) {
 		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD BACKGROUND");
 	}
+	textures["BOARD"].setSmooth(true);
 	// Torre negra
 	if (!textures["TN"].loadFromFile("resources/images/pieces/TorreN.png")) {
 		throw std::runtime_error("ERROR::GAME_STATE::FAILED TO LOAD TORRE NEGRA");
@@ -202,6 +203,8 @@ void Board::initPieces(std::map<std::string, sf::Texture>& textures) {
 		this->pieces[i+8][1] = std::make_unique<Piece>(6, i, textures["PB"], PieceType::PEON, 1);
 	}
 	this->background.setTexture(textures["BOARD"]);
+	this->background.setPosition(21.f, 20.f);
+	this->background.setScale(0.95f, 0.95f);
 
 }
 
@@ -245,17 +248,21 @@ void Board::calculateLegalMoves(bool turn, sf::Vector2i startPos) {
 
 					if (isCapture) {
 						// Captura: círculo hueco
-						sf::CircleShape circle(45.f);
+						float radius = CELL_SIZE * 0.45f;
+						sf::CircleShape circle(radius);
 						circle.setFillColor(sf::Color::Transparent);
 						circle.setOutlineColor(sf::Color(0, 0, 0, 45));
-						circle.setOutlineThickness(5.f);
-						circle.setPosition(colToPixelX(desPos.y) + 5.f, rowToPixelY(desPos.x) + 5.f);
+            circle.setOutlineThickness(CELL_SIZE * 0.05f);               // de B
+            circle.setPosition(colToPixelX(desPos.y) + (CELL_SIZE - 2.f * radius) / 2.f,   // orientación A + centrado B
+                                rowToPixelY(desPos.x) + (CELL_SIZE - 2.f * radius) / 2.f);
 						this->legalMovesShapes.push_back(circle);
 					} else {
 						// Movimiento normal: punto
-						sf::CircleShape dot(15.f);
+						float radius = CELL_SIZE * 0.15f;
+						sf::CircleShape dot(radius);
 						dot.setFillColor(sf::Color(0, 0, 0, 45));
-						dot.setPosition(colToPixelX(desPos.y) + 35.f, rowToPixelY(desPos.x) + 35.f);
+            dot.setPosition(colToPixelX(desPos.y) + (CELL_SIZE - 2.f * radius) / 2.f,
+                rowToPixelY(desPos.x) + (CELL_SIZE - 2.f * radius) / 2.f);
 						this->legalMovesShapes.push_back(dot);
 					}
 				}
@@ -624,15 +631,14 @@ void Board::promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting)
 	else {
 		if (this->movingPiece->getType() == PieceType::PEON) {
 
-				if (gridPos.x == 0 || gridPos.x == 7) {
-					// La posición depende de la pantalla (no de la fila lógica): el menú
-					// cae hacia abajo si la casilla de coronación está en la mitad superior
-					// y hacia arriba si está en la inferior. Así funciona con el tablero
-					// volteado (al jugar con negras).
-					float squareY = rowToPixelY(gridPos.x);
-					float menuY = (squareY < BOARD_SIZE / 2) ? squareY + CELL_SIZE
-					                                          : squareY - 2 * CELL_SIZE;
-					this->promotionMenu->setPosition(colToPixelX(gridPos.y), menuY);
+          if (gridPos.x == 0 || gridPos.x == 7) {
+              float squareY = rowToPixelY(gridPos.x);
+              float menuY = (squareY < BOARD_SIZE / 2) ? squareY + CELL_SIZE : squareY - 2 * CELL_SIZE;
+              this->promotionMenu->setPosition(colToPixelX(gridPos.y) + (CELL_SIZE - 70.f) / 2.f, menuY);
+              this->promotionMenu->setShown(true, turn);
+              this->promotionTurn = turn;
+              this->promotionGridPos = gridPos;
+          }
 					this->promotionMenu->setShown(true, turn);
 					this->promotionTurn = turn;
 					this->promotionGridPos = gridPos;
@@ -958,6 +964,10 @@ bool Board::isInCheck(bool color, BoardGrid& board) {
 	return isMenaced(!color, kingPos, king, board, this->castling);
 }
 
+bool Board::isInCheck(bool color) {
+	return this->isInCheck(color, this->board);
+}
+
 bool Board::isCheckmate(bool color) {
     for (int i = 0; i < 16; i++) {
         Piece* p = this->pieces[i][color].get();
@@ -1039,6 +1049,7 @@ void Board::update(sf::Vector2i mousePos, sf::RenderWindow& window) {
 		this->mousePos = sf::Mouse::getPosition(window);
 	}
 	else {
+		this->promotionMenu->update(mousePos);
 		if (this->promotionMenu->isPressed(mousePos)) {
 			this->promotionPiece = this->promotionMenu->getSelectedPiece(mousePos);
 			this->promotionMenu->setShown(false, false);
@@ -1288,3 +1299,16 @@ bool Board::applyAIMove(int fromX, int fromY, int toX, int toY, PieceType promot
 	this->isAIMove = false;
 	return true;
 }
+
+std::vector<Piece*> Board::getCapturedPieces(bool color) const {
+	std::vector<Piece*> captured;
+	int colIdx = color ? 1 : 0;
+	for (int i = 0; i < 16; i++) {
+		Piece* p = this->pieces[i][colIdx].get();
+		if (p && !p->isActive() && p->getType() != PieceType::REY) {
+			captured.push_back(p);
+		}
+	}
+	return captured;
+}
+

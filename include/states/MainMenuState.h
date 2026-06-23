@@ -1,54 +1,75 @@
 #pragma once
 
 #include "states/State.h"
-#include "ui/Button.h"
+#include "ui/MenuButton.h"
+#include "ui/WoodPanel.h"
+#include <array>
+#include <vector>
 #include <memory>
 
-/// Estado del menú principal: título y botones para iniciar partida,
-/// ajustes y salir.
-class MainMenuState :
-    public State
+class MainMenuState : public State
 {
 private:
-	// Variables
-	/* Fondo */
-	sf::Sprite background;
-	/* Fuente */
-	sf::Font font;
-	/* Botones */
-	std::map<std::string, std::unique_ptr<Button>> buttons;
-	/* Titulo */
-	sf::Text titleText;
-	// Recuerda si el ratón estaba pulsado el frame anterior, para actuar solo
-	// en el flanco de pulsación y no "heredar" un clic mantenido de otro estado.
-	bool mousePressedLastFrame;
+    // --- recursos ---
+    sf::Font font;
+    sf::Texture logoTex;
+    sf::Sprite logoSprite;
+    sf::Texture escafandraTex;
+    sf::Sprite escafandraSprite;
+    sf::Text escafandraLabel;
 
-	// Inicialización
-	/// Configura el texto del título.
-	void initVariables();
-	/// Carga las texturas de fondo y botones.
-	void initTextures();
-	/// Carga la asignación de teclas desde config/mainmenustate_keybinds.ini.
-	void initKeybinds();
-	/// Carga la fuente de texto.
-	void initFonts();
-	/// Crea los botones del menú.
-	void initButtons();
+    // --- fondo y viñeta ---
+    sf::RectangleShape bgRect;
+    sf::VertexArray gridVA;
+    sf::VertexArray vignetteVA;
+
+    // --- adornos de esquina (2 por esquina × 4 esquinas) ---
+    std::array<sf::RectangleShape, 8> cornerBrackets;
+
+    // --- panel central ---
+    WoodPanel panel;
+
+    // --- título ---
+    sf::Text titleText;
+
+    // --- separador ornamental: línea izq, diamante, línea der ---
+    std::array<sf::RectangleShape, 3> divider;
+
+    // --- botones ---
+    std::vector<MenuButton> menuButtons;
+
+    // --- pie de versión ---
+    sf::Text versionText;
+
+    // --- animación ---
+    sf::Clock animClock;
+    bool animFinished;
+
+    bool mousePressedLastFrame;
+
+    // --- init ---
+    void initFonts();
+    void initBackground();
+    void initGrid();
+    void initCornerBrackets();
+    void initPanel();
+    void initLogo();
+    void initTitle();
+    void initDivider();
+    void initButtons();
+    void initVersion();
+    void initKeybinds();
+
+    // --- helpers ---
+    void applyAlpha(float t);
+    void updateButtons();
 
 public:
-	// Constructor y destructor
-	MainMenuState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states);
-	virtual ~MainMenuState();
+    MainMenuState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys,
+                  std::stack<std::unique_ptr<State>>* states);
+    virtual ~MainMenuState() = default;
 
-	// Funciones
-	/// Procesa la entrada del usuario (sin uso por ahora).
-	void updateInput(float dt) override;
-	/// Actualiza los botones y ejecuta su acción al pulsarlos.
-	void updateButtons();
-	/// Actualiza la entrada, el ratón y los botones.
-	void update(float dt) override;
-	/// Dibuja todos los botones.
-	void renderButtons(sf::RenderTarget& target);
-	/// Dibuja el fondo, el título y los botones.
-	void render(sf::RenderTarget* target = nullptr) override;
+    void updateInput(float dt) override;
+    void update(float dt) override;
+    void render(sf::RenderTarget* target = nullptr) override;
 };

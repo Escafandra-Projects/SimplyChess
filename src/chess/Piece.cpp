@@ -53,6 +53,7 @@ Piece::Piece(unsigned x, unsigned y, sf::Texture& texture, PieceType type, bool 
 	this->targetPos = this->pos;
 	this->isAnimating = false;
 	this->piece.setTexture(texture);
+	this->piece.setScale(0.95f, 0.95f);
 	this->piece.setPosition(pos.x, pos.y);
 
 

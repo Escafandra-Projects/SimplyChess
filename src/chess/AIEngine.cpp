@@ -80,8 +80,16 @@ FastMove AIEngine::getBestMove(const FastBoard& board, int maxDepth, std::atomic
     orderMoves(moves, board);
     FastBoard searchBoard = board;
 
-    // Blancas intentan maximizar el score (empiezan en -infinito), Negras minimizan (empiezan en infinito)
     std::vector<std::pair<FastMove, int>> evaluatedMoves;
+    
+    // Solo usamos poda Alfa-Beta en la raíz en la dificultad más alta (maxDepth >= 4)
+    // para obtener un rendimiento óptimo de búsqueda. En dificultades bajas/medias
+    // necesitamos evaluar todos los movimientos exactos para aplicar la lógica de dificultad.
+    bool useRootPruning = (maxDepth >= 4);
+    
+    int alpha = -500000;
+    int beta = 500000;
+    int bestValue = board.turnBlack ? 500000 : -500000;
 
     for (const FastMove& move : moves) {
         if (stopFlag) break;
@@ -93,57 +101,87 @@ FastMove AIEngine::getBestMove(const FastBoard& board, int maxDepth, std::atomic
         uint8_t oldEpY = searchBoard.enPassantY;
 
         searchBoard.applyMove(move);
-        // Si acabamos de aplicar el turno de las negras, ahora le toca a las blancas (isMaximizing = true)
         bool isMaximizing = !searchBoard.turnBlack; 
         
-        int boardValue = minimax(searchBoard, maxDepth - 1, -500000, 500000, isMaximizing, stopFlag);
+        int boardValue = minimax(searchBoard, maxDepth - 1, alpha, beta, isMaximizing, stopFlag);
         
         searchBoard.undoMove(move, oldCastling, oldHasEp, oldEpX, oldEpY);
 
         evaluatedMoves.push_back({move, boardValue});
+
+        if (useRootPruning) {
+            if (board.turnBlack) { // Negras minimizan
+                if (boardValue < bestValue) {
+                    bestValue = boardValue;
+                    bestMove = move;
+                }
+                beta = std::min(beta, boardValue);
+            } else { // Blancas maximizan
+                if (boardValue > bestValue) {
+                    bestValue = boardValue;
+                    bestMove = move;
+                }
+                alpha = std::max(alpha, boardValue);
+            }
+        }
     }
 
     if (evaluatedMoves.empty()) {
-        return bestMove; // FAST_EMPTY, no legal moves?
+        return bestMove;
     }
 
-    // Ordenar movimientos según su valor
-    if (!board.turnBlack) { // Juegan blancas, quieren el mayor valor posible
-        std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto& a, const auto& b) {
-            return a.second > b.second;
-        });
-    } else { // Juegan negras, quieren el menor valor posible
-        std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto& a, const auto& b) {
-            return a.second < b.second;
-        });
-    }
+    if (!useRootPruning) {
+        // Ordenar movimientos según su valor
+        if (!board.turnBlack) { // Juegan blancas, quieren el mayor valor posible
+            std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto& a, const auto& b) {
+                return a.second > b.second;
+            });
+        } else { // Juegan negras, quieren el menor valor posible
+            std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto& a, const auto& b) {
+                return a.second < b.second;
+            });
+        }
 
-    // Lógica de dificultad ("emoción")
-    int chosenIndex = 0;
-    
-    if (maxDepth == 2) { // Easy
-        // Elegir aleatoriamente entre los 3 mejores movimientos si la diferencia de puntaje no es catastrófica (ej. regalar la dama)
-        int maxIdx = std::min(3, (int)evaluatedMoves.size());
-        // Filtrar aquellos que sean peores por más de 300 puntos para no ser absurdo
-        int validOptions = 1;
-        for (int i = 1; i < maxIdx; ++i) {
-            if (std::abs(evaluatedMoves[i].second - evaluatedMoves[0].second) <= 300) {
-                validOptions++;
+        // Lógica de dificultad ("emoción")
+        int chosenIndex = 0;
+        
+        if (maxDepth == 2) { // Easy / Baja
+            // Elegir aleatoriamente entre los 3 mejores movimientos si la diferencia de puntaje no es catastrófica (ej. regalar la dama)
+            int maxIdx = std::min(3, (int)evaluatedMoves.size());
+            int validOptions = 1;
+            for (int i = 1; i < maxIdx; ++i) {
+                if (std::abs(evaluatedMoves[i].second - evaluatedMoves[0].second) <= 300) {
+                    validOptions++;
+                }
+            }
+            chosenIndex = std::rand() % validOptions;
+        } else if (maxDepth == 3) { // Normal
+            // 20% de probabilidad de elegir el 2do mejor movimiento (si la diferencia no es catastrófica)
+            if (evaluatedMoves.size() > 1 && (std::rand() % 100) < 20) {
+                if (std::abs(evaluatedMoves[1].second - evaluatedMoves[0].second) <= 150) {
+                    chosenIndex = 1;
+                }
             }
         }
-        chosenIndex = std::rand() % validOptions;
-    } else if (maxDepth == 4) { // Normal
-        // 20% de probabilidad de elegir el 2do mejor movimiento (si la diferencia no es catastrófica)
-        if (evaluatedMoves.size() > 1 && (std::rand() % 100) < 20) {
-            if (std::abs(evaluatedMoves[1].second - evaluatedMoves[0].second) <= 150) {
-                chosenIndex = 1;
+
+        bestMove = evaluatedMoves[chosenIndex].first;
+    } else {
+        // Si usamos poda en la raíz y por alguna razón (ej. stopFlag) bestMove no quedó asignada,
+        // tomamos el mejor movimiento de los evaluados.
+        if (bestMove.movedPiece == 0 && !evaluatedMoves.empty()) {
+            int bestIdx = 0;
+            for (size_t i = 1; i < evaluatedMoves.size(); ++i) {
+                if (board.turnBlack) {
+                    if (evaluatedMoves[i].second < evaluatedMoves[bestIdx].second) bestIdx = i;
+                } else {
+                    if (evaluatedMoves[i].second > evaluatedMoves[bestIdx].second) bestIdx = i;
+                }
             }
+            bestMove = evaluatedMoves[bestIdx].first;
         }
     }
-
-    bestMove = evaluatedMoves[chosenIndex].first;
     
-    if (bestMove.movedPiece == 0) {
+    if (bestMove.movedPiece == 0 && !moves.empty()) {
         bestMove = moves[0];
     }
     
@@ -271,4 +309,11 @@ void AIEngine::orderMoves(std::vector<FastMove>& moves, const FastBoard& board) 
         
         return scoreA > scoreB;
     });
+}
+
+bool AIEngine::shouldAcceptDraw(const FastBoard& board) {
+    int score = evaluate(board);
+    // Para la IA (negras), si score es muy positivo (ventaja blanca), significa que la IA esta perdiendo.
+    // Aceptara tablas si la ventaja blanca es sustancial (p.ej., > 400 centipawns).
+    return score > 400;
 }

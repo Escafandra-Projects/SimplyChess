@@ -5,13 +5,13 @@
 #include <string>
 
 // Lado de cada casilla del tablero, en píxeles.
-constexpr int CELL_SIZE = 100;
+constexpr float CELL_SIZE = 95.f;
 
 // Origen de la rejilla jugable dentro de la imagen del tablero, en píxeles.
 // La franja con los números (1-8) ocupa el margen izquierdo, por lo que la
 // rejilla queda desplazada hacia la derecha respecto a la esquina de la imagen.
-constexpr int BOARD_OFFSET_X = 20;
-constexpr int BOARD_OFFSET_Y = 0;
+constexpr float BOARD_OFFSET_X = 40.f;
+constexpr float BOARD_OFFSET_Y = 20.f;
 
 // --- Orientación de la vista del tablero ---
 // Si la vista está volteada (perspectiva de negras), la fila/columna 0 se dibuja
