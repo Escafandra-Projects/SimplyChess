@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <cstdint>
 
 /// Panel de madera oscura reutilizable: gradiente vertical (5 paradas) + veta
 /// sutil + borde oscuro + marco interior dorado. Mismo aspecto en todas las
