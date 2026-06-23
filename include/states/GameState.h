@@ -8,6 +8,7 @@
 #include "ui/MessageBox.h"
 #include "ui/MoveListPanel.h"
 #include "ui/MenuButton.h"
+#include "ui/WoodPanel.h"
 #include "chess/GameSnapshot.h"
 #include "chess/AIEngine.h"
 #include <thread>
@@ -31,7 +32,7 @@ private:
 	// ── Nuevo panel lateral (dark-wood theme) ──────────────────
 	sf::RectangleShape bgRect;
 	sf::VertexArray vignetteVA;
-	sf::RectangleShape sidePanel, sidePanelInner;
+	WoodPanel sidePanel;
 
 	// Labels tablero
 	sf::Text labelNegras, labelBlancas;

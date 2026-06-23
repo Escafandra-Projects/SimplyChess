@@ -110,18 +110,7 @@ void MainMenuState::initCornerBrackets()
 
 void MainMenuState::initPanel()
 {
-    panel.setSize({PANEL_W, PANEL_H});
-    panel.setPosition(PANEL_X, PANEL_Y);
-    panel.setFillColor(sf::Color(140, 102, 68));
-    panel.setOutlineColor(sf::Color(60, 30, 12));
-    panel.setOutlineThickness(3.f);
-
-    // Inner gold frame line (inset 7px)
-    panelInnerFrame.setSize({PANEL_W - 14.f, PANEL_H - 14.f});
-    panelInnerFrame.setPosition(PANEL_X + 7.f, PANEL_Y + 7.f);
-    panelInnerFrame.setFillColor(sf::Color::Transparent);
-    panelInnerFrame.setOutlineColor(sf::Color(208, 158, 78, 38));
-    panelInnerFrame.setOutlineThickness(1.f);
+    panel.setBounds({PANEL_X, PANEL_Y, PANEL_W, PANEL_H});
 }
 
 void MainMenuState::initLogo()
@@ -272,9 +261,7 @@ void MainMenuState::applyAlpha(float t)
 {
     uint8_t panelA = static_cast<uint8_t>(std::min(1.f, t / 0.56f) * 255.f);
 
-    panel.setFillColor(ca({140, 102, 68}, panelA));
-    panel.setOutlineColor(ca({60, 30, 12}, panelA));
-    panelInnerFrame.setOutlineColor(ca({208, 158, 78}, static_cast<uint8_t>(panelA * 38 / 255)));
+    panel.setAlpha(panelA);
 
     logoSprite.setColor(ca({255, 255, 255}, panelA));
     escafandraSprite.setColor(ca({242, 226, 192}, static_cast<uint8_t>(80u * panelA / 255u)));
@@ -351,8 +338,7 @@ void MainMenuState::render(sf::RenderTarget* target)
     for (auto& b : cornerBrackets)
         target->draw(b);
 
-    target->draw(panel);
-    target->draw(panelInnerFrame);
+    panel.render(*target);
     target->draw(logoSprite);
     target->draw(escafandraLabel);
     target->draw(escafandraSprite);

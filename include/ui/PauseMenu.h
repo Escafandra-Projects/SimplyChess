@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "ui/MenuButton.h"
+#include "ui/WoodPanel.h"
 #include <memory>
 
 /// Menú de pausa: un contenedor con un conjunto de botones indexados por clave.
@@ -14,8 +15,7 @@ private:
     sf::Font& font;
     sf::Text menuText;
 
-    sf::RectangleShape container;
-    sf::RectangleShape innerFrame;
+    WoodPanel container;
     std::map<std::string, std::unique_ptr<MenuButton>> buttons;
 
 public:

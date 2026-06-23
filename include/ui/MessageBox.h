@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "ui/MenuButton.h"
+#include "ui/WoodPanel.h"
 #include <memory>
 
 /// Cuadro de mensaje con texto y un botón (p. ej. el aviso de fin de partida).
@@ -12,8 +13,7 @@ private:
     sf::Font& font;
     sf::Text titleText;
     sf::Text bodyText;
-    sf::RectangleShape container;
-    sf::RectangleShape innerFrame;
+    WoodPanel container;
     std::unique_ptr<MenuButton> button;
 
     /// Centra el texto dentro del cuadro.

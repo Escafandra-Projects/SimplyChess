@@ -43,7 +43,7 @@ void GameState::initVariables() {
 	this->aiStopFlag = false;
 
 	// Mensaje fin del juego
-	this->gameOverBox = std::make_unique<MessageBox>(this->panelFont, "Game over", "Exit");
+	this->gameOverBox = std::make_unique<MessageBox>(this->panelFont, "Fin de la partida", "Salir");
 }   
    
 
@@ -69,9 +69,9 @@ void GameState::initTextures() {
 
 void GameState::initPauseMenu() {
 	this->pauseMenu = std::make_unique<PauseMenu>(this->panelFont);
-	this->pauseMenu->addButton("EXIT", 50.f, 370.f, "Exit");
-	this->pauseMenu->addButton("SAVE_PGN", 50.f, 270.f, "Save PGN");
-	this->pauseMenu->addButton("CONTINUE", 50.f, 170.f, "Continue");
+	this->pauseMenu->addButton("EXIT", 50.f, 370.f, "Salir");
+	this->pauseMenu->addButton("SAVE_PGN", 50.f, 270.f, "Guardar PGN");
+	this->pauseMenu->addButton("CONTINUE", 50.f, 170.f, "Continuar");
 }
 
 void GameState::initGamePanel() {
@@ -97,17 +97,7 @@ void GameState::initGamePanel() {
 
 	// ── Side panel ────────────────────────────────────────────────────────
 	constexpr float SX = 822.f, SY = 6.f, SW = 452.f, SH = 808.f;
-	sidePanel.setSize({SW, SH});
-	sidePanel.setPosition(SX, SY);
-	sidePanel.setFillColor(sf::Color(148, 110, 72));
-	sidePanel.setOutlineColor(sf::Color(60, 30, 12));
-	sidePanel.setOutlineThickness(3.f);
-
-	sidePanelInner.setSize({SW - 14.f, SH - 14.f});
-	sidePanelInner.setPosition(SX + 7.f, SY + 7.f);
-	sidePanelInner.setFillColor(sf::Color::Transparent);
-	sidePanelInner.setOutlineColor(sf::Color(208, 158, 78, 35));
-	sidePanelInner.setOutlineThickness(1.f);
+	sidePanel.setBounds({SX, SY, SW, SH});
 
 	// ── Board labels ──────────────────────────────────────────────────────
 	auto setupLabel = [&](sf::Text& t, const std::string& s, sf::RectangleShape& dot,
@@ -588,22 +578,22 @@ void GameState::update(float dt) {
 					GameStatus status = this->board->getGameStatus();
 					if (status == GameStatus::TIMEOUT) {
 						if (this->turn) {
-							this->gameOverBox->setText("Game over.\nTime Out. " + this->player2 + " wins");
+							this->gameOverBox->setText("Fin de la partida.\nTiempo agotado. Gana " + this->player2);
 						} else {
-							this->gameOverBox->setText("Game over.\nTime Out. " + this->player1 + " wins");
+							this->gameOverBox->setText("Fin de la partida.\nTiempo agotado. Gana " + this->player1);
 						}
 					} else if (status == GameStatus::CHECKMATE) {
 						if (this->turn) {
-							this->gameOverBox->setText("Game over.\n" + this->player2 + " wins");
+							this->gameOverBox->setText("Fin de la partida.\nGana " + this->player2);
 						} else {
-							this->gameOverBox->setText("Game over.\n" + this->player1 + " wins");
+							this->gameOverBox->setText("Fin de la partida.\nGana " + this->player1);
 						}
 					} else if (status == GameStatus::STALEMATE) {
-						this->gameOverBox->setText("Game over.\nDraw by stalemate");
+						this->gameOverBox->setText("Fin de la partida.\nTablas por ahogado");
 					} else if (status == GameStatus::FIFTY_MOVE_RULE) {
-						this->gameOverBox->setText("Game over.\nDraw by 50-move rule");
+						this->gameOverBox->setText("Fin de la partida.\nTablas por regla de 50 movimientos");
 					} else if (status == GameStatus::REPETITION) {
-						this->gameOverBox->setText("Game over.\nDraw by repetition");
+						this->gameOverBox->setText("Fin de la partida.\nTablas por repeticion");
 					}
 					this->gameOverReady = true;
 				} else {
@@ -647,8 +637,7 @@ void GameState::render(sf::RenderTarget* target) {
 	target->draw(this->labelBlancas);
 
 	// ── Panel lateral ──────────────────────────────────────────────────
-	target->draw(this->sidePanel);
-	target->draw(this->sidePanelInner);
+	this->sidePanel.render(*target);
 
 	// Fila jugador negro
 	target->draw(this->blackRowBg);

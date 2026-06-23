@@ -1,31 +1,26 @@
 #include "ui/PauseMenu.h"
 
+namespace {
+    constexpr float PX = 490.f, PY = 195.f, PW = 300.f, PH = 430.f;
+}
 
 PauseMenu::PauseMenu(sf::Font& font) : font(font) {
-	// Fondo   
-	this->container.setSize(sf::Vector2f(300.f, 430.f));
-	this->container.setPosition(490.f, 195.f);
-	this->container.setFillColor(sf::Color(140, 102, 68));
-	this->container.setOutlineColor(sf::Color(60, 30, 12));
-	this->container.setOutlineThickness(3.f);
-	
-	// Golden inner frame
-	this->innerFrame.setSize(sf::Vector2f(286.f, 416.f));
-	this->innerFrame.setPosition(497.f, 202.f);
-	this->innerFrame.setFillColor(sf::Color::Transparent);
-	this->innerFrame.setOutlineColor(sf::Color(208, 158, 78, 38));
-	this->innerFrame.setOutlineThickness(1.f);
+	// Panel de madera (gradiente + veta + marco dorado)
+	this->container.setBounds({PX, PY, PW, PH});
 
 	// Titulo
 	this->menuText.setFont(font);
-	this->menuText.setCharacterSize(24);   
-	this->menuText.setFillColor(sf::Color(60, 30, 12));
+	this->menuText.setCharacterSize(24);
+	this->menuText.setLetterSpacing(2.f);
+	this->menuText.setFillColor(sf::Color(242, 226, 192));
+	this->menuText.setOutlineColor(sf::Color(40, 20, 8, 180));
+	this->menuText.setOutlineThickness(1.f);
 	this->menuText.setString("PAUSA");
-	
+
 	auto lb = this->menuText.getLocalBounds();
 	this->menuText.setPosition(
-		this->container.getPosition().x + (this->container.getSize().x - lb.width) / 2.f - lb.left,
-		this->container.getPosition().y + 25.f - lb.top
+		PX + (PW - lb.width) / 2.f - lb.left,
+		PY + 25.f - lb.top
 	);
 }
 
@@ -38,8 +33,8 @@ bool PauseMenu::isButtonPressed(std::string key) {
 
 void PauseMenu::addButton(std::string key, float x, float y, std::string text) {
 	this->buttons[key] = std::make_unique<MenuButton>(
-		this->container.getPosition().x + x,
-		this->container.getPosition().y + y - 75.f,
+		PX + x,
+		PY + y - 75.f,
 		200.f,
 		40.f,
 		&this->font,
@@ -55,8 +50,7 @@ void PauseMenu::update(sf::Vector2i& mousePosWindow) {
 }
 
 void PauseMenu::render(sf::RenderTarget& target) {
-	target.draw(this->container);
-	target.draw(this->innerFrame);
+	this->container.render(target);
 
 	for (auto& [key, button] : this->buttons) {
 		button->render(target);

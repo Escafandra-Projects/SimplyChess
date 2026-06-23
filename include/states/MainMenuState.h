@@ -2,6 +2,7 @@
 
 #include "states/State.h"
 #include "ui/MenuButton.h"
+#include "ui/WoodPanel.h"
 #include <array>
 #include <vector>
 #include <memory>
@@ -26,8 +27,7 @@ private:
     std::array<sf::RectangleShape, 8> cornerBrackets;
 
     // --- panel central ---
-    sf::RectangleShape panel;
-    sf::RectangleShape panelInnerFrame;
+    WoodPanel panel;
 
     // --- título ---
     sf::Text titleText;

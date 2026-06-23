@@ -62,19 +62,8 @@ void SettingsState::initTextures() {
 	this->bgRect.setSize({1280.f, 820.f});
 	this->bgRect.setFillColor(sf::Color(26, 12, 6)); // Dark brown canvas
 
-	// 2. Central wooden panel
-	this->panel.setSize({900.f, 700.f});
-	this->panel.setPosition(190.f, 60.f); // Centered
-	this->panel.setFillColor(sf::Color(140, 102, 68)); // Wooden fill
-	this->panel.setOutlineColor(sf::Color(60, 30, 12)); // Border color
-	this->panel.setOutlineThickness(3.f);
-
-	// 3. Golden inner frame
-	this->panelInnerFrame.setSize({900.f - 14.f, 700.f - 14.f});
-	this->panelInnerFrame.setPosition(190.f + 7.f, 60.f + 7.f);
-	this->panelInnerFrame.setFillColor(sf::Color::Transparent);
-	this->panelInnerFrame.setOutlineColor(sf::Color(208, 158, 78, 38)); // Gold with ~15% alpha
-	this->panelInnerFrame.setOutlineThickness(1.f);
+	// 2. Panel de madera (gradiente + veta + marco dorado)
+	this->panel.setBounds({190.f, 60.f, 900.f, 700.f});
 }
 
 void SettingsState::initKeybinds() {
@@ -88,9 +77,10 @@ void SettingsState::initFonts() {
 
 void SettingsState::initText() {
 	this->titleText.setFont(this->font);
-	this->titleText.setCharacterSize(50);
-	this->titleText.setString("Settings");
-	this->titleText.setFillColor(sf::Color(238, 224, 194));
+	this->titleText.setCharacterSize(44);
+	this->titleText.setLetterSpacing(2.5f);
+	this->titleText.setString("AJUSTES");
+	this->titleText.setFillColor(sf::Color(242, 226, 192));
 	
 	// Center the title horizontally
 	auto titleBounds = this->titleText.getLocalBounds();
@@ -99,25 +89,25 @@ void SettingsState::initText() {
 
 	this->modeLabel.setFont(this->font);
 	this->modeLabel.setCharacterSize(28);
-	this->modeLabel.setString("Opponent:");
+	this->modeLabel.setString("Oponente:");
 	this->modeLabel.setFillColor(sf::Color(238, 224, 194));
 	this->modeLabel.setPosition(350.f, 300.f);
 
 	this->diffLabel.setFont(this->font);
 	this->diffLabel.setCharacterSize(28);
-	this->diffLabel.setString("Difficulty:");
+	this->diffLabel.setString("Dificultad:");
 	this->diffLabel.setFillColor(sf::Color(238, 224, 194));
 	this->diffLabel.setPosition(350.f, 410.f);
 
 	this->timeLabel.setFont(this->font);
 	this->timeLabel.setCharacterSize(28);
-	this->timeLabel.setString("Base Time:");
+	this->timeLabel.setString("Tiempo base:");
 	this->timeLabel.setFillColor(sf::Color(238, 224, 194));
 	this->timeLabel.setPosition(350.f, 300.f);
 
 	this->incrementLabel.setFont(this->font);
 	this->incrementLabel.setCharacterSize(28);
-	this->incrementLabel.setString("Increment:");
+	this->incrementLabel.setString("Incremento:");
 	this->incrementLabel.setFillColor(sf::Color(238, 224, 194));
 	this->incrementLabel.setPosition(350.f, 410.f);
 }
@@ -125,40 +115,40 @@ void SettingsState::initText() {
 void SettingsState::initButtons() {
 	// Pestañas
 	this->buttons["TAB_BOT"] = std::make_unique<MenuButton>(350.f, 180.f, 200.f, 50.f, &this->font, "Bot", 24);
-	this->buttons["TAB_TIME"] = std::make_unique<MenuButton>(650.f, 180.f, 200.f, 50.f, &this->font, "Time", 24);
+	this->buttons["TAB_TIME"] = std::make_unique<MenuButton>(650.f, 180.f, 200.f, 50.f, &this->font, "Tiempo", 24);
 
 	// Opciones
 	this->buttons["MODE_CYCLE"] = std::make_unique<MenuButton>(650.f, 290.f, 250.f, 50.f, &this->font, "Escafandrin", 24);
 	this->buttons["DIFF_CYCLE"] = std::make_unique<MenuButton>(650.f, 400.f, 250.f, 50.f, &this->font, "Normal", 24);
 	this->buttons["TIME_CYCLE"] = std::make_unique<MenuButton>(650.f, 290.f, 250.f, 50.f, &this->font, "5 min", 24);
-	this->buttons["INC_CYCLE"] = std::make_unique<MenuButton>(650.f, 400.f, 250.f, 50.f, &this->font, "0 sec", 24);
+	this->buttons["INC_CYCLE"] = std::make_unique<MenuButton>(650.f, 400.f, 250.f, 50.f, &this->font, "0 seg", 24);
 
 	// Controles
-	this->buttons["CANCEL"] = std::make_unique<MenuButton>(350.f, 560.f, 200.f, 50.f, &this->font, "Cancel", 28);
-	this->buttons["CONFIRM"] = std::make_unique<MenuButton>(650.f, 560.f, 200.f, 50.f, &this->font, "Confirm", 28);
+	this->buttons["CANCEL"] = std::make_unique<MenuButton>(350.f, 560.f, 200.f, 50.f, &this->font, "Cancelar", 28);
+	this->buttons["CONFIRM"] = std::make_unique<MenuButton>(650.f, 560.f, 200.f, 50.f, &this->font, "Confirmar", 28);
 }
 
 void SettingsState::updateButtonTexts() {
 	this->buttons["MODE_CYCLE"]->setText(modeOptions[currentModeIdx]);
 	this->buttons["DIFF_CYCLE"]->setText(diffNames[currentDiffIdx]);
 
-	if (currentModeIdx == 0) { // Local 2P
-		this->buttons["DIFF_CYCLE"]->setText("N/A");
+	if (currentModeIdx == 0) { // 2 Jugadores
+		this->buttons["DIFF_CYCLE"]->setText("N/D");
 	}
 
 	int bt = baseTimeOptions[currentBaseTimeIdx];
 	if (bt == 0) {
-		this->buttons["TIME_CYCLE"]->setText("INF");
+		this->buttons["TIME_CYCLE"]->setText("Ilimitado");
 	} else {
 		std::string btStr = std::to_string(bt / 60) + " min";
 		this->buttons["TIME_CYCLE"]->setText(btStr);
 	}
 
 	if (bt == 0) {
-		this->buttons["INC_CYCLE"]->setText("Off");
+		this->buttons["INC_CYCLE"]->setText("Apagado");
 	} else {
 		int inc = incrementOptions[currentIncrementIdx];
-		std::string incStr = std::to_string(inc) + " sec";
+		std::string incStr = std::to_string(inc) + " seg";
 		this->buttons["INC_CYCLE"]->setText(incStr);
 	}
 }
@@ -268,8 +258,7 @@ void SettingsState::render(sf::RenderTarget* target) {
 		target = this->window;
 	}
 	target->draw(this->bgRect);
-	target->draw(this->panel);
-	target->draw(this->panelInnerFrame);
+	this->panel.render(*target);
 	target->draw(this->titleText);
 
 	if (currentTab == TAB_BOT) {

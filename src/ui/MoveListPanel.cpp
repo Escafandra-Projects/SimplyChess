@@ -137,7 +137,8 @@ void MoveListPanel::rebuildRows(const MoveHistory& history) {
     
     // Recalculate maxScroll
     float totalHeight = numRows * rowHeight;
-    float visibleHeight = bounds.height - 30.f; // 30px for header
+    float headerH = dark ? 0.f : 30.f; // tema oscuro: sin cabecera (como el diseño)
+    float visibleHeight = bounds.height - headerH;
     maxScroll = std::max(0.f, totalHeight - visibleHeight);
 }
 
@@ -177,20 +178,21 @@ void MoveListPanel::render(sf::RenderTarget& target) {
     sf::View oldView = target.getView();
     
     // Calculate normalized viewport using current view mapping to support window resizing/DPI
-    sf::Vector2i pixelTopLeft = target.mapCoordsToPixel(sf::Vector2f(bounds.left, bounds.top + 30.f), oldView);
+    float headerH = dark ? 0.f : 30.f;
+    sf::Vector2i pixelTopLeft = target.mapCoordsToPixel(sf::Vector2f(bounds.left, bounds.top + headerH), oldView);
     sf::Vector2i pixelBottomRight = target.mapCoordsToPixel(sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height), oldView);
-    
+
     sf::Vector2u windowSize = target.getSize();
     if (windowSize.x > 0 && windowSize.y > 0) {
         float vpLeft = static_cast<float>(pixelTopLeft.x) / windowSize.x;
         float vpTop = static_cast<float>(pixelTopLeft.y) / windowSize.y;
         float vpWidth = static_cast<float>(pixelBottomRight.x - pixelTopLeft.x) / windowSize.x;
         float vpHeight = static_cast<float>(pixelBottomRight.y - pixelTopLeft.y) / windowSize.y;
-        
+
         sf::View scrollView;
         scrollView.setViewport(sf::FloatRect(vpLeft, vpTop, vpWidth, vpHeight));
-        scrollView.setSize(bounds.width, bounds.height - 30.f);
-        scrollView.setCenter(bounds.width / 2.f, scrollOffset + (bounds.height - 30.f) / 2.f);
+        scrollView.setSize(bounds.width, bounds.height - headerH);
+        scrollView.setCenter(bounds.width / 2.f, scrollOffset + (bounds.height - headerH) / 2.f);
         
         target.setView(scrollView);
         
@@ -208,10 +210,13 @@ void MoveListPanel::render(sf::RenderTarget& target) {
         target.setView(oldView);
     }
     
-    // 3. Draw header (drawn outside the scroll view so it stays fixed)
-    target.draw(headerBg);
-    target.draw(headerTextNo);
-    target.draw(headerTextWhite);
-    target.draw(headerTextBlack);
-    target.draw(headerBorder);
+    // 3. Draw header (drawn outside the scroll view so it stays fixed).
+    //    Tema oscuro: sin cabecera (el diseño muestra las filas directamente).
+    if (!dark) {
+        target.draw(headerBg);
+        target.draw(headerTextNo);
+        target.draw(headerTextWhite);
+        target.draw(headerTextBlack);
+        target.draw(headerBorder);
+    }
 }

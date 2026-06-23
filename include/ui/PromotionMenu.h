@@ -4,6 +4,7 @@
 #include <array>
 
 #include "chess/Piece.h"
+#include "ui/WoodPanel.h"
 
 enum class OptionState { Idle, Hover, Active };
 
@@ -20,8 +21,7 @@ struct PromotionOption {
 class PromotionMenu {
 
 private:
-    sf::RectangleShape container;
-    sf::RectangleShape innerFrame;
+    WoodPanel container;
     sf::Font font;
     sf::Text headerText;
 

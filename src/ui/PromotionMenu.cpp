@@ -16,24 +16,17 @@ namespace {
 }
 
 PromotionMenu::PromotionMenu(sf::Texture& texture) : basePosition(0.f, 0.f), shown(false), currentColor(true) {
-    // Container background
-    container.setSize({70.f, 240.f});
-    container.setFillColor(sf::Color(140, 102, 68));
-    container.setOutlineColor(sf::Color(60, 30, 12));
-    container.setOutlineThickness(3.f);
-
-    // Golden inner frame
-    innerFrame.setSize({56.f, 226.f}); // 70 - 2*7, 240 - 2*7
-    innerFrame.setFillColor(sf::Color::Transparent);
-    innerFrame.setOutlineColor(sf::Color(208, 158, 78, 38));
-    innerFrame.setOutlineThickness(1.f);
+    // El panel de madera se dimensiona en setPosition().
 
     // Header label
     if (font.loadFromFile("resources/fonts/Gameplay.ttf")) {
         headerText.setFont(font);
-        headerText.setString("PROMOTE");
+        headerText.setString("CORONAR");
         headerText.setCharacterSize(11);
-        headerText.setFillColor(sf::Color(60, 30, 12));
+        headerText.setLetterSpacing(1.5f);
+        headerText.setFillColor(sf::Color(242, 226, 192));
+        headerText.setOutlineColor(sf::Color(40, 20, 8, 180));
+        headerText.setOutlineThickness(1.f);
         sf::FloatRect textRect = headerText.getLocalBounds();
         headerText.setOrigin(textRect.left + textRect.width / 2.f, textRect.top + textRect.height / 2.f);
     }
@@ -53,8 +46,7 @@ PromotionMenu::PromotionMenu(sf::Texture& texture) : basePosition(0.f, 0.f), sho
 
 void PromotionMenu::setPosition(float x, float y) {
     this->basePosition = sf::Vector2f(x, y);
-    this->container.setPosition(x, y);
-    this->innerFrame.setPosition(x + 7.f, y + 7.f);
+    this->container.setBounds({x, y, 70.f, 240.f});
     if (headerText.getFont()) {
         this->headerText.setPosition(x + 35.f, y + 15.f);
     }
@@ -191,8 +183,7 @@ void PromotionMenu::setShown(bool shown, bool color) {
 void PromotionMenu::render(sf::RenderTarget& target) {
     if (!shown) return;
 
-    target.draw(container);
-    target.draw(innerFrame);
+    container.render(target);
     if (headerText.getFont()) {
         target.draw(headerText);
     }
