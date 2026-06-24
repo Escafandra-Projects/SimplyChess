@@ -2,12 +2,9 @@
 
 > Versión **1.0.0**
 
-Ajedrez para dos jugadores (local, mismo teclado/ratón) escrito en **C++20** con **SFML 2.6**.
+Ajedrez escrito en **C++20** con **SFML 2.6** para jugar partidas locales (dos jugadores en el mismo teclado/ratón) o enfrentarse contra la IA **Escafandrín** (basada en Minimax con poda Alfa-Beta y tres niveles de dificultad).
 
-Implementa las reglas completas del ajedrez —movimiento de todas las piezas, enroque, captura
-al paso, coronación, jaque y jaque mate— y todas las condiciones de tablas (ahogado, regla de
-los 50 movimientos y triple repetición). Incluye además un reloj de ajedrez configurable
-(tiempo base e incremento) con menú de ajustes.
+Implementa las reglas completas del ajedrez —movimiento de todas las piezas, enroque, captura al paso, coronación, jaque y jaque mate— y todas las condiciones de tablas (ahogado, regla de los 50 movimientos, triple repetición y acuerdo de tablas). Incluye un reloj de ajedrez configurable (tiempo base, incremento y modo infinito), soporte para deshacer/rehacer jugadas (undos/redos) y un panel lateral con historial de jugadas en notación PGN simplificada, ventaja material y captura de piezas.
 
 ## Requisitos
 
@@ -72,8 +69,10 @@ cd build
 ## Controles
 
 - **Clic izquierdo**: seleccionar una pieza y, con el segundo clic, su casilla destino.
-- **Clic derecho**: cancelar la selección actual.
-- **Esc**: pausar / reanudar la partida.
+- **Clic derecho**: cancelar la selección actual de pieza.
+- **Flecha izquierda / Ctrl + Z**: deshacer la última jugada (solo disponible en partidas sin límite de tiempo).
+- **Flecha derecha / Ctrl + Y**: rehacer la última jugada deshecha (solo disponible en partidas sin límite de tiempo).
+- **Esc**: pausar / reanudar la partida y ver opciones (Guardar PGN, Salir).
 - Al coronar un peón aparece un menú; haz clic en la pieza deseada (dama, caballo, alfil o torre).
 
 ## Configuración

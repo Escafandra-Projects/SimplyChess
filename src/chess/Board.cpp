@@ -714,7 +714,7 @@ void Board::initCoordinates() {
 		sf::Text t = makeLabel(std::string(1, static_cast<char>('a' + col)));
 		sf::FloatRect b = t.getLocalBounds();
 		float cx = colToPixelX(col) + CELL_SIZE / 2.f;
-		t.setPosition(cx - b.left - b.width / 2.f, 800.f);
+		t.setPosition(cx - b.left - b.width / 2.f, 789.5f - b.top - b.height / 2.f);
 		this->coordLabels.push_back(t);
 	}
 
@@ -723,7 +723,7 @@ void Board::initCoordinates() {
 		sf::Text t = makeLabel(std::to_string(8 - r));
 		sf::FloatRect b = t.getLocalBounds();
 		float cy = rowToPixelY(r) + CELL_SIZE / 2.f;
-		t.setPosition(4.f - b.left - b.width / 2.f, cy - b.top - b.height / 2.f);
+		t.setPosition(30.5f - b.left - b.width / 2.f, cy - b.top - b.height / 2.f);
 		this->coordLabels.push_back(t);
 	}
 }

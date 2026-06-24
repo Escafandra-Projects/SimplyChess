@@ -11,7 +11,7 @@
 static constexpr float WIN_W   = 1280.f;
 static constexpr float WIN_H   = 820.f;
 static constexpr float PANEL_W = 480.f;
-static constexpr float PANEL_H = 530.f;
+static constexpr float PANEL_H = 470.f;
 static constexpr float PANEL_X = (WIN_W - PANEL_W) * 0.5f; // 400
 static constexpr float PANEL_Y = (WIN_H - PANEL_H) * 0.5f; // 145
 static constexpr float PANEL_CX = PANEL_X + PANEL_W * 0.5f; // 640
@@ -134,14 +134,14 @@ void MainMenuState::initLogo()
         PANEL_X + PANEL_W - ESMALL - 12.f,
         PANEL_Y + PANEL_H - ESMALL - 10.f
     );
-    escafandraSprite.setColor(sf::Color(242, 226, 192, 80));
+    escafandraSprite.setColor(sf::Color(242, 226, 192, 140));
 
     // Label a la izquierda del logo
     escafandraLabel.setFont(font);
     escafandraLabel.setString("Made by Escafandra Projects");
-    escafandraLabel.setCharacterSize(8);
+    escafandraLabel.setCharacterSize(10);
     escafandraLabel.setLetterSpacing(1.4f);
-    escafandraLabel.setFillColor(sf::Color(192, 152, 96, 60));
+    escafandraLabel.setFillColor(sf::Color(192, 152, 96, 130));
     auto elb = escafandraLabel.getLocalBounds();
     float esLogoX = PANEL_X + PANEL_W - ESMALL - 12.f;
     float esLogoY = PANEL_Y + PANEL_H - ESMALL - 10.f;
@@ -213,12 +213,12 @@ void MainMenuState::initVersion()
 {
     versionText.setFont(font);
     versionText.setString("v 1.0");
-    versionText.setCharacterSize(10);
+    versionText.setCharacterSize(12);
     versionText.setLetterSpacing(2.f);
-    versionText.setFillColor(sf::Color(192, 152, 96, 92));
+    versionText.setFillColor(sf::Color(192, 152, 96, 160));
 
     auto lb = versionText.getLocalBounds();
-    float vy = PANEL_Y + PANEL_H - 28.f - lb.height - lb.top;
+    float vy = PANEL_Y + PANEL_H - 48.f - lb.height - lb.top;
     versionText.setPosition(PANEL_CX - lb.width * 0.5f - lb.left, vy);
 }
 
@@ -266,15 +266,15 @@ void MainMenuState::applyAlpha(float t)
     panel.setAlpha(panelA);
 
     logoSprite.setColor(ca({255, 255, 255}, panelA));
-    escafandraSprite.setColor(ca({242, 226, 192}, static_cast<uint8_t>(80u * panelA / 255u)));
-    escafandraLabel.setFillColor(ca({192, 152, 96}, static_cast<uint8_t>(60u * panelA / 255u)));
+    escafandraSprite.setColor(ca({242, 226, 192}, static_cast<uint8_t>(140u * panelA / 255u)));
+    escafandraLabel.setFillColor(ca({192, 152, 96}, static_cast<uint8_t>(130u * panelA / 255u)));
     titleText.setFillColor(ca({242, 226, 192}, panelA));
 
     for (auto& d : divider) {
         auto fc = d.getFillColor();
         d.setFillColor(ca(fc, panelA));
     }
-    versionText.setFillColor(ca({192, 152, 96}, static_cast<uint8_t>(92u * panelA / 255u)));
+    versionText.setFillColor(ca({192, 152, 96}, static_cast<uint8_t>(160u * panelA / 255u)));
 
     for (size_t i = 0; i < menuButtons.size(); ++i) {
         float bt = std::clamp((t - 0.25f - static_cast<float>(i) * 0.1f) / 0.38f, 0.f, 1.f);

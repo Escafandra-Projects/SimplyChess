@@ -18,37 +18,39 @@ void MessageBox::centerText() {
 	);
 }
 
-MessageBox::MessageBox(sf::Font& font, std::string message, std::string buttonText) : font(font), button2(nullptr) {
+MessageBox::MessageBox(sf::Font& font, std::string message, std::string buttonText)
+	: font(font), button2(nullptr), waitingForRelease(true), lastUpdateTime(std::chrono::steady_clock::time_point()) {
 	// Panel de madera (gradiente + veta + marco dorado)
 	this->container.setBounds({CX, CY, CW, CH});
-
-	// Textos (crema sobre madera, con sombra ligera)
-	this->titleText.setFont(font);
-	this->titleText.setCharacterSize(24);
-	this->titleText.setLetterSpacing(2.f);
-	this->titleText.setFillColor(sf::Color(242, 226, 192));
-	this->titleText.setOutlineColor(sf::Color(40, 20, 8, 180));
-	this->titleText.setOutlineThickness(1.f);
-
-	this->bodyText.setFont(font);
-	this->bodyText.setCharacterSize(18);
-	this->bodyText.setFillColor(sf::Color(238, 224, 194));
-
-	// Botón
-	this->button = std::make_unique<MenuButton>(
-		CX + 200.f,
-		CY + 170.f,
-		200.f,
-		40.f,
-		&this->font,
-		buttonText,
-		15
-	);
-
-	this->setText(message);
-}
-
-MessageBox::MessageBox(sf::Font& font, std::string message, std::string button1Text, std::string button2Text) : font(font) {
+ 
+ 	// Textos (crema sobre madera, con sombra ligera)
+ 	this->titleText.setFont(font);
+ 	this->titleText.setCharacterSize(24);
+ 	this->titleText.setLetterSpacing(2.f);
+ 	this->titleText.setFillColor(sf::Color(242, 226, 192));
+ 	this->titleText.setOutlineColor(sf::Color(40, 20, 8, 180));
+ 	this->titleText.setOutlineThickness(1.f);
+ 
+ 	this->bodyText.setFont(font);
+ 	this->bodyText.setCharacterSize(18);
+ 	this->bodyText.setFillColor(sf::Color(238, 224, 194));
+ 
+ 	// Botón
+ 	this->button = std::make_unique<MenuButton>(
+ 		CX + 200.f,
+ 		CY + 170.f,
+ 		200.f,
+ 		40.f,
+ 		&this->font,
+ 		buttonText,
+ 		15
+ 	);
+ 
+ 	this->setText(message);
+ }
+ 
+ MessageBox::MessageBox(sf::Font& font, std::string message, std::string button1Text, std::string button2Text)
+	: font(font), waitingForRelease(true), lastUpdateTime(std::chrono::steady_clock::time_point()) {
 	// Panel de madera (gradiente + veta + marco dorado)
 	this->container.setBounds({CX, CY, CW, CH});
 
@@ -93,12 +95,12 @@ MessageBox::~MessageBox() {
 
 bool MessageBox::isButtonPressed()
 {
-	return this->button->isPressed();
+	return !this->waitingForRelease && this->button->isPressed();
 }
 
 bool MessageBox::isButton2Pressed()
 {
-	return this->button2 && this->button2->isPressed();
+	return !this->waitingForRelease && this->button2 && this->button2->isPressed();
 }
 
 void MessageBox::setText(std::string text)
@@ -116,6 +118,19 @@ void MessageBox::setText(std::string text)
 
 void MessageBox::update(sf::Vector2i& mousePosWindow)
 {
+	auto now = std::chrono::steady_clock::now();
+	auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->lastUpdateTime).count();
+	if (elapsed > 150) {
+		this->waitingForRelease = true;
+	}
+	this->lastUpdateTime = now;
+
+	if (this->waitingForRelease) {
+		if (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+			this->waitingForRelease = false;
+		}
+	}
+
 	this->button->update(mousePosWindow);
 	if (this->button2) {
 		this->button2->update(mousePosWindow);
