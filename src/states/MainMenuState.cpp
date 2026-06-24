@@ -196,12 +196,14 @@ void MainMenuState::initDivider()
 
 void MainMenuState::initButtons()
 {
-    const std::array<std::string, 4> labels = {
-        "NUEVA PARTIDA", "2 JUGADORES", "OPCIONES", "SALIR"
+    // El rival (IA / 2 jugadores) se elige en la pantalla previa, así que el menú
+    // tiene un único botón de juego.
+    const std::array<std::string, 3> labels = {
+        "NUEVA PARTIDA", "OPCIONES", "SALIR"
     };
 
     float y0 = divider[1].getPosition().y + 3.f + 22.f; // below divider
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < static_cast<int>(labels.size()); ++i) {
         float by = y0 + i * (BTN_H + BTN_GAP);
         menuButtons.emplace_back(BTN_X, by, BTN_W, BTN_H, &font, labels[i]);
     }
@@ -274,8 +276,8 @@ void MainMenuState::applyAlpha(float t)
     }
     versionText.setFillColor(ca({192, 152, 96}, static_cast<uint8_t>(92u * panelA / 255u)));
 
-    for (int i = 0; i < 4; ++i) {
-        float bt = std::clamp((t - 0.25f - i * 0.1f) / 0.38f, 0.f, 1.f);
+    for (size_t i = 0; i < menuButtons.size(); ++i) {
+        float bt = std::clamp((t - 0.25f - static_cast<float>(i) * 0.1f) / 0.38f, 0.f, 1.f);
         menuButtons[i].setAlpha(static_cast<uint8_t>(bt * 255.f));
     }
 }
@@ -293,14 +295,11 @@ void MainMenuState::updateButtons()
 
     if (!mousePressedLastFrame) {
         if (menuButtons[0].isPressed()) {
-            // vs IA: abre la pantalla previa (nombres, color, orientación) con el modo IA preseleccionado.
-            this->states->push(std::make_unique<GameSetupState>(this->window, this->supportedKeys, this->states, 1));
+            // Nueva partida: la pantalla previa permite elegir rival, nombres y color.
+            this->states->push(std::make_unique<GameSetupState>(this->window, this->supportedKeys, this->states));
         } else if (menuButtons[1].isPressed()) {
-            // 2 jugadores: pantalla previa con el modo local preseleccionado.
-            this->states->push(std::make_unique<GameSetupState>(this->window, this->supportedKeys, this->states, 0));
-        } else if (menuButtons[2].isPressed()) {
             this->states->push(std::make_unique<SettingsState>(this->window, this->supportedKeys, this->states));
-        } else if (menuButtons[3].isPressed()) {
+        } else if (menuButtons[2].isPressed()) {
             this->quit = true;
         }
     }
