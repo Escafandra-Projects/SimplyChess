@@ -49,9 +49,11 @@ void SettingsState::loadSettings() {
 void SettingsState::saveSettings() {
 	std::ofstream ofs("config/game.ini");
 	if (ofs.is_open()) {
-		ofs << this->baseTimeOptions[currentBaseTimeIdx] << " " 
+		// El rival ya no se elige aquí (se hace en la pantalla previa); conservamos
+		// el valor de aiMode tal cual estaba en game.ini para no alterarlo.
+		ofs << this->baseTimeOptions[currentBaseTimeIdx] << " "
 			<< this->incrementOptions[currentIncrementIdx] << " "
-			<< (this->currentModeIdx == 1) << " "
+			<< this->aiMode << " "
 			<< this->diffOptions[currentDiffIdx] << "\n";
 		ofs.close();
 	}
@@ -97,7 +99,7 @@ void SettingsState::initText() {
 	this->diffLabel.setCharacterSize(28);
 	this->diffLabel.setString("Dificultad:");
 	this->diffLabel.setFillColor(sf::Color(238, 224, 194));
-	this->diffLabel.setPosition(350.f, 410.f);
+	this->diffLabel.setPosition(350.f, 300.f);
 
 	this->timeLabel.setFont(this->font);
 	this->timeLabel.setCharacterSize(28);
@@ -117,9 +119,8 @@ void SettingsState::initButtons() {
 	this->buttons["TAB_BOT"] = std::make_unique<MenuButton>(350.f, 180.f, 200.f, 50.f, &this->font, "Bot", 24);
 	this->buttons["TAB_TIME"] = std::make_unique<MenuButton>(650.f, 180.f, 200.f, 50.f, &this->font, "Tiempo", 24);
 
-	// Opciones
-	this->buttons["MODE_CYCLE"] = std::make_unique<MenuButton>(650.f, 290.f, 250.f, 50.f, &this->font, "Escafandrin", 24);
-	this->buttons["DIFF_CYCLE"] = std::make_unique<MenuButton>(650.f, 400.f, 250.f, 50.f, &this->font, "Normal", 24);
+	// Opciones (el rival se elige en la pantalla previa a la partida)
+	this->buttons["DIFF_CYCLE"] = std::make_unique<MenuButton>(650.f, 290.f, 250.f, 50.f, &this->font, "Normal", 24);
 	this->buttons["TIME_CYCLE"] = std::make_unique<MenuButton>(650.f, 290.f, 250.f, 50.f, &this->font, "5 min", 24);
 	this->buttons["INC_CYCLE"] = std::make_unique<MenuButton>(650.f, 400.f, 250.f, 50.f, &this->font, "0 seg", 24);
 
@@ -129,12 +130,7 @@ void SettingsState::initButtons() {
 }
 
 void SettingsState::updateButtonTexts() {
-	this->buttons["MODE_CYCLE"]->setText(modeOptions[currentModeIdx]);
 	this->buttons["DIFF_CYCLE"]->setText(diffNames[currentDiffIdx]);
-
-	if (currentModeIdx == 0) { // 2 Jugadores
-		this->buttons["DIFF_CYCLE"]->setText("N/D");
-	}
 
 	int bt = baseTimeOptions[currentBaseTimeIdx];
 	if (bt == 0) {
@@ -180,7 +176,6 @@ void SettingsState::updateButtons() {
 	this->buttons["CONFIRM"]->update(this->mousePosWindow);
 
 	if (currentTab == TAB_BOT) {
-		this->buttons["MODE_CYCLE"]->update(this->mousePosWindow);
 		this->buttons["DIFF_CYCLE"]->update(this->mousePosWindow);
 	} else if (currentTab == TAB_TIME) {
 		this->buttons["TIME_CYCLE"]->update(this->mousePosWindow);
@@ -196,16 +191,9 @@ void SettingsState::updateButtons() {
 	}
 
 	if (currentTab == TAB_BOT) {
-		if (this->buttons["MODE_CYCLE"]->isPressed() && this->getKeytime()) {
-			currentModeIdx = (currentModeIdx + 1) % modeOptions.size();
-			updateButtonTexts();
-		}
-
 		if (this->buttons["DIFF_CYCLE"]->isPressed() && this->getKeytime()) {
-			if (currentModeIdx == 1) { // Only change diff if Bot mode is selected
-				currentDiffIdx = (currentDiffIdx + 1) % diffOptions.size();
-				updateButtonTexts();
-			}
+			currentDiffIdx = (currentDiffIdx + 1) % diffOptions.size();
+			updateButtonTexts();
 		}
 	} else if (currentTab == TAB_TIME) {
 		if (this->buttons["TIME_CYCLE"]->isPressed() && this->getKeytime()) {
@@ -245,7 +233,6 @@ void SettingsState::renderButtons(sf::RenderTarget& target) {
 	this->buttons["CONFIRM"]->render(target);
 
 	if (currentTab == TAB_BOT) {
-		this->buttons["MODE_CYCLE"]->render(target);
 		this->buttons["DIFF_CYCLE"]->render(target);
 	} else if (currentTab == TAB_TIME) {
 		this->buttons["TIME_CYCLE"]->render(target);
@@ -262,7 +249,6 @@ void SettingsState::render(sf::RenderTarget* target) {
 	target->draw(this->titleText);
 
 	if (currentTab == TAB_BOT) {
-		target->draw(this->modeLabel);
 		target->draw(this->diffLabel);
 	} else if (currentTab == TAB_TIME) {
 		target->draw(this->timeLabel);
