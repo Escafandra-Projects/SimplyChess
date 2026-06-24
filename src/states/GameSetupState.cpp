@@ -7,10 +7,10 @@
 
 // Inicialización
 void GameSetupState::initVariables() {
-	this->currentMode = 1;  // Por defecto: IA (se sobrescribe con loadDefaults)
+	this->currentMode = 1;  // Por defecto: IA (se sobrescribe con loadDefaults / forcedMode)
 	this->currentColor = 0; // Por defecto: Blancas
 	this->mousePressedLastFrame = false;
-	this->keytimeMax = 20.0f;
+	this->keytimeMax = 30.0f;
 
 	this->baseTime = 300.f;
 	this->increment = 0.f;
@@ -21,87 +21,52 @@ void GameSetupState::initKeybinds() {
 }
 
 void GameSetupState::initFonts() {
-	if (!this->font.loadFromFile("resources/fonts/Factory LJDS.ttf")) {
+	if (!this->font.loadFromFile("resources/fonts/Gameplay.ttf")) {
 		throw std::runtime_error("ERROR::GAME_SETUP_STATE::COULD NOT LOAD FONT");
 	}
 }
 
 void GameSetupState::initTextures() {
-	if (!this->textures["BACKGROUND"].loadFromFile("resources/images/menu/background.png")) {
-		throw std::runtime_error("ERROR::GAME_SETUP_STATE::FAILED TO LOAD BACKGROUND");
-	}
-	this->background.setTexture(this->textures["BACKGROUND"]);
-	this->background.scale(5.12f, 4.1f);
-
-	if (!this->textures["BUTTONS"].loadFromFile("resources/images/interface/buttons.png")) {
-		throw std::runtime_error("ERROR::GAME_SETUP_STATE::FAILED TO LOAD BUTTONS");
-	}
+	// Fondo oscuro + panel de madera (mismo tema que Ajustes).
+	this->bgRect.setSize({1280.f, 820.f});
+	this->bgRect.setFillColor(sf::Color(26, 12, 6));
+	this->panel.setBounds({190.f, 60.f, 900.f, 700.f});
 }
 
 void GameSetupState::initText() {
 	this->titleText.setFont(this->font);
-	this->titleText.setCharacterSize(80);
-	this->titleText.setString("New Game");
-	// Centrado horizontal sobre el ancho de la ventana (evita posiciones descuadradas).
-	sf::FloatRect titleBounds = this->titleText.getLocalBounds();
-	float winW = static_cast<float>(this->window->getSize().x);
-	this->titleText.setPosition((winW - titleBounds.width) / 2.f - titleBounds.left, 140.f);
+	this->titleText.setCharacterSize(44);
+	this->titleText.setLetterSpacing(2.5f);
+	this->titleText.setString("NUEVA PARTIDA");
+	this->titleText.setFillColor(sf::Color(242, 226, 192));
+	auto tb = this->titleText.getLocalBounds();
+	this->titleText.setOrigin(tb.left + tb.width / 2.f, tb.top + tb.height / 2.f);
+	this->titleText.setPosition(1280.f / 2.f, 115.f);
 
-	this->modeLabel.setFont(this->font);
-	this->modeLabel.setCharacterSize(40);
-	this->modeLabel.setString("Opponent:");
-	this->modeLabel.setPosition(300.f, 295.f);
-
-	this->nameLabel.setFont(this->font);
-	this->nameLabel.setCharacterSize(40);
-	this->nameLabel.setString("Your name:");
-	this->nameLabel.setPosition(300.f, 410.f);
-
-	this->colorLabel.setFont(this->font);
-	this->colorLabel.setCharacterSize(40);
-	this->colorLabel.setString("You play:");
-	this->colorLabel.setPosition(300.f, 515.f);
-
-	this->whiteLabel.setFont(this->font);
-	this->whiteLabel.setCharacterSize(40);
-	this->whiteLabel.setString("White:");
-	this->whiteLabel.setPosition(300.f, 410.f);
-
-	this->blackLabel.setFont(this->font);
-	this->blackLabel.setCharacterSize(40);
-	this->blackLabel.setString("Black:");
-	this->blackLabel.setPosition(300.f, 515.f);
+	auto makeLabel = [&](sf::Text& t, const std::string& s, float y) {
+		t.setFont(this->font);
+		t.setCharacterSize(28);
+		t.setString(s);
+		t.setFillColor(sf::Color(238, 224, 194));
+		t.setPosition(350.f, y);
+	};
+	makeLabel(this->modeLabel,  "Rival:",      250.f);
+	makeLabel(this->nameLabel,  "Tu nombre:",  360.f);
+	makeLabel(this->colorLabel, "Juegas:",     470.f);
+	makeLabel(this->whiteLabel, "Blancas:",    360.f);
+	makeLabel(this->blackLabel, "Negras:",     470.f);
 }
 
 void GameSetupState::initButtons() {
-	this->buttons["MODE_CYCLE"] = std::make_unique<Button>(630.0f, 290.0f, 100.f, 61.0f,
-		&this->font, "Escafandrin", 30,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["MODE_CYCLE"]->scale(2.8f, 2.5f);
-
-	this->buttons["COLOR_CYCLE"] = std::make_unique<Button>(630.0f, 505.0f, 100.f, 61.0f,
-		&this->font, "White", 30,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["COLOR_CYCLE"]->scale(2.5f, 2.5f);
-
-	this->buttons["BACK"] = std::make_unique<Button>(300.0f, 640.0f, 100.0f, 61.0f,
-		&this->font, "Back", 40,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["BACK"]->scale(2.5f, 2.5f);
-
-	this->buttons["START"] = std::make_unique<Button>(770.0f, 640.0f, 100.0f, 61.0f,
-		&this->font, "Start", 40,
-		sf::Color::White, sf::Color(200, 200, 200, 255), sf::Color::White,
-		this->textures["BUTTONS"]);
-	this->buttons["START"]->scale(3.0f, 3.0f);
+	this->buttons["MODE_CYCLE"]  = std::make_unique<MenuButton>(650.f, 240.f, 250.f, 50.f, &this->font, "Escafandrin", 24);
+	this->buttons["COLOR_CYCLE"] = std::make_unique<MenuButton>(650.f, 460.f, 250.f, 50.f, &this->font, "Blancas", 24);
+	this->buttons["BACK"]        = std::make_unique<MenuButton>(350.f, 580.f, 200.f, 50.f, &this->font, "Atras", 28);
+	this->buttons["START"]       = std::make_unique<MenuButton>(650.f, 580.f, 200.f, 50.f, &this->font, "Empezar", 28);
 }
 
 void GameSetupState::initFields() {
-	this->field1 = std::make_unique<TextField>(600.f, 405.f, 380.f, 60.f, &this->font, 35, "Player 1");
-	this->field2 = std::make_unique<TextField>(600.f, 510.f, 380.f, 60.f, &this->font, 35, "Player 2");
+	this->field1 = std::make_unique<TextField>(650.f, 355.f, 250.f, 50.f, &this->font, 24, "Jugador 1");
+	this->field2 = std::make_unique<TextField>(650.f, 465.f, 250.f, 50.f, &this->font, 24, "Jugador 2");
 	this->focusField(this->field1.get());
 }
 
@@ -125,7 +90,7 @@ void GameSetupState::loadDefaults() {
 void GameSetupState::updateButtonTexts() {
 	this->buttons["MODE_CYCLE"]->setText(this->currentMode == 1 ? "Escafandrin" : "Local 2P");
 
-	const char* colorNames[3] = { "White", "Black", "Random" };
+	const char* colorNames[3] = { "Blancas", "Negras", "Aleatorio" };
 	this->buttons["COLOR_CYCLE"]->setText(colorNames[this->currentColor]);
 }
 
@@ -172,7 +137,7 @@ void GameSetupState::startGame() {
 		if (this->currentColor == 2) playerWhite = (std::rand() % 2) == 0;
 		config.playerIsWhite = playerWhite;
 
-		std::string playerName = orDefault(this->field1->getText(), "Player");
+		std::string playerName = orDefault(this->field1->getText(), "Jugador");
 		if (playerWhite) {
 			config.whiteName = playerName;
 			config.blackName = "Escafandrin";
@@ -182,8 +147,8 @@ void GameSetupState::startGame() {
 		}
 	} else {
 		config.playerIsWhite = true; // 2 jugadores: tablero siempre con blancas abajo
-		config.whiteName = orDefault(this->field1->getText(), "White");
-		config.blackName = orDefault(this->field2->getText(), "Black");
+		config.whiteName = orDefault(this->field1->getText(), "Blancas");
+		config.blackName = orDefault(this->field2->getText(), "Negras");
 	}
 
 	// Lanza la partida y marca este estado para retirarse: al terminar la
@@ -203,13 +168,11 @@ void GameSetupState::updateInput(float /*dt*/) {
 void GameSetupState::updateButtons() {
 	bool isAI = (this->currentMode == 1);
 
-	// Actualizar botones visibles.
 	this->buttons["MODE_CYCLE"]->update(this->mousePosWindow);
 	this->buttons["BACK"]->update(this->mousePosWindow);
 	this->buttons["START"]->update(this->mousePosWindow);
 	if (isAI) this->buttons["COLOR_CYCLE"]->update(this->mousePosWindow);
 
-	// Ciclos con antirrebote.
 	if (this->buttons["MODE_CYCLE"]->isPressed() && this->getKeytime()) {
 		this->currentMode = (this->currentMode + 1) % 2;
 		this->updateButtonTexts();
@@ -254,7 +217,8 @@ void GameSetupState::render(sf::RenderTarget* target) {
 		target = this->window;
 	}
 
-	target->draw(this->background);
+	target->draw(this->bgRect);
+	this->panel.render(*target);
 	target->draw(this->titleText);
 	target->draw(this->modeLabel);
 

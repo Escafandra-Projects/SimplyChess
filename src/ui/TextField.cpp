@@ -12,23 +12,23 @@ TextField::TextField(float x, float y, float width, float height,
 	this->caretTimer = 0.f;
 	this->caretVisible = true;
 
-	// Caja con borde.
+	// Caja con borde (tema madera oscura, a juego con el panel).
 	this->box.setPosition(x, y);
 	this->box.setSize(sf::Vector2f(width, height));
-	this->box.setFillColor(sf::Color(245, 240, 235, 255));
-	this->box.setOutlineThickness(3.f);
-	this->box.setOutlineColor(sf::Color(120, 90, 80, 255));
+	this->box.setFillColor(sf::Color(42, 26, 12, 255));
+	this->box.setOutlineThickness(2.f);
+	this->box.setOutlineColor(sf::Color(200, 148, 70, 255));
 
 	// Texto introducido.
 	this->text.setFont(*this->font);
 	this->text.setCharacterSize(characterSize);
-	this->text.setFillColor(sf::Color(60, 45, 40, 255));
+	this->text.setFillColor(sf::Color(238, 224, 194, 255));
 
 	// Placeholder atenuado.
 	this->placeholder.setFont(*this->font);
 	this->placeholder.setCharacterSize(characterSize);
 	this->placeholder.setString(placeholder);
-	this->placeholder.setFillColor(sf::Color(150, 140, 135, 255));
+	this->placeholder.setFillColor(sf::Color(150, 120, 80, 255));
 
 	this->layoutText();
 }
@@ -100,8 +100,8 @@ void TextField::handleEvent(const sf::Event& event) {
 
 void TextField::update(float dt) {
 	// Borde resaltado cuando está enfocado.
-	this->box.setOutlineColor(this->focused ? sf::Color(180, 120, 60, 255)
-	                                         : sf::Color(120, 90, 80, 255));
+	this->box.setOutlineColor(this->focused ? sf::Color(255, 205, 120, 255)
+	                                         : sf::Color(200, 148, 70, 255));
 
 	// Parpadeo del cursor (solo enfocado).
 	if (this->focused) {
@@ -128,7 +128,7 @@ void TextField::render(sf::RenderTarget& target) {
 		float caretY = this->box.getPosition().y + 10.f;
 		sf::RectangleShape caret(sf::Vector2f(2.f, this->box.getSize().y - 20.f));
 		caret.setPosition(caretX, caretY);
-		caret.setFillColor(sf::Color(60, 45, 40, 255));
+		caret.setFillColor(sf::Color(238, 224, 194, 255));
 		target.draw(caret);
 	}
 }

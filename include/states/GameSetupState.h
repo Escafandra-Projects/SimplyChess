@@ -2,7 +2,8 @@
 
 #include "states/State.h"
 #include "states/GameConfig.h"
-#include "ui/Button.h"
+#include "ui/MenuButton.h"
+#include "ui/WoodPanel.h"
 #include "ui/TextField.h"
 
 #include <map>
@@ -10,12 +11,14 @@
 
 /// Pantalla previa a la partida: pide los nombres de los jugadores, permite
 /// elegir el rival (IA / local 2 jugadores) y, en modo IA, el color con el que
-/// juega el usuario. Al confirmar, crea el GameState con la configuración.
+/// juega el usuario. Comparte el tema visual de Ajustes (madera oscura).
 class GameSetupState : public State {
 private:
 	// Variables
 	sf::Font font;
-	sf::Sprite background;
+	sf::RectangleShape bgRect;
+	WoodPanel panel;
+
 	sf::Text titleText;
 	sf::Text modeLabel;
 	sf::Text colorLabel;
@@ -23,7 +26,7 @@ private:
 	sf::Text blackLabel;
 	sf::Text nameLabel;
 
-	std::map<std::string, std::unique_ptr<Button>> buttons;
+	std::map<std::string, std::unique_ptr<MenuButton>> buttons;
 	std::unique_ptr<TextField> field1; // Nombre del jugador (IA) o de blancas (2P)
 	std::unique_ptr<TextField> field2; // Nombre de negras (solo 2P)
 
