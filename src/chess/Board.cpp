@@ -723,7 +723,7 @@ void Board::initCoordinates() {
 		sf::Text t = makeLabel(std::to_string(8 - r));
 		sf::FloatRect b = t.getLocalBounds();
 		float cy = rowToPixelY(r) + CELL_SIZE / 2.f;
-		t.setPosition(BOARD_OFFSET_X / 2.f - b.left - b.width / 2.f, cy - b.top - b.height / 2.f);
+		t.setPosition(4.f - b.left - b.width / 2.f, cy - b.top - b.height / 2.f);
 		this->coordLabels.push_back(t);
 	}
 }
