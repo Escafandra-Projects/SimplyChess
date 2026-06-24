@@ -842,9 +842,18 @@ void GameState::captureStateForUndo() {
 }
 
 void GameState::undo() {
-	if (this->baseTime > 0.0f) return;
-	if (this->currentMoveIndex > 0) {
-		this->currentMoveIndex--;
+	if (this->baseTime > 0.0f || this->aiIsThinking) return;
+	
+	int steps = this->aiMode ? 2 : 1;
+	bool undone = false;
+	for (int i = 0; i < steps; ++i) {
+		if (this->currentMoveIndex > 0) {
+			this->currentMoveIndex--;
+			undone = true;
+		}
+	}
+	
+	if (undone) {
 		const GameSnapshot& snap = this->undoStack[this->currentMoveIndex];
 		this->board->restoreSnapshot(snap, this->textures);
 		this->turn = snap.turn;
@@ -858,9 +867,18 @@ void GameState::undo() {
 }
 
 void GameState::redo() {
-	if (this->baseTime > 0.0f) return;
-	if (this->currentMoveIndex < (int)this->undoStack.size() - 1) {
-		this->currentMoveIndex++;
+	if (this->baseTime > 0.0f || this->aiIsThinking) return;
+	
+	int steps = this->aiMode ? 2 : 1;
+	bool redone = false;
+	for (int i = 0; i < steps; ++i) {
+		if (this->currentMoveIndex < (int)this->undoStack.size() - 1) {
+			this->currentMoveIndex++;
+			redone = true;
+		}
+	}
+	
+	if (redone) {
 		const GameSnapshot& snap = this->undoStack[this->currentMoveIndex];
 		this->board->restoreSnapshot(snap, this->textures);
 		this->turn = snap.turn;

@@ -142,6 +142,9 @@ expandirse a otras áreas.
 - [x] **Ajuste de dificultad**
   - Permitir escoger distintos niveles de profundidad de búsqueda (Depth) desde el menú de inicio para hacer la IA más o menos agresiva.
 
+- [ ] **Tiempo de respuesta humanizado**
+  - Implementar un tiempo de espera mínimo aleatorio para la IA antes de ejecutar su movimiento (ej: según la dificultad), evitando respuestas instantáneas no realistas.
+
 ---
 
 ## 🟡 Hito 5 — Pulido final y mantenimiento
