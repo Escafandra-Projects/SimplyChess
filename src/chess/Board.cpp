@@ -631,18 +631,14 @@ void Board::promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting)
 	else {
 		if (this->movingPiece->getType() == PieceType::PEON) {
 
-          if (gridPos.x == 0 || gridPos.x == 7) {
-              float squareY = rowToPixelY(gridPos.x);
-              float menuY = (squareY < BOARD_SIZE / 2) ? squareY + CELL_SIZE : squareY - 2 * CELL_SIZE;
-              this->promotionMenu->setPosition(colToPixelX(gridPos.y) + (CELL_SIZE - 70.f) / 2.f, menuY);
-              this->promotionMenu->setShown(true, turn);
-              this->promotionTurn = turn;
-              this->promotionGridPos = gridPos;
-          }
-					this->promotionMenu->setShown(true, turn);
-					this->promotionTurn = turn;
-					this->promotionGridPos = gridPos;
-				}
+			if (gridPos.x == 0 || gridPos.x == 7) {
+				float squareY = rowToPixelY(gridPos.x);
+				float menuY = (squareY < BOARD_SIZE / 2) ? squareY + CELL_SIZE : squareY - 2 * CELL_SIZE;
+				this->promotionMenu->setPosition(colToPixelX(gridPos.y) + (CELL_SIZE - 70.f) / 2.f, menuY);
+				this->promotionMenu->setShown(true, turn);
+				this->promotionTurn = turn;
+				this->promotionGridPos = gridPos;
+			}
 
 
 		}

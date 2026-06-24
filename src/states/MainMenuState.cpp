@@ -268,20 +268,6 @@ void MainMenuState::applyAlpha(float t)
     escafandraLabel.setFillColor(ca({192, 152, 96}, static_cast<uint8_t>(60u * panelA / 255u)));
     titleText.setFillColor(ca({242, 226, 192}, panelA));
 
-	if (!this->mousePressedLastFrame) {
-		// Nuevo juego: primero la pantalla de configuración (nombres, rival, color).
-		if (this->buttons["GAME_STATE"]->isPressed()) {
-			this->states->push(std::make_unique<GameSetupState>(this->window, this->supportedKeys, this->states));
-		}
-		// Ajustes
-		else if (this->buttons["SETTINGS_STATE"]->isPressed()) {
-			this->states->push(std::make_unique<SettingsState>(this->window, this->supportedKeys, this->states));
-		}
-		// Salir del juego
-		else if (this->buttons["EXIT_STATE"]->isPressed()) {
-			this->quit = true;
-		}
-	}
     for (auto& d : divider) {
         auto fc = d.getFillColor();
         d.setFillColor(ca(fc, panelA));
@@ -307,11 +293,11 @@ void MainMenuState::updateButtons()
 
     if (!mousePressedLastFrame) {
         if (menuButtons[0].isPressed()) {
-            // vs AI
-            this->states->push(std::make_unique<GameState>(this->window, this->supportedKeys, this->states, true));
+            // vs IA: abre la pantalla previa (nombres, color, orientación) con el modo IA preseleccionado.
+            this->states->push(std::make_unique<GameSetupState>(this->window, this->supportedKeys, this->states, 1));
         } else if (menuButtons[1].isPressed()) {
-            // 2 jugadores
-            this->states->push(std::make_unique<GameState>(this->window, this->supportedKeys, this->states, false));
+            // 2 jugadores: pantalla previa con el modo local preseleccionado.
+            this->states->push(std::make_unique<GameSetupState>(this->window, this->supportedKeys, this->states, 0));
         } else if (menuButtons[2].isPressed()) {
             this->states->push(std::make_unique<SettingsState>(this->window, this->supportedKeys, this->states));
         } else if (menuButtons[3].isPressed()) {

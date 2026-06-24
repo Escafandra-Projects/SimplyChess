@@ -135,10 +135,12 @@ void GameSetupState::focusField(TextField* target) {
 }
 
 // Constructor y destructor
-GameSetupState::GameSetupState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states)
+GameSetupState::GameSetupState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states, int forcedMode)
 	: State(window, supportedKeys, states) {
 	this->initVariables();
 	this->loadDefaults();
+	// El menú puede preseleccionar el rival (vs IA / 2 jugadores); si no, vale el de game.ini.
+	if (forcedMode == 0 || forcedMode == 1) this->currentMode = forcedMode;
 	this->initFonts();
 	this->initTextures();
 	this->initText();

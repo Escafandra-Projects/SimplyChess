@@ -57,8 +57,9 @@ private:
 	void startGame();
 
 public:
-	// Constructor y destructor
-	GameSetupState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states);
+	// Constructor y destructor.
+	// forcedMode: -1 = usar el modo de config/game.ini; 0 = Local 2 jugadores; 1 = IA.
+	GameSetupState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states, int forcedMode = -1);
 	virtual ~GameSetupState();
 
 	// Funciones

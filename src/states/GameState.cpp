@@ -21,7 +21,7 @@ void GameState::initVariables() {
 	this->points1 = 0;
 	this->points2 = 0;
 	this->gameOverReady = false;
-	this->mouseHeldLastFrame = false;https://github.com/Escafandra-Projects/SimplyChess/pull/28/conflict?name=src%252Fstates%252FMainMenuState.cpp&ancestor_oid=e174fb736ca2072170f40ff3c274f023c2d0e236&base_oid=c4fbe189c8bc23f7a22eef14fbd48c926f8ca7b4&head_oid=2fcd209a487d39e01c36aff304d45ed444fb4e1a
+	this->mouseHeldLastFrame = false;
 	this->background.setPosition(sf::Vector2f(820.f, 0.f));
 
 	this->baseTime = this->config.baseTime;
@@ -327,10 +327,28 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 	this->initGamePanel();
 }
 
+// Arma una GameConfig básica a partir del modo elegido en el menú: nombres por
+// defecto y tiempo/dificultad leídos de config/game.ini (el modo lo fija el botón).
+static GameConfig makeMenuConfig(bool aiMode) {
+	GameConfig cfg;
+	cfg.aiMode = aiMode;
+	cfg.playerIsWhite = true;
+	cfg.whiteName = "Jugador 1";
+	cfg.blackName = aiMode ? "Escafandrin" : "Jugador 2";
+
+	std::ifstream ifs("config/game.ini");
+	if (ifs.is_open()) {
+		int fileMode = 0, diff = 0;
+		ifs >> cfg.baseTime >> cfg.increment;
+		if (ifs >> fileMode) { (void)fileMode; } // el modo del .ini se ignora: lo fija el menú
+		if (ifs >> diff) cfg.aiDifficulty = diff;
+	}
+	return cfg;
+}
+
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<std::unique_ptr<State>>* states, bool forceAiMode)
-    : GameState(window, supportedKeys, states)
+	: GameState(window, supportedKeys, states, makeMenuConfig(forceAiMode))
 {
-    this->aiMode = forceAiMode;
 }
 
 GameState::~GameState() {
@@ -675,10 +693,6 @@ void GameState::update(float dt) {
 					} else {
 						this->processAIMove();
 					}
-				}
-			}
-		}
-
 				}
 			}
 		}
