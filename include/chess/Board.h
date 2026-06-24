@@ -32,6 +32,8 @@ class Board {
 private:
 	// Variables
 	sf::Sprite background;
+	sf::Font coordFont;                  // Fuente para las coordenadas dibujadas
+	std::vector<sf::Text> coordLabels;   // Letras (a-h) y números (1-8) del borde
 	BoardGrid board;
 	CastlingState castling;
 	std::array<bool, 2> jaque;
@@ -94,6 +96,8 @@ private:
 	void initTextures(std::map<std::string, sf::Texture>& textures);
 	/// Crea los objetos Piece en su posición inicial.
 	void initPieces(std::map<std::string, sf::Texture>& textures);
+	/// Construye las etiquetas de coordenadas (a-h, 1-8) según la orientación actual.
+	void initCoordinates();
 
 	// Funciones privadas
 	/// Genera un string que representa el estado actual para detectar repeticiones.

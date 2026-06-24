@@ -10,6 +10,10 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 ## [Sin publicar]
 
 ### Añadido
+- **Pantalla de configuración de partida**: al pulsar *Start* se abre una pantalla previa que pide los nombres de los jugadores antes de empezar. Frente a la IA se introduce solo el nombre del jugador; en local 2 jugadores se piden los nombres de blancas y negras. El rival (Escafandrín / Local 2P) también puede elegirse aquí, además de en Ajustes.
+- **Elegir color frente a la IA**: en modo IA el jugador elige jugar con blancas, negras o aleatorio. Si juega con negras, el tablero se muestra volteado (perspectiva de negras) y la IA juega con blancas.
+- **Coordenadas dinámicas del tablero**: las letras (a-h) y los números (1-8) se dibujan por software y se reorientan automáticamente según la perspectiva, en lugar de venir fijadas en la imagen del tablero.
+- **Campo de entrada de texto** (`TextField`): nuevo widget de interfaz para introducir texto por teclado.
 - **Tiempo Infinito**: Añadida la opción de tiempo infinito en el menú de Ajustes (representado por "Infinite"). El reloj se oculta durante la partida y el incremento queda desactivado ("Off").
 - **Iconos de Aplicación**: Se han incorporado los iconos nativos para los ejecutables de release (icono de peón `PeonN`).
   - En **Windows** (`.ico`), el icono se incrusta en el `.exe` mediante el compilador de recursos `windres` en CMake.

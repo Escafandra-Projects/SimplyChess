@@ -4,6 +4,34 @@
 #include <cstdlib>
 #include <cmath>
 
+// --- Orientación de la vista del tablero ---
+namespace {
+	bool g_boardFlipped = false;
+}
+
+void setBoardFlipped(bool flipped) { g_boardFlipped = flipped; }
+bool isBoardFlipped() { return g_boardFlipped; }
+
+float colToPixelX(int col) {
+	int c = g_boardFlipped ? (7 - col) : col;
+	return static_cast<float>(c * CELL_SIZE + BOARD_OFFSET_X);
+}
+
+float rowToPixelY(int row) {
+	int r = g_boardFlipped ? (7 - row) : row;
+	return static_cast<float>(r * CELL_SIZE + BOARD_OFFSET_Y);
+}
+
+int pixelXToCol(int px) {
+	int c = (px - BOARD_OFFSET_X) / CELL_SIZE;
+	return g_boardFlipped ? (7 - c) : c;
+}
+
+int pixelYToRow(int py) {
+	int r = (py - BOARD_OFFSET_Y) / CELL_SIZE;
+	return g_boardFlipped ? (7 - r) : r;
+}
+
 Piece::Piece() {
 	this->points = 0;
 	this->color = true;
@@ -20,8 +48,8 @@ Piece::Piece(unsigned x, unsigned y, sf::Texture& texture, PieceType type, bool 
 
 	this->gridPos.y = y;
 	this->gridPos.x = x;
-	this->pos.x = this->gridPos.y * CELL_SIZE + BOARD_OFFSET_X;
-	this->pos.y = this->gridPos.x * CELL_SIZE + BOARD_OFFSET_Y;
+	this->pos.x = colToPixelX(this->gridPos.y);
+	this->pos.y = rowToPixelY(this->gridPos.x);
 	this->targetPos = this->pos;
 	this->isAnimating = false;
 	this->piece.setTexture(texture);
@@ -138,8 +166,8 @@ bool Piece::getIsAnimating() const {
 }
 
 void Piece::move(int x, int y){
-	this->targetPos.x = y * CELL_SIZE + BOARD_OFFSET_X;
-	this->targetPos.y = x * CELL_SIZE + BOARD_OFFSET_Y;
+	this->targetPos.x = colToPixelX(y);
+	this->targetPos.y = rowToPixelY(x);
 	this->gridPos.x = x;
 	this->gridPos.y = y;
 
@@ -149,8 +177,8 @@ void Piece::move(int x, int y){
 void Piece::setGridPositionImmediate(unsigned x, unsigned y) {
 	this->gridPos.x = x;
 	this->gridPos.y = y;
-	this->pos.x = y * CELL_SIZE + BOARD_OFFSET_X;
-	this->pos.y = x * CELL_SIZE + BOARD_OFFSET_Y;
+	this->pos.x = colToPixelX(y);
+	this->pos.y = rowToPixelY(x);
 	this->targetPos = this->pos;
 	this->piece.setPosition(this->pos);
 	this->isAnimating = false;
@@ -167,8 +195,8 @@ void Piece::setRenderPosition(float x, float y){
 
 void Piece::snapToGrid(){
 	// Recoloca el sprite en su casilla de rejilla actual, sin animación.
-	this->pos.x = this->gridPos.y * CELL_SIZE + BOARD_OFFSET_X;
-	this->pos.y = this->gridPos.x * CELL_SIZE + BOARD_OFFSET_Y;
+	this->pos.x = colToPixelX(this->gridPos.y);
+	this->pos.y = rowToPixelY(this->gridPos.x);
 	this->targetPos = this->pos;
 	this->isAnimating = false;
 	this->piece.setPosition(this->pos.x, this->pos.y);

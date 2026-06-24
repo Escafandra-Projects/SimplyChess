@@ -24,6 +24,9 @@ Funcionalidades ya implementadas y funcionando:
 - [x] Panel lateral con marcador (nombres y puntos)
 - [x] Configuración de ventana vía archivos `.ini`
 - [x] Refactor de estructura de carpetas por módulo (`core/`, `states/`, `ui/`, `chess/`)
+- [x] Pantalla de configuración de partida: entrada de nombres por teclado y elección de rival (IA / local 2 jugadores)
+- [x] Elección de color frente a la IA (blancas/negras/aleatorio) con el tablero orientado a la perspectiva del jugador
+- [x] Coordenadas del tablero dibujadas dinámicamente y reorientadas según la perspectiva
 
 ---
 
@@ -135,3 +138,29 @@ expandirse a otras áreas.
 
 - [x] **Ajuste de dificultad**
   - Permitir escoger distintos niveles de profundidad de búsqueda (Depth) desde el menú de inicio para hacer la IA más o menos agresiva.
+
+---
+
+## 🟡 Hito 5 — Pulido final y mantenimiento
+
+**Prioridad:** Media
+**Objetivo:** Refinar la experiencia de juego, revisar la configuración del proyecto y
+dejar el código limpio antes de cerrar el ciclo.
+
+- [ ] **Barra de evaluación ("quién va ganando")**
+  - Añadir a la derecha del tablero una barra vertical que indique qué bando lleva
+    ventaja, al estilo de chess.com (proporción blanco/negro).
+  - Puede basarse en la evaluación del motor (`AIEngine::evaluate`) o, como alternativa
+    ligera, en la ventaja material.
+
+- [ ] **Revisión de la configuración (`config/`)**
+  - Revisar los archivos de `config/`: valorar si todos son necesarios o si hay valores
+    redundantes que se puedan simplificar o unificar.
+  - Añadir al `.gitignore` lo que no deba versionarse (p. ej. configuración generada o
+    local de cada usuario, como `game.ini` si pasa a ser estado por máquina).
+
+- [ ] **Revisión final: optimización y limpieza de código** *(paso final del ciclo)*
+  - Eliminar warnings pendientes (p. ej. los de `AIEngine.cpp`), código muerto y
+    duplicado.
+  - Revisar rendimiento y consistencia de estilo (convenciones de `ESCAFANDRIN.md`)
+    antes de dar el ciclo por cerrado.

@@ -252,17 +252,17 @@ void Board::calculateLegalMoves(bool turn, sf::Vector2i startPos) {
 						sf::CircleShape circle(radius);
 						circle.setFillColor(sf::Color::Transparent);
 						circle.setOutlineColor(sf::Color(0, 0, 0, 45));
-						circle.setOutlineThickness(CELL_SIZE * 0.05f);
-						circle.setPosition(desPos.y * CELL_SIZE + BOARD_OFFSET_X + (CELL_SIZE - 2.f * radius) / 2.f,
-						                   desPos.x * CELL_SIZE + BOARD_OFFSET_Y + (CELL_SIZE - 2.f * radius) / 2.f);
+            circle.setOutlineThickness(CELL_SIZE * 0.05f);               // de B
+            circle.setPosition(colToPixelX(desPos.y) + (CELL_SIZE - 2.f * radius) / 2.f,   // orientación A + centrado B
+                                rowToPixelY(desPos.x) + (CELL_SIZE - 2.f * radius) / 2.f);
 						this->legalMovesShapes.push_back(circle);
 					} else {
 						// Movimiento normal: punto
 						float radius = CELL_SIZE * 0.15f;
 						sf::CircleShape dot(radius);
 						dot.setFillColor(sf::Color(0, 0, 0, 45));
-						dot.setPosition(desPos.y * CELL_SIZE + BOARD_OFFSET_X + (CELL_SIZE - 2.f * radius) / 2.f,
-						                 desPos.x * CELL_SIZE + BOARD_OFFSET_Y + (CELL_SIZE - 2.f * radius) / 2.f);
+            dot.setPosition(colToPixelX(desPos.y) + (CELL_SIZE - 2.f * radius) / 2.f,
+                rowToPixelY(desPos.x) + (CELL_SIZE - 2.f * radius) / 2.f);
 						this->legalMovesShapes.push_back(dot);
 					}
 				}
@@ -273,8 +273,8 @@ void Board::calculateLegalMoves(bool turn, sf::Vector2i startPos) {
 
 void Board::startMove(sf::Vector2i mousePos, bool& turn) {
 	sf::Vector2i pieceStartGridPos;
-	pieceStartGridPos.y = (mousePos.x - BOARD_OFFSET_X) / CELL_SIZE;
-	pieceStartGridPos.x = (mousePos.y - BOARD_OFFSET_Y) / CELL_SIZE;
+	pieceStartGridPos.y = pixelXToCol(mousePos.x);
+	pieceStartGridPos.x = pixelYToRow(mousePos.y);
 
 
 
@@ -283,7 +283,7 @@ void Board::startMove(sf::Vector2i mousePos, bool& turn) {
 
 
 	if (movingPiece) {
-		this->selectedCell.setPosition(pieceStartGridPos.y * CELL_SIZE + BOARD_OFFSET_X, pieceStartGridPos.x * CELL_SIZE + BOARD_OFFSET_Y);
+		this->selectedCell.setPosition(colToPixelX(pieceStartGridPos.y), rowToPixelY(pieceStartGridPos.x));
 		// Permitimos selección solo si es el turno adecuado
 		if (turn == movingPiece->getColor()) {
 			this->isMoving = true;
@@ -296,8 +296,8 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	if (!movingPiece) return;
 
 	sf::Vector2i pieceDesGridPos;
-	pieceDesGridPos.y = (mousePos.x - BOARD_OFFSET_X) / CELL_SIZE;
-	pieceDesGridPos.x = (mousePos.y - BOARD_OFFSET_Y) / CELL_SIZE;
+	pieceDesGridPos.y = pixelXToCol(mousePos.x);
+	pieceDesGridPos.x = pixelYToRow(mousePos.y);
 	sf::Vector2i pieceStartGridPos;
 	pieceStartGridPos.y = movingPiece->getGridPosition().y;
 	pieceStartGridPos.x = movingPiece->getGridPosition().x;
@@ -423,8 +423,8 @@ void Board::endMove(sf::Vector2i mousePos, bool& turn, int& points1, int& points
 	this->peonPaso = testPeonPaso;
 
 	// Actualizar celdas del último movimiento
-	this->lastMoveStartCell.setPosition(pieceStartGridPos.y * CELL_SIZE + BOARD_OFFSET_X, pieceStartGridPos.x * CELL_SIZE + BOARD_OFFSET_Y);
-	this->lastMoveEndCell.setPosition(pieceDesGridPos.y * CELL_SIZE + BOARD_OFFSET_X, pieceDesGridPos.x * CELL_SIZE + BOARD_OFFSET_Y);
+	this->lastMoveStartCell.setPosition(colToPixelX(pieceStartGridPos.y), rowToPixelY(pieceStartGridPos.x));
+	this->lastMoveEndCell.setPosition(colToPixelX(pieceDesGridPos.y), rowToPixelY(pieceDesGridPos.x));
 	this->hasLastMove = true;
 	this->legalMovesShapes.clear();
 
@@ -631,18 +631,14 @@ void Board::promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting)
 	else {
 		if (this->movingPiece->getType() == PieceType::PEON) {
 
-				if (gridPos.x == 0) {
-					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE + BOARD_OFFSET_X + (CELL_SIZE - 70.f) / 2.f, gridPos.x * CELL_SIZE + CELL_SIZE + BOARD_OFFSET_Y);
-					this->promotionMenu->setShown(true, turn);
-					this->promotionTurn = turn;
-					this->promotionGridPos = gridPos;
-				}
-				if (gridPos.x == 7) {
-					this->promotionMenu->setPosition(gridPos.y * CELL_SIZE + BOARD_OFFSET_X + (CELL_SIZE - 70.f) / 2.f, gridPos.x * CELL_SIZE - 240.f + BOARD_OFFSET_Y);
-					this->promotionMenu->setShown(true, turn);
-					this->promotionTurn = turn;
-					this->promotionGridPos = gridPos;
-				}
+			if (gridPos.x == 0 || gridPos.x == 7) {
+				float squareY = rowToPixelY(gridPos.x);
+				float menuY = (squareY < BOARD_SIZE / 2) ? squareY + CELL_SIZE : squareY - 2 * CELL_SIZE;
+				this->promotionMenu->setPosition(colToPixelX(gridPos.y) + (CELL_SIZE - 70.f) / 2.f, menuY);
+				this->promotionMenu->setShown(true, turn);
+				this->promotionTurn = turn;
+				this->promotionGridPos = gridPos;
+			}
 
 
 		}
@@ -689,6 +685,47 @@ Board::Board(std::map<std::string, sf::Texture>& textures) :
 	this->initTextures(textures);
 	this->initVariables();
 	this->initPieces(textures);
+	this->initCoordinates();
+}
+
+void Board::initCoordinates() {
+	if (!this->coordFont.loadFromFile("resources/fonts/Factory LJDS.ttf")) {
+		throw std::runtime_error("ERROR::BOARD::COULD NOT LOAD COORD FONT");
+	}
+
+	this->coordLabels.clear();
+	const unsigned charSize = 16;
+	const sf::Color fill(245, 240, 235, 255);
+	const sf::Color outline(60, 45, 40, 255);
+
+	auto makeLabel = [&](const std::string& str) {
+		sf::Text t;
+		t.setFont(this->coordFont);
+		t.setCharacterSize(charSize);
+		t.setString(str);
+		t.setFillColor(fill);
+		t.setOutlineColor(outline);
+		t.setOutlineThickness(1.5f);
+		return t;
+	};
+
+	// Letras de columna (a-h) en el margen inferior. colToPixelX ya aplica el volteo.
+	for (int col = 0; col < 8; ++col) {
+		sf::Text t = makeLabel(std::string(1, static_cast<char>('a' + col)));
+		sf::FloatRect b = t.getLocalBounds();
+		float cx = colToPixelX(col) + CELL_SIZE / 2.f;
+		t.setPosition(cx - b.left - b.width / 2.f, 800.f);
+		this->coordLabels.push_back(t);
+	}
+
+	// Números de fila (1-8) en el margen izquierdo. La fila r corresponde al rango (8 - r).
+	for (int r = 0; r < 8; ++r) {
+		sf::Text t = makeLabel(std::to_string(8 - r));
+		sf::FloatRect b = t.getLocalBounds();
+		float cy = rowToPixelY(r) + CELL_SIZE / 2.f;
+		t.setPosition(4.f - b.left - b.width / 2.f, cy - b.top - b.height / 2.f);
+		this->coordLabels.push_back(t);
+	}
 }
 
 Board::~Board() {
@@ -764,8 +801,7 @@ void Board::movePiece(bool& turn, int& points1, int& points2) {
 
 sf::Vector2i Board::mouseToGrid(sf::Vector2i mousePos) const {
 	// x = fila (desde mousePos.y), y = columna (desde mousePos.x)
-	return sf::Vector2i((mousePos.y - BOARD_OFFSET_Y) / CELL_SIZE,
-	                    (mousePos.x - BOARD_OFFSET_X) / CELL_SIZE);
+	return sf::Vector2i(pixelYToRow(mousePos.y), pixelXToCol(mousePos.x));
 }
 
 bool Board::isInsideBoard(sf::Vector2i mousePos) const {
@@ -1023,6 +1059,11 @@ void Board::render(sf::RenderTarget& target)
 	// Tablero
 	target.draw(background);
 
+	// Coordenadas (a-h, 1-8) dibujadas dinámicamente para respetar la orientación.
+	for (const sf::Text& label : this->coordLabels) {
+		target.draw(label);
+	}
+
 	// Último movimiento
 	if (this->hasLastMove) {
 		target.draw(this->lastMoveStartCell);
@@ -1248,7 +1289,7 @@ bool Board::applyAIMove(int fromX, int fromY, int toX, int toY, PieceType promot
 	this->isAIMove = true;
 	this->promotionPiece = promotion;
 	
-	sf::Vector2i pixelPos(toY * CELL_SIZE + BOARD_OFFSET_X + CELL_SIZE/2, toX * CELL_SIZE + BOARD_OFFSET_Y + CELL_SIZE/2);
+	sf::Vector2i pixelPos(static_cast<int>(colToPixelX(toY)) + CELL_SIZE/2, static_cast<int>(rowToPixelY(toX)) + CELL_SIZE/2);
 	endMove(pixelPos, turn, points1, points2);
 	
 	this->isAIMove = false;
