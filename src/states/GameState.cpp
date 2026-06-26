@@ -5,6 +5,13 @@
 #include <cmath>
 #include <algorithm>
 #include <filesystem>
+#include "ui/WoodPanel.h"
+#include "chess/GameSnapshot.h"
+#include "chess/AIEngine.h"
+#include "ui/EvalBar.h"
+#include <thread>
+#include <atomic>
+#include <future>
 #include "chess/PGNManager.h"
 
 #include <stdexcept>
@@ -267,6 +274,14 @@ void GameState::initGamePanel() {
 	actionBtns.emplace_back(CX,            BTN_Y, bw, BTN_H, &panelFont, "RENDIRSE", 12u);
 	actionBtns.emplace_back(CX + bw + BTN_GAP, BTN_Y, bw, BTN_H, &panelFont, "OFRECER TABLAS", 12u);
 
+	// ── EvalBar ───────────────────────────────────────────────────────────
+	this->evalBar = std::make_unique<EvalBar>(839.f, 124.f, 20.f, 518.f, this->panelFont);
+	this->evalBar->setFlipped(this->flipped);
+	this->lastEvalScore = 0.0f;
+	if (this->board) {
+		this->launchAsyncEvaluation();
+	}
+
 	mouseHeldForActionBtns = false;
 }
 
@@ -304,7 +319,7 @@ void GameState::initText() {
 	this->gameInfoText.setString(this->buildScoreText());
 	this->gameInfoText.setPosition(850, 50);
 
-	this->moveListPanel = std::make_unique<MoveListPanel>(this->panelFont, sf::FloatRect(839.f, 124.f, 424.f, 518.f), true);
+	this->moveListPanel = std::make_unique<MoveListPanel>(this->panelFont, sf::FloatRect(865.f, 124.f, 398.f, 518.f), true);
 }
 
 void GameState::initKeybinds() {
@@ -582,6 +597,31 @@ void GameState::updateGamePanel() {
 	}
 }
 
+void GameState::launchAsyncEvaluation() {
+	if (!this->evalBar || !this->board) return;
+
+	if (this->isEvaluating) {
+		this->evalStopFlag = true;
+		if (this->evalFuture.valid()) {
+			this->evalFuture.wait();
+		}
+	}
+	
+	this->evalStopFlag = false;
+	
+	GameSnapshot snap = this->board->captureSnapshot();
+	FastBoard fBoard;
+	// Usamos this->turn ya que snapshot puede no tenerlo si no fue un undo state válido
+	fBoard.initFromBoardGrid(snap.board, this->turn, snap.castling, snap.peonPaso);
+	
+	this->evalFuture = std::async(std::launch::async, [fBoard, this]() {
+		// Profundidad 3: suficiente para ver intercambios y capturas inminentes.
+		return AIEngine::evaluatePosition(fBoard, 3, this->evalStopFlag);
+	});
+	
+	this->isEvaluating = true;
+}
+
 void GameState::update(float dt) {
 
 	this->updateMousePositions();
@@ -590,6 +630,21 @@ void GameState::update(float dt) {
 
 	this->updateInput(dt);
 	this->updateGamePanel();
+	
+	if (this->evalBar) {
+		this->evalBar->update(dt);
+		
+		if (this->isEvaluating && this->evalFuture.valid()) {
+			if (this->evalFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+				int scoreCp = this->evalFuture.get();
+				// Convertir centipeones a la escala normal (1.0 = 1 peón)
+				float score = scoreCp / 100.0f;
+				this->evalBar->setEvaluation(score);
+				this->lastEvalScore = score;
+				this->isEvaluating = false;
+			}
+		}
+	}
 
 	if (!this->paused) {
 		if (this->moveListPanel) {
@@ -628,6 +683,8 @@ void GameState::update(float dt) {
 				this->previousTurn = this->turn;
 				this->clockStarted = true;
 				this->captureStateForUndo();
+				
+				this->launchAsyncEvaluation();
 			}
 			this->updateText();
 		}
@@ -768,6 +825,10 @@ void GameState::render(sf::RenderTarget* target) {
 	if (this->moveListPanel)
 		this->moveListPanel->render(*target);
 
+	// EvalBar
+	if (this->evalBar)
+		this->evalBar->render(*target);
+
 	target->draw(this->sepLines[2]);
 	target->draw(this->whiteAdvTxt);
 
@@ -863,6 +924,7 @@ void GameState::undo() {
 		this->timeBlack = snap.timeBlack;
 		this->previousTurn = this->turn;
 		this->updateText();
+		this->launchAsyncEvaluation();
 	}
 }
 
@@ -888,6 +950,7 @@ void GameState::redo() {
 		this->timeBlack = snap.timeBlack;
 		this->previousTurn = this->turn;
 		this->updateText();
+		this->launchAsyncEvaluation();
 	}
 }
 

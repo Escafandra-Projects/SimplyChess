@@ -1308,3 +1308,35 @@ std::vector<Piece*> Board::getCapturedPieces(bool color) const {
 	return captured;
 }
 
+int Board::countLegalMoves(bool color) const {
+	int count = 0;
+	int colIdx = color ? 1 : 0;
+	for (int i = 0; i < 16; i++) {
+		Piece* p = this->pieces[i][colIdx].get();
+		if (p && p->isActive()) {
+			sf::Vector2i startPos = p->getGridPosition();
+			for (int x = 0; x < 8; x++) {
+				for (int y = 0; y < 8; y++) {
+					sf::Vector2i desPos(x, y);
+					if (startPos == desPos) continue;
+					if (isMoveLegal(color, startPos, desPos)) {
+						count++;
+					}
+				}
+			}
+		}
+	}
+	return count;
+}
+
+const std::array<std::array<std::unique_ptr<Piece>, 2>, 16>& Board::getPieces() const {
+	return this->pieces;
+}
+
+const BoardGrid& Board::getBoard() const {
+	return this->board;
+}
+
+const CastlingState& Board::getCastlingState() const {
+	return this->castling;
+}

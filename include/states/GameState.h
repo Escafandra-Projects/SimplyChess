@@ -12,7 +12,10 @@
 #include "ui/WoodPanel.h"
 #include "chess/GameSnapshot.h"
 #include "chess/AIEngine.h"
+#include "ui/EvalBar.h"
 #include <thread>
+#include <atomic>
+#include <future>
 #include <atomic>
 #include <future>
 
@@ -60,6 +63,14 @@ private:
 	// Separadores y ventaja
 	std::array<sf::RectangleShape, 5> sepLines;
 	sf::Text blackAdvTxt, whiteAdvTxt;
+	
+	// EvalBar
+	std::unique_ptr<EvalBar> evalBar;
+	float lastEvalScore;
+	std::future<int> evalFuture;
+	std::atomic<bool> evalStopFlag{false};
+	bool isEvaluating = false;
+	void launchAsyncEvaluation();
 
 	// Botones de acción
 	std::vector<MenuButton> actionBtns;

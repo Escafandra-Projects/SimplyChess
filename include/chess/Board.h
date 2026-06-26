@@ -118,13 +118,12 @@ private:
 	void capturePiece(Piece* menacedPiece, bool turn, int& points1, int& points2);
 	/// Gestiona la coronación: muestra el menú o aplica la pieza elegida.
 	void promotion(bool turn, sf::Vector2i& gridPos, bool isPromoting);
-	/// Elimina el peón capturado en una captura al paso.
 	void peonPasoMovement(bool turn, sf::Vector2i startPos, sf::Vector2i desPos);
 
+public:
 	bool needsDisambiguation(bool turn, PieceType type, sf::Vector2i from, sf::Vector2i to) const;
 	bool isMoveLegal(bool turn, sf::Vector2i from, sf::Vector2i to) const;
 
-public:
 	// Constructor y destructor
 	Board(std::map<std::string, sf::Texture>& textures);
 	virtual ~Board();
@@ -188,6 +187,18 @@ public:
 	const MoveHistory& getMoveHistory() const { return moveHistory; }
 
 	std::vector<Piece*> getCapturedPieces(bool color) const;
+
+	/// Cuenta los movimientos legales disponibles para un color.
+	int countLegalMoves(bool color) const;
+
+	/// Devuelve la referencia a las piezas (solo lectura) para evaluación.
+	const std::array<std::array<std::unique_ptr<Piece>, 2>, 16>& getPieces() const;
+
+	/// Devuelve la rejilla actual del tablero (solo lectura).
+	const BoardGrid& getBoard() const;
+
+	/// Devuelve el estado de enroque actual.
+	const CastlingState& getCastlingState() const;
 
 	/// Captura un snapshot del estado actual del tablero
 	GameSnapshot captureSnapshot() const;

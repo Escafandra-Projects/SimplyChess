@@ -188,6 +188,12 @@ FastMove AIEngine::getBestMove(const FastBoard& board, int maxDepth, std::atomic
     return bestMove;
 }
 
+int AIEngine::evaluatePosition(const FastBoard& board, int depth, std::atomic<bool>& stopFlag) {
+    FastBoard searchBoard = board;
+    // Utilizamos minimax con poda Alfa-Beta para evaluar la posición
+    return minimax(searchBoard, depth, -500000, 500000, !board.turnBlack, stopFlag);
+}
+
 int AIEngine::minimax(FastBoard& board, int depth, int alpha, int beta, bool isMaximizing, std::atomic<bool>& stopFlag) {
     if (stopFlag) return 0;
     if (depth == 0) {
