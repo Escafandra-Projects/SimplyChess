@@ -79,10 +79,10 @@ expandirse a otras áreas.
   - Marcar visualmente las casillas de origen y destino del último movimiento realizado.
   - Almacenar las coordenadas del último movimiento completado.
 
-- [ ] **Efectos de sonido**
+- [x] **Efectos de sonido**
   - [x] Integrar `sfml-audio` y añadir a `target_link_libraries`.
   - [x] Efectos de movimiento normal, captura y enroque.
-  - [ ] Reemplazar los sonidos temporales (placeholders) de:
+  - [x] Reemplazar los sonidos temporales (placeholders) de:
     - Jaque
     - Jaque mate / fin de partida
 
