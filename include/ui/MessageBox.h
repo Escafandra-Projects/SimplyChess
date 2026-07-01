@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <chrono>
 
 #include "ui/MenuButton.h"
 #include "ui/WoodPanel.h"
@@ -16,6 +17,9 @@ private:
     WoodPanel container;
     std::unique_ptr<MenuButton> button;
     std::unique_ptr<MenuButton> button2;
+
+    bool waitingForRelease;
+    std::chrono::steady_clock::time_point lastUpdateTime;
 
     /// Centra el texto dentro del cuadro.
     void centerText();

@@ -27,6 +27,9 @@ Funcionalidades ya implementadas y funcionando:
 - [x] Pantalla de configuración de partida: entrada de nombres por teclado y elección de rival (IA / local 2 jugadores)
 - [x] Elección de color frente a la IA (blancas/negras/aleatorio) con el tablero orientado a la perspectiva del jugador
 - [x] Coordenadas del tablero dibujadas dinámicamente y reorientadas según la perspectiva
+- [x] Pulido visual de coordenadas (centrado exacto en los marcos de madera del tablero) e inversión de leyendas BLANCAS/NEGRAS según orientación
+- [x] Prevención de clics fantasma en diálogos de confirmación y fin de partida (MessageBox con debouncing por liberación de ratón)
+- [x] Ajuste de proporciones del menú principal (altura de panel a 470px para 3 botones y legibilidad de versión/créditos mejorada)
 
 ---
 
@@ -138,6 +141,9 @@ expandirse a otras áreas.
 
 - [x] **Ajuste de dificultad**
   - Permitir escoger distintos niveles de profundidad de búsqueda (Depth) desde el menú de inicio para hacer la IA más o menos agresiva.
+
+- [ ] **Tiempo de respuesta humanizado**
+  - Implementar un tiempo de espera mínimo aleatorio para la IA antes de ejecutar su movimiento (ej: según la dificultad), evitando respuestas instantáneas no realistas.
 
 ---
 

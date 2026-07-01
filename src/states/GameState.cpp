@@ -123,16 +123,26 @@ void GameState::initGamePanel() {
 		dot.setOutlineColor(sf::Color(200, 152, 72, 102));
 		dot.setOutlineThickness(1.f);
 	};
-	// NEGRAS arriba-izq con casilla a la izquierda (☐ NEGRAS);
-	// BLANCAS abajo-der con casilla a la derecha (BLANCAS ☐), espejando el layout.
-	// Rediseñado para quedar completamente fuera del tablero (y=4 para negras, y=804 para blancas)
-	setupLabel(labelNegras, "NEGRAS", dotNegras, 33.f, 4.f,  false);
-	setupLabel(labelBlancas, "BLANCAS", dotBlancas, 0.f, 804.f, true);
-	{
-		auto lb = labelBlancas.getLocalBounds();
-		float xText = 800.f - 7.f - 8.f - lb.width - lb.left;
-		labelBlancas.setPosition(xText, 804.f);
-		dotBlancas.setPosition(xText + lb.left + lb.width + 8.f, 804.f + 2.f);
+	// NEGRAS/BLANCAS según orientación.
+	// Si el tablero está volteado (perspectiva de negras), BLANCAS arriba-izq y NEGRAS abajo-der.
+	if (this->flipped) {
+		setupLabel(labelBlancas, "BLANCAS", dotBlancas, 33.f, 4.f, true);
+		setupLabel(labelNegras, "NEGRAS", dotNegras, 0.f, 804.f, false);
+		{
+			auto lb = labelNegras.getLocalBounds();
+			float xText = 800.f - 7.f - 8.f - lb.width - lb.left;
+			labelNegras.setPosition(xText, 804.f);
+			dotNegras.setPosition(xText + lb.left + lb.width + 8.f, 804.f + 2.f);
+		}
+	} else {
+		setupLabel(labelNegras, "NEGRAS", dotNegras, 33.f, 4.f, false);
+		setupLabel(labelBlancas, "BLANCAS", dotBlancas, 0.f, 804.f, true);
+		{
+			auto lb = labelBlancas.getLocalBounds();
+			float xText = 800.f - 7.f - 8.f - lb.width - lb.left;
+			labelBlancas.setPosition(xText, 804.f);
+			dotBlancas.setPosition(xText + lb.left + lb.width + 8.f, 804.f + 2.f);
+		}
 	}
 
 	// ── Helper: absolute content coords ──────────────────────────────────
@@ -656,7 +666,6 @@ void GameState::update(float dt) {
 					} else if (status == GameStatus::DRAW_AGREEMENT) {
 						this->gameOverBox->setText("Fin de la partida.\nTablas por acuerdo");
 					}
-					this->gameOverReady = true;
 				} else {
 					this->gameOverBox->update(this->mousePosWindow);
 				}
@@ -833,9 +842,18 @@ void GameState::captureStateForUndo() {
 }
 
 void GameState::undo() {
-	if (this->baseTime > 0.0f) return;
-	if (this->currentMoveIndex > 0) {
-		this->currentMoveIndex--;
+	if (this->baseTime > 0.0f || this->aiIsThinking) return;
+	
+	int steps = this->aiMode ? 2 : 1;
+	bool undone = false;
+	for (int i = 0; i < steps; ++i) {
+		if (this->currentMoveIndex > 0) {
+			this->currentMoveIndex--;
+			undone = true;
+		}
+	}
+	
+	if (undone) {
 		const GameSnapshot& snap = this->undoStack[this->currentMoveIndex];
 		this->board->restoreSnapshot(snap, this->textures);
 		this->turn = snap.turn;
@@ -849,9 +867,18 @@ void GameState::undo() {
 }
 
 void GameState::redo() {
-	if (this->baseTime > 0.0f) return;
-	if (this->currentMoveIndex < (int)this->undoStack.size() - 1) {
-		this->currentMoveIndex++;
+	if (this->baseTime > 0.0f || this->aiIsThinking) return;
+	
+	int steps = this->aiMode ? 2 : 1;
+	bool redone = false;
+	for (int i = 0; i < steps; ++i) {
+		if (this->currentMoveIndex < (int)this->undoStack.size() - 1) {
+			this->currentMoveIndex++;
+			redone = true;
+		}
+	}
+	
+	if (redone) {
 		const GameSnapshot& snap = this->undoStack[this->currentMoveIndex];
 		this->board->restoreSnapshot(snap, this->textures);
 		this->turn = snap.turn;
