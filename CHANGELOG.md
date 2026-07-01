@@ -29,6 +29,7 @@ usa [Semantic Versioning](https://semver.org/lang/es/).
 - **Nombre de los jugadores**: Se unifican los nombres de los jugadores en la partida como "Jugador 1", "Jugador 2" (modo 2 jugadores local) y "Escafandrin" (modo vs IA, sin acento por restricciones de la tipografía).
 - **Rendimiento de la IA (Poda Alfa-Beta)**: Se añade poda Alfa-Beta directamente en el bucle principal de búsqueda raíz de `AIEngine::getBestMove` para dificultades altas (profundidad >= 4), logrando velocidades de respuesta de la IA entre 15 y 30 veces más rápidas en modo difícil.
 - **Mapeo de Dificultad**: Se corrige la lógica de dificultad, asociando el 20% de probabilidad de error de Escafandrín a la dificultad "Normal" (profundidad 3) y garantizando que en dificultad "Alta" (profundidad 4) juegue su mejor jugada.
+- **Sonidos de jaque y fin de partida**: Se reemplazan los sonidos temporales (placeholders) de jaque y de jaque mate/fin de partida por assets definitivos. Ahora el jaque suena como un aviso corto de dos notas ascendentes y el fin de partida como un arpegio de acorde mayor que se resuelve, en línea con el carácter percusivo de los sonidos de mover y capturar.
 
 ### Corregido
 - Corregido que el bot (Escafandrín) no moviera en algunas plataformas: `startAIThinking` construía la posición de la IA con `GameSnapshot::turn`, un campo que `captureSnapshot()` no rellena, leyendo memoria indeterminada. Según la plataforma, la IA calculaba la jugada para el bando equivocado y se descartaba. Ahora usa el turno actual y `GameSnapshot` inicializa sus campos por defecto.
